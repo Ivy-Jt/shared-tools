@@ -57,6 +57,8 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .rules li+li{margin-top:4px}
 .button{display:flex;align-items:center;justify-content:center;min-height:46px;margin-top:16px;border-radius:12px;background:var(--ink);color:#fff;text-decoration:none;font-size:14px;font-weight:700}
 .button:active{transform:translateY(1px)}
+.status .button{max-width:340px;margin:18px auto 0}
+.entry-note{max-width:520px;margin:10px auto 0;color:#8c8177;font-size:12px;line-height:1.6}
 .notes{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.74)}
 .notes h3{margin:0 0 10px;font-size:15px}
 .notes ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.7}
@@ -93,7 +95,7 @@ const notes=document.querySelector("#notes");
 const GROUPS=[
   {kind:"pass_free_trial",source:"passFreeTrial",title:"PASS 可兑换免费试",target:"约 5 个",desc:"必须支持 PASS 且剩余名额大于 0；近场和高价值优先。"},
   {kind:"lv_store_gift",source:"lvStoreGift",title:"LV6+ 到店礼",target:"2–3 个",desc:"只收无门槛、当前可领且距离较近的到店礼。"},
-  {kind:"orange_v_paid",source:"orangeVPaid",title:"付费橙V专享价",target:"2–3 个",desc:"只收明确标注橙V专享价且当前可购买的美食套餐。"}
+  {kind:"orange_v_paid",source:"orangeVPaid",title:"付费橙V专享价",target:"2–3 个",desc:"只收明确标注橙V专享价且当前可购买的美食套餐。",entryUrl:"https://w.dianping.com/cube/evoke/dianping.html?url=dianping%3A%2F%2Fpicassobox%3Fpicassoid%3Dpexus-freetry-index%2Findex-bundle.js%26tabpage%3D2",entryLabel:"去大众点评查看橙V活动",entryNote:"微信内会先打开大众点评官方跳转页，需再点“已下载 立即打开”；此入口仅供手动浏览，不代表套餐已核验或仍可购买。"}
 ];
 
 const safeUrl=value=>{
@@ -159,8 +161,9 @@ function renderItem(item){
 
 function renderSection(group,items,source){
   let body="";
+  const manualEntry=group.entryUrl?`<a class="button" href="${safeUrl(group.entryUrl)}" target="_blank" rel="noopener noreferrer">${esc(group.entryLabel)}</a><p class="entry-note">${esc(group.entryNote)}</p>`:"";
   if(source?.status==="login_required"){body=`<div class="status">需要登录账号核验，暂不展示未经验证的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
-  else if(source?.status==="app_required"){body=`<div class="status">官方入口已确认，但关键资格、价格或领取/购买状态仍需在大众点评 App 内核验；暂不展示未经验证的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
+  else if(source?.status==="app_required"){body=`<div class="status">官方入口已确认，但关键资格、价格或领取/购买状态仍需在大众点评 App 内核验；暂不展示未经验证的候选。${source.note?`<br>${esc(source.note)}`:""}${manualEntry}</div>`}
   else if(source?.status==="error"){body=`<div class="status">本轮数据源不可用：${esc(source.note||"稍后重试")}</div>`}
   else if(source?.status==="ok"&&items.length){body=`<div class="list">${items.map(renderItem).join("")}</div>`}
   else{body='<div class="status">本轮没有符合条件且可用的项目。</div>'}
