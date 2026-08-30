@@ -11,11 +11,26 @@ const PUBLIC_URL = "https://ivy-jt.github.io/shared-tools/food-radar/";
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_PATH = path.join(PROJECT_ROOT, "food-radar", "latest.json");
 const STATE_PATH = path.join(PROJECT_ROOT, "food-radar", ".push-state.json");
+const VALIDATOR_PATH = path.join(PROJECT_ROOT, "scripts", "validate-food-radar.mjs");
 const dryRun = process.argv.includes("--dry-run");
 
+try {
+  execFileSync(process.execPath, [VALIDATOR_PATH], { stdio: "ignore" });
+} catch {
+  console.error("PUSH_FAILED invalid_or_stale_data");
+  process.exit(1);
+}
+
 const data = JSON.parse(await readFile(DATA_PATH, "utf8"));
+const sourceKeyByKind = {
+  pass_free_trial: "passFreeTrial",
+  lv_store_gift: "lvStoreGift",
+  orange_v_paid: "orangeVPaid",
+};
 const items = Array.isArray(data.items)
-  ? data.items.filter(item => item.availability === "available")
+  ? data.items
+    .filter(item => item.availability === "available" && data.sources?.[sourceKeyByKind[item.kind]]?.status === "ok")
+    .sort((a, b) => a.priorityRank - b.priorityRank)
   : [];
 const passItems = items.filter(item => item.kind === "pass_free_trial").slice(0, 5);
 const giftItems = items.filter(item => item.kind === "lv_store_gift").slice(0, 3);
@@ -23,6 +38,7 @@ const paidItems = items.filter(item => item.kind === "orange_v_paid").slice(0, 3
 const selected = [...passItems, ...giftItems, ...paidItems];
 const giftStatus = data.sources?.lvStoreGift?.status;
 const paidStatus = data.sources?.orangeVPaid?.status;
+const scanDate = String(data.generatedAt || "").slice(0, 10);
 
 if (selected.length === 0) {
   console.log("PUSH_SKIPPED no_items");
@@ -30,16 +46,20 @@ if (selected.length === 0) {
 }
 
 const fingerprintInput = {
-  scanDate: String(data.generatedAt || "").slice(0, 10),
-  sourceStatus: { giftStatus, paidStatus },
+  scanDate,
   items: selected.map(item => ({
     sourceId: item.sourceId,
     kind: item.kind,
-    availability: item.availability,
-    passRemaining: item.passRemaining,
+    priorityRank: item.priorityRank,
+    title: item.title,
+    detailUrl: item.detailUrl,
+    distanceKm: item.distanceKm,
+    referenceValueCny: item.referenceValueCny,
+    score: item.score,
     priceCny: item.priceCny,
     savedCny: item.savedCny,
     deadline: item.deadline,
+    useWindow: item.useWindow,
     restrictions: item.restrictions,
   })),
 };
@@ -50,8 +70,8 @@ const fingerprint = createHash("sha256")
 if (!dryRun) {
   try {
     const previous = JSON.parse(await readFile(STATE_PATH, "utf8"));
-    if (previous.fingerprint === fingerprint) {
-      console.log("PUSH_SKIPPED unchanged");
+    if (previous.scanDate === scanDate) {
+      console.log("PUSH_SKIPPED already_sent_today");
       process.exit(0);
     }
   } catch {}
@@ -144,7 +164,7 @@ if (!response.ok || result.code !== 0) {
   process.exit(5);
 }
 
-await writeFile(STATE_PATH, `${JSON.stringify({ fingerprint, sentAt: new Date().toISOString() }, null, 2)}\n`, {
+await writeFile(STATE_PATH, `${JSON.stringify({ fingerprint, scanDate, sentAt: new Date().toISOString() }, null, 2)}\n`, {
   mode: 0o600,
 });
 console.log(`PUSH_OK http=${response.status} code=0`);

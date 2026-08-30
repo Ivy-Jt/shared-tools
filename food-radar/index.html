@@ -139,10 +139,10 @@ function renderItem(item){
 
 function renderSection(group,items,source){
   let body="";
-  if(items.length){body=`<div class="list">${items.map(renderItem).join("")}</div>`}
-  else if(source?.status==="login_required"){body='<div class="status">需要登录账号核验，暂不展示未经验证的候选。</div>'}
+  if(source?.status==="login_required"){body='<div class="status">需要登录账号核验，暂不展示未经验证的候选。</div>'}
   else if(source?.status==="app_required"){body='<div class="status">账号资格可确认，但当前列表和领取/购买状态仍需在大众点评 App 内核验；暂不展示未经验证的候选。</div>'}
   else if(source?.status==="error"){body=`<div class="status">本轮数据源不可用：${esc(source.note||"稍后重试")}</div>`}
+  else if(source?.status==="ok"&&items.length){body=`<div class="list">${items.map(renderItem).join("")}</div>`}
   else{body='<div class="status">本轮没有符合条件且可用的项目。</div>'}
   return `<section class="section"><div class="section-head"><div><h2>${group.title}</h2><p>${group.desc}</p></div><span class="target">${group.target}</span></div>${body}</section>`;
 }
@@ -150,7 +150,10 @@ function renderSection(group,items,source){
 fetch(`./latest.json?v=${Date.now()}`,{cache:"no-store"})
   .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()})
   .then(data=>{
-    const items=(Array.isArray(data.items)?data.items:[]).filter(item=>item.availability!=="sold_out");
+    const sourceKeyByKind={pass_free_trial:"passFreeTrial",lv_store_gift:"lvStoreGift",orange_v_paid:"orangeVPaid"};
+    const items=(Array.isArray(data.items)?data.items:[])
+      .filter(item=>item.availability==="available"&&data.sources?.[sourceKeyByKind[item.kind]]?.status==="ok")
+      .sort((a,b)=>(a.priorityRank??999)-(b.priorityRank??999));
     summary.hidden=false;
     summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(data.summary?.headline||`今日展示 ${items.length} 条`)}</strong><span>筛出 ${fmt(items.length)} 条已核验结果 · 更新于 ${esc(new Date(data.generatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
     sections.innerHTML=GROUPS.map(group=>renderSection(group,items.filter(item=>(item.kind||item.dealType)===group.kind),data.sources?.[group.source])).join("");
