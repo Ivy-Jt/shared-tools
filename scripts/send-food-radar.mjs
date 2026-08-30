@@ -58,6 +58,7 @@ const fingerprintInput = {
     score: item.score,
     priceCny: item.priceCny,
     savedCny: item.savedCny,
+    menuSummary: item.menuSummary,
     deadline: item.deadline,
     useWindow: item.useWindow,
     restrictions: item.restrictions,
@@ -78,24 +79,34 @@ if (!dryRun) {
 }
 
 const statusCount = (items, status) => items.length || (status === "app_required" ? "待App核验" : 0);
+const scoreLabel = score => {
+  if (score == null) return "⚪暂无评分";
+  const value = Number(score);
+  const marker = value >= 4 ? "🟢" : value >= 3 ? "🟡" : "🔴";
+  return `${marker}${value.toFixed(1)}分`;
+};
+const itemLines = (item, headline) => [
+  `- ${headline}｜${scoreLabel(item.score)}`,
+  `  - 菜品：${item.menuSummary}`,
+];
 const title = `🍜 生活｜雷达：P${passItems.length}·礼${statusCount(giftItems, giftStatus)}·橙V${statusCount(paidItems, paidStatus)}`;
 const sectionLines = [];
 if (passItems.length) {
-  sectionLines.push("**PASS 可兑换**", ...passItems.map(item =>
-    `- 余${item.passRemaining}｜${item.title}（${item.area}${item.distanceLabel ? `，${item.distanceLabel}` : ""}）`
-  ), "");
+  sectionLines.push("**PASS 可兑换**", ...passItems.flatMap(item => itemLines(item,
+    `余${item.passRemaining}｜${item.title}（${item.area}${item.distanceLabel ? `，${item.distanceLabel}` : ""}）`
+  )), "");
 }
 if (giftItems.length) {
-  sectionLines.push("**LV6+ 到店礼**", ...giftItems.map(item =>
-    `- ${item.title}（${item.area}${item.distanceLabel ? `，${item.distanceLabel}` : ""}）`
-  ), "");
+  sectionLines.push("**LV6+ 到店礼**", ...giftItems.flatMap(item => itemLines(item,
+    `${item.title}（${item.area}${item.distanceLabel ? `，${item.distanceLabel}` : ""}）`
+  )), "");
 } else if (giftStatus === "app_required") {
   sectionLines.push("**LV6+ 到店礼**", "- 本轮仍需 App 内核验，不发送未确认候选。", "");
 }
 if (paidItems.length) {
-  sectionLines.push("**付费橙V专享价**", ...paidItems.map(item =>
-    `- ¥${item.priceCny}｜${item.title}（${item.area}）`
-  ), "");
+  sectionLines.push("**付费橙V专享价**", ...paidItems.flatMap(item => itemLines(item,
+    `¥${item.priceCny}｜${item.title}（${item.area}）`
+  )), "");
 } else if (paidStatus === "app_required") {
   sectionLines.push("**付费橙V专享价**", "- 本轮仍需 App 内核验，不发送普通团购冒充的候选。", "");
 }

@@ -23,11 +23,12 @@ const SOURCE_KEYS = ["lvStoreGift", "orangeVPaid", "passFreeTrial"];
 const SOURCE_STATUSES = new Set(["ok", "login_required", "app_required", "no_match", "error"]);
 const SENSITIVE_QUERY_KEYS = new Set([
   "accountid", "cookie", "dpid", "lat", "latitude", "lng", "longitude",
-  "openid", "session", "token", "userid",
+  "encctx", "isshare", "notitlebar", "openid", "session", "sharecampaignid",
+  "shareid", "token", "utm_source", "userid",
 ]);
 const REQUIRED_TEXT_FIELDS = [
   "sourceId", "title", "shop", "branch", "area", "distanceLabel", "reason",
-  "deadline", "useWindow", "restrictions", "detailUrl", "verifiedAt",
+  "deadline", "useWindow", "restrictions", "menuSummary", "detailUrl", "verifiedAt",
 ];
 const MAX_SCAN_AGE_MS = 6 * 60 * 60 * 1000;
 const MAX_VERIFICATION_SKEW_MS = 60 * 60 * 1000;
@@ -62,8 +63,15 @@ function validateDetailUrl(item) {
     assert([...url.searchParams.keys()].length === 0, `LV gift link must be sanitized: ${item.sourceId}`);
   } else {
     assert(["m.dianping.com", "t.dianping.com"].includes(url.hostname), `unexpected Orange V host: ${item.sourceId}`);
-    assert(/^\/(?:shop|deal)\/[A-Za-z0-9_-]+$/.test(url.pathname), `unexpected Orange V path: ${item.sourceId}`);
-    assert([...url.searchParams.keys()].length === 0, `Orange V link must be sanitized: ${item.sourceId}`);
+    const isActivityPage = url.hostname === "m.dianping.com" && url.pathname === "/app/femember-groupbuyinter-static/main.html";
+    if (isActivityPage) {
+      assert(/^\d+$/.test(item.sourceId), `Orange V activityId must be numeric: ${item.sourceId}`);
+      assert(url.searchParams.get("activityid") === item.sourceId, `Orange V activityId mismatch: ${item.sourceId}`);
+      assert([...url.searchParams.keys()].every(key => key === "activityid"), `unexpected Orange V activity query: ${item.sourceId}`);
+    } else {
+      assert(/^\/(?:shop|deal)\/[A-Za-z0-9_-]+$/.test(url.pathname), `unexpected Orange V path: ${item.sourceId}`);
+      assert([...url.searchParams.keys()].length === 0, `Orange V link must be sanitized: ${item.sourceId}`);
+    }
   }
 }
 
@@ -80,9 +88,13 @@ const actualSourceKeys = Object.keys(data.sources || {}).sort();
 assert(JSON.stringify(actualSourceKeys) === JSON.stringify(SOURCE_KEYS), "sources must contain exactly the three radar sources");
 for (const [sourceKey, source] of Object.entries(data.sources)) {
   assert(SOURCE_STATUSES.has(source.status), `unknown source status: ${source.status}`);
-  if (source.status === "ok") {
+  const sourceCheckedAtMs = parseDate(source.checkedAt, `${sourceKey}.checkedAt`);
+  assert(Math.abs(sourceCheckedAtMs - generatedAtMs) <= MAX_VERIFICATION_SKEW_MS, `${sourceKey} check is stale`);
+  if (source.status === "ok" || source.status === "no_match") {
     const sourceVerifiedAtMs = parseDate(source.verifiedAt, `${sourceKey}.verifiedAt`);
     assert(Math.abs(sourceVerifiedAtMs - generatedAtMs) <= MAX_VERIFICATION_SKEW_MS, `${sourceKey} verification is stale`);
+  } else {
+    assert(source.verifiedAt === null, `${sourceKey}.verifiedAt must be null when source is not fully verified`);
   }
 }
 
@@ -106,7 +118,10 @@ for (const item of data.items) {
   assert(Number.isInteger(item.priorityRank) && item.priorityRank > 0, `invalid priorityRank: ${item.sourceId}`);
   const itemVerifiedAtMs = parseDate(item.verifiedAt, `${item.sourceId}.verifiedAt`);
   assert(Math.abs(itemVerifiedAtMs - generatedAtMs) <= MAX_VERIFICATION_SKEW_MS, `stale item verification: ${item.sourceId}`);
-  if (item.score != null) assert(item.score >= 0 && item.score <= 5, `invalid score: ${item.sourceId}`);
+  assert(Object.hasOwn(item, "score"), `missing score: ${item.sourceId}`);
+  if (item.score != null) assert(Number.isFinite(item.score) && item.score >= 0 && item.score <= 5, `invalid score: ${item.sourceId}`);
+  assert(item.menuSummary.length <= 180, `menuSummary is too long: ${item.sourceId}`);
+  assert(!/[*?？]/.test(item.menuSummary), `masked or uncertain menuSummary: ${item.sourceId}`);
   validateDetailUrl(item);
 
   if (item.kind === "pass_free_trial") {
@@ -133,6 +148,9 @@ for (const item of data.items) {
 
 for (const kind of Object.keys(counts)) {
   assert(counts[kind] <= LIMIT_BY_KIND[kind], `too many ${kind} items`);
+  const sourceStatus = data.sources[SOURCE_BY_KIND[kind]].status;
+  if (sourceStatus === "ok") assert(counts[kind] > 0, `ok source has no published items: ${kind}`);
+  else assert(counts[kind] === 0, `non-ok source has published items: ${kind}`);
   const expectedCount = data.summary?.counts?.[SUMMARY_BY_KIND[kind]];
   assert(expectedCount === counts[kind], `summary count mismatch for ${kind}`);
   const ranked = itemsByKind[kind].slice().sort((a, b) => a.priorityRank - b.priorityRank);
@@ -148,6 +166,7 @@ const serialized = JSON.stringify(data);
 const privatePatterns = [
   /"(?:latitude|longitude|token|cookie|dpid|accountId|userId)"\s*:/i,
   /(?:token|cookie|latitude|longitude|dpid|userid)(?:=|%3d)/i,
+  /(?:encctx|isshare|notitlebar|sharecampaignid|shareid|utm_source)(?:=|%3d)/i,
   /(?:^|\D)30\.\d{4,}(?:\D|$)/,
   /(?:^|\D)114\.\d{4,}(?:\D|$)/,
 ];

@@ -8,7 +8,7 @@
 <meta property="og:description" content="每日筛选武汉 PASS 可兑换免费试、LV 到店礼和橙V专享价。">
 <title>武汉美食优惠雷达</title>
 <style>
-:root{color-scheme:light;--ink:#251a12;--muted:#74665b;--paper:#fffdf9;--line:#eadfd3;--accent:#d85b25;--soft:#fff0df;--green:#247a58}
+:root{color-scheme:light;--ink:#251a12;--muted:#74665b;--paper:#fffdf9;--line:#eadfd3;--accent:#d85b25;--soft:#fff0df;--green:#247a58;--score-high:#e5f5ec;--score-high-ink:#176a4a;--score-mid:#fff1c9;--score-mid-ink:#885b08;--score-low:#fde5e3;--score-low-ink:#a13d36;--score-na:#eceeef;--score-na-ink:#6b7075}
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,#fff6e9 0,#f8f4ef 42%,#f6f7f8 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
 main{width:min(760px,100%);margin:0 auto;padding:24px 16px 56px}
@@ -38,10 +38,20 @@ h1{margin:0;font-size:30px;line-height:1.18;letter-spacing:-.03em}
 .price{color:var(--green);font-size:14px;font-weight:800;text-align:right}
 h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .place{margin:0;color:var(--muted);font-size:13px}
+.menu{margin:13px 0 0;padding:11px 12px;border-radius:12px;background:#f8f5f1;color:#4d3a2d;font-size:13px;line-height:1.65}
+.menu strong{color:var(--ink)}
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:16px 0}
 .metric{padding:10px;border-radius:12px;background:#f8f5f1}
 .metric b{display:block;font-size:15px}
 .metric span{display:block;margin-top:3px;color:var(--muted);font-size:11px}
+.metric.score-high{background:var(--score-high)}
+.metric.score-high b,.metric.score-high span{color:var(--score-high-ink)}
+.metric.score-mid{background:var(--score-mid)}
+.metric.score-mid b,.metric.score-mid span{color:var(--score-mid-ink)}
+.metric.score-low{background:var(--score-low)}
+.metric.score-low b,.metric.score-low span{color:var(--score-low-ink)}
+.metric.score-na{background:var(--score-na)}
+.metric.score-na b,.metric.score-na span{color:var(--score-na-ink)}
 .reason{margin:0;padding:12px 14px;border-left:3px solid var(--accent);background:#fff8ef;color:#4d3a2d;font-size:13px;line-height:1.65}
 .rules{margin:13px 0 0;padding:0;list-style:none;color:var(--muted);font-size:13px;line-height:1.65}
 .rules li+li{margin-top:4px}
@@ -90,8 +100,17 @@ const safeUrl=value=>{
   try{const url=new URL(String(value||""),location.href);return url.protocol==="https:"?esc(url.href):"#"}catch{return "#"}
 };
 
-function metric(value,label){
-  return value===undefined||value===null||value===""?"":`<div class="metric"><b>${esc(value)}</b><span>${esc(label)}</span></div>`;
+function metric(value,label,className=""){
+  return value===undefined||value===null||value===""?"":`<div class="metric ${esc(className)}"><b>${esc(value)}</b><span>${esc(label)}</span></div>`;
+}
+
+function scoreMetric(score){
+  if(score===undefined||score===null||score==="")return metric("暂无","门店评分 · 未公开","score-na");
+  const value=Number(score);
+  if(!Number.isFinite(value))return metric("暂无","门店评分 · 未公开","score-na");
+  if(value>=4)return metric(`${value.toFixed(1)} 分`,"门店评分 · 4.0分及以上","score-high");
+  if(value>=3)return metric(`${value.toFixed(1)} 分`,"门店评分 · 3.0–3.9分","score-mid");
+  return metric(`${value.toFixed(1)} 分`,"门店评分 · 3.0分以下","score-low");
 }
 
 function renderItem(item){
@@ -119,7 +138,7 @@ function renderItem(item){
     metrics.push(metric(item.savedCny!=null?`省 ¥${fmt(item.savedCny)}`:null,"同页可核验优惠"));
   }
   metrics.push(metric(distance,"距公开参考点"));
-  if(item.score!=null)metrics.push(metric(`${esc(item.score)} 分`,"门店评分"));
+  metrics.push(scoreMetric(item.score));
   const rules=[
     item.deadline?["截止",item.deadline]:null,
     item.useWindow?["使用",item.useWindow]:null,
@@ -130,6 +149,7 @@ function renderItem(item){
     <div class="topline"><div><span class="tag ${kindMeta.className}">${esc(kindMeta.label)}</span> ${secondary}</div><span class="price">${esc(price)}</span></div>
     <h2>${esc(item.title)}</h2>
     <p class="place">${[item.area,item.branch,distance].filter(Boolean).map(esc).join(" · ")}</p>
+    <p class="menu"><strong>菜品：</strong>${esc(item.menuSummary||"活动页未公开菜品明细")}</p>
     <div class="metrics">${metrics.join("")}</div>
     <p class="reason">${esc(item.reason)}</p>
     ${rules?`<ul class="rules">${rules}</ul>`:""}
@@ -139,8 +159,8 @@ function renderItem(item){
 
 function renderSection(group,items,source){
   let body="";
-  if(source?.status==="login_required"){body='<div class="status">需要登录账号核验，暂不展示未经验证的候选。</div>'}
-  else if(source?.status==="app_required"){body='<div class="status">账号资格可确认，但当前列表和领取/购买状态仍需在大众点评 App 内核验；暂不展示未经验证的候选。</div>'}
+  if(source?.status==="login_required"){body=`<div class="status">需要登录账号核验，暂不展示未经验证的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
+  else if(source?.status==="app_required"){body=`<div class="status">官方入口已确认，但关键资格、价格或领取/购买状态仍需在大众点评 App 内核验；暂不展示未经验证的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
   else if(source?.status==="error"){body=`<div class="status">本轮数据源不可用：${esc(source.note||"稍后重试")}</div>`}
   else if(source?.status==="ok"&&items.length){body=`<div class="list">${items.map(renderItem).join("")}</div>`}
   else{body='<div class="status">本轮没有符合条件且可用的项目。</div>'}

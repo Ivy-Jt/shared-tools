@@ -1,24 +1,27 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-30T17:15:52+08:00",
+  "generatedAt": "2026-08-30T17:47:00+08:00",
   "city": "武汉",
   "referenceArea": "融侨城周边",
   "referenceRadiusKm": 3,
   "sources": {
     "passFreeTrial": {
       "status": "ok",
+      "checkedAt": "2026-08-30T17:15:52+08:00",
       "verifiedAt": "2026-08-30T17:15:52+08:00",
       "note": "已通过免费试候选列表与活动详情二次复核 PASS 剩余名额。"
     },
     "lvStoreGift": {
       "status": "app_required",
       "verifiedAt": null,
-      "note": "需要在大众点评 App 内确认等级资格、当前可领按钮和无门槛规则。"
+      "checkedAt": "2026-08-30T17:47:00+08:00",
+      "note": "已确认官方到店礼活动广场入口；活动清单、无门槛规则、账号资格和当前余量仍只在 App 内可见。"
     },
     "orangeVPaid": {
       "status": "app_required",
       "verifiedAt": null,
-      "note": "需要在大众点评 App 内确认套餐明确标注橙V专享价且当前可购买。"
+      "checkedAt": "2026-08-30T17:47:00+08:00",
+      "note": "已识别 1 个付费会员价候选：榜一龙虾街道口店 4 人餐，评分 4.2；网页仅确认招牌香辣蟹和碳火烧烤，精确价格与可购买状态仍被 App 遮罩。"
     }
   },
   "summary": {
@@ -44,6 +47,7 @@
       "distanceLabel": "约 5.8 km",
       "priorityRank": 1,
       "score": 3.9,
+      "menuSummary": "排骨藕汤、椒麻沸腾肉片、咸蛋黄鸡翅、老面鲜肉包，含米饭与茶水餐具。",
       "passSupported": true,
       "passRemaining": 9,
       "passCapacity": 50,
@@ -70,6 +74,7 @@
       "distanceLabel": "约 9.9 km",
       "priorityRank": 2,
       "score": 4.8,
+      "menuSummary": "腊八豆蒸大白刁；热菜二选一（冰川茄子或擂辣椒炕扁豆），含香米、水果及茶饮。",
       "passSupported": true,
       "passRemaining": 9,
       "passCapacity": 10,
@@ -96,6 +101,7 @@
       "distanceLabel": "约 8.7 km",
       "priorityRank": 3,
       "score": 4.2,
+      "menuSummary": "六月黄香辣蟹、拍黄瓜、锅底热干面，含双人餐具。",
       "passSupported": true,
       "passRemaining": 3,
       "passCapacity": 10,
@@ -122,6 +128,7 @@
       "distanceLabel": "约 11.3 km",
       "priorityRank": 4,
       "score": 3.8,
+      "menuSummary": "香辣花甲、鲜牛肉串等荤串、韭菜等素串，另含凉面和香辣田螺。",
       "passSupported": true,
       "passRemaining": 5,
       "passCapacity": 10,
@@ -148,6 +155,7 @@
       "distanceLabel": "约 12.5 km",
       "priorityRank": 5,
       "score": 4.7,
+      "menuSummary": "牛骨锅底、鲜牛肉串串、手作特饮、手工面、红糖糍粑和秘制味碟。",
       "passSupported": true,
       "passRemaining": 85,
       "passCapacity": 100,
@@ -167,6 +175,6 @@
     "平台标称价值用于候选排序，未经独立核验，不等同于门店真实日常售价。",
     "本次试跑发生在下午，约 3 km 内候选的 PASS 名额已用光；正式任务改为每天 10:01 扫描。",
     "橙V专享免费试不等同于付费橙V专享价，页面已分开处理。",
-    "LV 到店礼和付费橙V专享价尚需登录态核验，本轮不展示未经确认的候选。"
+    "LV 到店礼和付费橙V专享价的官方入口已确认，但关键条件仍需 App 核验，本轮不展示未经确认的候选。"
   ]
 }
