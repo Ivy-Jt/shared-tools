@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-30T16:09:00+08:00",
+  "city": "武汉",
+  "sourceName": "大众点评公开活动页",
+  "summary": {
+    "scannedActivities": 389,
+    "shown": 3,
+    "headline": "近场、名额相对友好和高品质各 1 条"
+  },
+  "items": [
+    {
+      "tag": "近场",
+      "title": "程品记·大虾锅贴·水饺单人套餐",
+      "shop": "程品记·大虾锅贴·水饺",
+      "branch": "融侨城店",
+      "area": "余家头/四美塘",
+      "score": 4.3,
+      "priceCny": 0,
+      "sourceCostCny": 36,
+      "slots": 30,
+      "applicationCount": 2264,
+      "slotApplicantRatioPct": 1.33,
+      "vipOnly": false,
+      "proximity": "近场",
+      "deadline": "2026-09-03 23:30",
+      "useWindow": "2026-09-05 起，中奖后以页面显示的个人 14 天体验期为准",
+      "restrictions": "无需预约；繁忙时可能等位",
+      "reason": "融侨城门店，领取和到店成本最低",
+      "detailUrl": "https://h5.dianping.com/app/app-community-free-meal/detail.html?offlineActivityId=1321484746&busiType=0"
+    },
+    {
+      "tag": "名额相对友好",
+      "title": "汉味柒串·汉味砂锅串串双人套餐",
+      "shop": "汉味柒串·汉味砂锅串串",
+      "branch": "光谷店",
+      "area": "洪山区",
+      "score": 4.7,
+      "priceCny": 0,
+      "sourceCostCny": 160,
+      "slots": 200,
+      "applicationCount": 4757,
+      "slotApplicantRatioPct": 4.2,
+      "vipOnly": false,
+      "proximity": "较远",
+      "deadline": "2026-09-09 23:30",
+      "useWindow": "2026-09-11 起，中奖后以页面显示的个人 14 天体验期为准",
+      "restrictions": "每周六及中秋、国庆部分日期不可用；至少提前 1 天沟通",
+      "reason": "200 个名额，名额人数比在本轮候选中相对友好",
+      "detailUrl": "https://h5.dianping.com/app/app-community-free-meal/detail.html?offlineActivityId=437097433&busiType=0"
+    },
+    {
+      "tag": "品质与价值",
+      "title": "老武汉武汉菜双人套餐",
+      "shop": "老武汉武汉菜",
+      "branch": "黄鹤楼店",
+      "area": "司门口",
+      "score": 4.8,
+      "priceCny": 0,
+      "sourceCostCny": 250,
+      "slots": 100,
+      "applicationCount": 5746,
+      "slotApplicantRatioPct": 1.74,
+      "vipOnly": true,
+      "proximity": "一般",
+      "deadline": "2026-09-07 23:30",
+      "useWindow": "2026-09-09 至 2026-10-08",
+      "restrictions": "V 专享；每周六及中秋、国庆部分日期不可用；至少提前 1 天沟通",
+      "reason": "4.8 分、100 个名额，兼顾品质和平台标称价值",
+      "detailUrl": "https://h5.dianping.com/app/app-community-free-meal/detail.html?offlineActivityId=451953946&busiType=0"
+    }
+  ],
+  "notes": [
+    "平台标称价值未经独立核验，不等同于真实日常原价。",
+    "名额人数比仅用于候选比较，不等同于真实中奖率。",
+    "当前稳定覆盖免费试公开活动，普通付费团购折扣仍在补充数据源。"
+  ]
+}

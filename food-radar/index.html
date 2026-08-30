@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff8ef">
+<meta property="og:title" content="武汉美食优惠雷达">
+<meta property="og:description" content="每日筛选武汉近场、高品质和名额相对友好的美食活动。">
+<title>武汉美食优惠雷达</title>
+<style>
+:root{color-scheme:light;--ink:#251a12;--muted:#74665b;--paper:#fffdf9;--line:#eadfd3;--accent:#d85b25;--soft:#fff0df;--green:#247a58}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#fff6e9 0,#f8f4ef 42%,#f6f7f8 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+main{width:min(760px,100%);margin:0 auto;padding:24px 16px 56px}
+a{color:inherit}
+.back{display:inline-flex;align-items:center;min-height:40px;color:var(--muted);font-size:14px;text-decoration:none}
+.hero{padding:24px 0 18px}
+.eyebrow{margin:0 0 8px;color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em}
+h1{margin:0;font-size:30px;line-height:1.18;letter-spacing:-.03em}
+.lede{margin:12px 0 0;color:var(--muted);font-size:15px;line-height:1.7}
+.summary{display:flex;gap:10px;align-items:flex-start;margin:18px 0 22px;padding:14px 16px;border:1px solid #f0d6bc;border-radius:16px;background:rgba(255,248,239,.88)}
+.summary-dot{flex:0 0 auto;width:9px;height:9px;margin-top:6px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 5px rgba(216,91,37,.12)}
+.summary strong{display:block;font-size:15px}
+.summary span{display:block;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.5}
+.list{display:grid;gap:16px}
+.card{overflow:hidden;border:1px solid var(--line);border-radius:18px;background:rgba(255,253,249,.96);box-shadow:0 8px 26px rgba(53,34,20,.06)}
+.card-body{padding:18px}
+.topline{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.tag{display:inline-flex;align-items:center;min-height:26px;padding:4px 9px;border-radius:999px;background:var(--soft);color:#a74319;font-size:12px;font-weight:700}
+.vip{background:#2b2927;color:#fff}
+.free{color:var(--green);font-size:14px;font-weight:800}
+h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
+.place{margin:0;color:var(--muted);font-size:13px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0}
+.metric{padding:10px;border-radius:12px;background:#f8f5f1}
+.metric b{display:block;font-size:15px}
+.metric span{display:block;margin-top:3px;color:var(--muted);font-size:11px}
+.reason{margin:0;padding:12px 14px;border-left:3px solid var(--accent);background:#fff8ef;color:#4d3a2d;font-size:13px;line-height:1.65}
+.rules{margin:13px 0 0;padding:0;list-style:none;color:var(--muted);font-size:13px;line-height:1.65}
+.rules li+li{margin-top:4px}
+.button{display:flex;align-items:center;justify-content:center;min-height:46px;margin-top:16px;border-radius:12px;background:var(--ink);color:#fff;text-decoration:none;font-size:14px;font-weight:700}
+.button:active{transform:translateY(1px)}
+.notes{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.74)}
+.notes h3{margin:0 0 10px;font-size:15px}
+.notes ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.7}
+.status{padding:28px 18px;border:1px dashed var(--line);border-radius:16px;background:#fff;text-align:center;color:var(--muted)}
+footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:center}
+@media(max-width:420px){main{padding-top:14px}.hero{padding-top:16px}h1{font-size:27px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric span{margin:0}.card-body{padding:16px}}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="../">← Shared Tools</a>
+<section class="hero">
+<p class="eyebrow">生活 · 武汉</p>
+<h1>美食优惠雷达</h1>
+<p class="lede">每天筛选近场、名额相对友好或高品质的活动。这里只展示公开信息，不包含家庭坐标或账号数据。</p>
+</section>
+<div id="summary" class="summary" hidden></div>
+<section id="list" class="list" aria-live="polite">
+<div class="status">正在读取今日结果…</div>
+</section>
+<section id="notes" class="notes" hidden>
+<h3>阅读提示</h3>
+<ul></ul>
+</section>
+<footer id="footer">数据来自公开活动页；最终可用条件以活动页面和门店说明为准。</footer>
+</main>
+<script>
+const esc=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
+const fmt=value=>Number(value||0).toLocaleString("zh-CN");
+const list=document.querySelector("#list");
+const summary=document.querySelector("#summary");
+const notes=document.querySelector("#notes");
+
+function renderItem(item){
+  const vip=item.vipOnly?'<span class="tag vip">V 专享</span>':"";
+  return `<article class="card"><div class="card-body">
+    <div class="topline"><div><span class="tag">${esc(item.tag)}</span> ${vip}</div><span class="free">¥${fmt(item.priceCny)} 试</span></div>
+    <h2>${esc(item.title)}</h2>
+    <p class="place">${esc(item.area)} · ${esc(item.branch)} · ${esc(item.proximity)}</p>
+    <div class="metrics">
+      <div class="metric"><b>${esc(item.score)} 分</b><span>活动详情评分</span></div>
+      <div class="metric"><b>标称 ¥${fmt(item.sourceCostCny)}</b><span>未独立核验原价</span></div>
+      <div class="metric"><b>${fmt(item.slots)} / ${fmt(item.applicationCount)}</b><span>名额 / 报名人数</span></div>
+    </div>
+    <p class="reason">${esc(item.reason)}</p>
+    <ul class="rules"><li><strong>截止：</strong>${esc(item.deadline)}</li><li><strong>体验：</strong>${esc(item.useWindow)}</li><li><strong>限制：</strong>${esc(item.restrictions)}</li></ul>
+    <a class="button" href="${esc(item.detailUrl)}" target="_blank" rel="noopener noreferrer">打开大众点评活动页</a>
+  </div></article>`;
+}
+
+fetch(`./latest.json?v=${Date.now()}`,{cache:"no-store"})
+  .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()})
+  .then(data=>{
+    const items=Array.isArray(data.items)?data.items:[];
+    summary.hidden=false;
+    summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(data.summary?.headline||`今日展示 ${items.length} 条`)}</strong><span>本轮扫描 ${fmt(data.summary?.scannedActivities)} 条公开活动，筛出 ${fmt(items.length)} 条 · 更新于 ${esc(new Date(data.generatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
+    list.innerHTML=items.length?items.map(renderItem).join(""):'<div class="status">今天没有值得单独提醒的新活动。</div>';
+    const tips=Array.isArray(data.notes)?data.notes:[];
+    if(tips.length){notes.hidden=false;notes.querySelector("ul").innerHTML=tips.map(tip=>`<li>${esc(tip)}</li>`).join("")}
+  })
+  .catch(()=>{list.innerHTML='<div class="status">今日结果暂时加载失败，请稍后刷新。</div>'});
+</script>
+</body>
+</html>
