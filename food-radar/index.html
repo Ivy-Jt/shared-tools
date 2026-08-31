@@ -127,10 +127,10 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .map-status{margin:10px 2px 0;color:var(--muted);font-size:12px;line-height:1.55}
 .map-status.error{color:#9d463f}
 .decision-list{display:grid;gap:8px;margin-top:10px}
-.decision-link{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:#fff;color:inherit;text-decoration:none}
-.decision-main{min-width:0}
+.decision-link{display:flex;min-height:78px;gap:10px;align-items:flex-start;justify-content:space-between;padding:12px;border:1px solid var(--line);border-radius:13px;background:#fff;color:inherit;text-decoration:none}
+.decision-main{min-width:0;flex:1}
 .decision-main strong{display:block;overflow:hidden;font-size:13px;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
-.decision-main span{display:block;margin-top:3px;overflow:hidden;color:var(--muted);font-size:11px;line-height:1.4;text-overflow:ellipsis;white-space:nowrap}
+.decision-main span{display:-webkit-box;margin-top:5px;overflow:hidden;color:var(--muted);font-size:11px;line-height:1.45;-webkit-box-orient:vertical;-webkit-line-clamp:2}
 .decision-meta{display:flex;flex:0 0 auto;flex-direction:column;gap:3px;align-items:flex-end;color:var(--muted);font-size:10px}
 .decision-meta b{font-size:12px}
 .decision-meta .decision-price{color:var(--green);font-size:12px;font-weight:800}
@@ -140,7 +140,7 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .leaflet-popup-content span{display:block}
 .leaflet-popup-content ul{margin:6px 0 0;padding-left:18px}
 footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:center}
-@media(max-width:420px){main{padding-top:14px}.hero{padding-top:16px}h1{font-size:27px}.quick-nav{margin-left:-2px;margin-right:-2px}.quick-nav a{padding:0 11px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric span{margin:0}.card-body{padding:14px}.card h2{font-size:17px}.purchase-map{height:230px}.map-head{display:block}.map-count{margin-top:6px}.decision-link{padding:10px}.decision-main{max-width:68%}}
+@media(max-width:420px){main{padding-top:14px}.hero{padding-top:16px}h1{font-size:27px}.quick-nav{margin-left:-2px;margin-right:-2px}.quick-nav a{padding:0 11px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric span{margin:0}.card-body{padding:14px}.card h2{font-size:17px}.purchase-map{height:230px}.map-head{display:block}.map-count{margin-top:6px}.decision-link{min-height:82px;padding:12px 10px}.decision-main{max-width:68%}}
 </style>
 </head>
 <body>
@@ -183,6 +183,20 @@ const dateKeyToDayNumber=value=>{
 const compactDate=value=>{
   const match=/^\d{4}-(\d{2})-(\d{2})$/.exec(String(value||""));
   return match?`${Number(match[1])}/${Number(match[2])}`:"日期待确认";
+};
+const PUBLIC_REFERENCE_POINT={lat:30.609964,lng:114.340187};
+const distanceKm=(a,b)=>{
+  const radians=value=>value*Math.PI/180;
+  const dLat=radians(b.lat-a.lat);
+  const dLng=radians(b.lng-a.lng);
+  const value=Math.sin(dLat/2)**2+Math.cos(radians(a.lat))*Math.cos(radians(b.lat))*Math.sin(dLng/2)**2;
+  return 6371*2*Math.asin(Math.sqrt(value));
+};
+const nearestDistanceLabel=item=>{
+  const stores=(Array.isArray(item.confirmedStores)?item.confirmedStores:[]).filter(store=>Number.isFinite(store.lat)&&Number.isFinite(store.lng));
+  if(!stores.length)return "距离待确认";
+  const nearest=Math.min(...stores.map(store=>distanceKm(PUBLIC_REFERENCE_POINT,store)));
+  return `${stores.length>1?"最近":""}约 ${nearest.toFixed(1)} km`;
 };
 const expiryMeta=(validUntil,todayKey)=>{
   const remaining=dateKeyToDayNumber(validUntil)-dateKeyToDayNumber(todayKey);
@@ -341,8 +355,9 @@ function renderDecisionList(items,todayKey){
   return `<div class="decision-list">${items.map(item=>{
     const expiry=expiryMeta(item.validUntil,todayKey);
     const weekend=WEEKEND_META[item.weekendPolicy]||WEEKEND_META.unknown;
-    const shop=[item.shop,item.branch].filter(Boolean).join(" · ");
-    const details=[item.foodType,item.menuSummary].filter(Boolean).join(" · ");
+    const storeCount=Array.isArray(item.confirmedStores)?item.confirmedStores.length:0;
+    const shop=[item.shop,storeCount>1?`${storeCount}家门店`:item.branch].filter(Boolean).join(" · ");
+    const details=[item.foodType,nearestDistanceLabel(item),item.menuSummary].filter(Boolean).join(" · ");
     const comparison=item.comparisonPriceCny!=null?`<del>¥${fmt(item.comparisonPriceCny)}</del>`:"";
     const current=item.purchasePriceCny!=null?`¥${fmt(item.purchasePriceCny)}`:"已购买";
     return `<a class="decision-link" href="#deal-${esc(item.sourceId)}">
@@ -353,7 +368,7 @@ function renderDecisionList(items,todayKey){
 }
 
 function renderPurchasePlanner(items,todayKey){
-  return `<div class="section-head"><div><h2>这周吃什么</h2><p>先按地图选区域，再看菜系、到期日和可用日期；点清单直接跳到套餐。</p></div><span class="target">${fmt(items.length)} 张可用券</span></div>${renderPurchaseMapShell(items)}${renderDecisionList(items,todayKey)}`;
+  return `<div class="section-head"><div><h2>这周吃什么</h2><p>先按地图选区域，再看菜系、到期日和可用日期；距离为融侨城公开参考点的直线约数。</p></div><span class="target">${fmt(items.length)} 张可用券</span></div>${renderPurchaseMapShell(items)}${renderDecisionList(items,todayKey)}`;
 }
 
 function renderSection(group,items,source,todayKey){
