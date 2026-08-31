@@ -19,7 +19,18 @@ const SUMMARY_BY_KIND = {
 const LIMIT_BY_KIND = { pass_free_trial: 5 };
 const SOURCE_KEYS = ["passFreeTrial"];
 const SOURCE_STATUSES = new Set(["ok", "login_required", "app_required", "no_match", "error"]);
-const PURCHASE_SOURCE_STATUSES = new Set(["pending_sync", "ok", "no_match"]);
+const PURCHASE_SOURCE_STATUSES = new Set(["pending_sync", "ok", "partial", "no_match"]);
+const PURCHASE_DEAL_TYPES = new Set(["package", "voucher", "drink", "single_dish", "buffet", "checkin_gift"]);
+const PURCHASE_DETAIL_STATUSES = new Set([
+  "order_only",
+  "official_app_list_verified",
+  "official_app_detail_verified",
+  "public_store_verified",
+  "official_deal_verified",
+]);
+const WEEKEND_POLICIES = new Set(["weekdays_only", "weekend_available", "weekend_except_saturday", "unknown"]);
+const WEEKEND_RULE_SOURCES = new Set(["official_order_title", "official_deal_detail", "official_app", "user_supplied_official_capture"]);
+const STORE_KEYS = ["address", "area", "branch", "lat", "lng", "shop", "sourceType"];
 const SENSITIVE_QUERY_KEYS = new Set([
   "accountid", "cookie", "dpid", "lat", "latitude", "lng", "longitude",
   "encctx", "isshare", "notitlebar", "openid", "session", "sharecampaignid",
@@ -30,8 +41,9 @@ const REQUIRED_TEXT_FIELDS = [
   "deadline", "useWindow", "restrictions", "menuSummary", "detailUrl", "verifiedAt",
 ];
 const REQUIRED_PURCHASE_TEXT_FIELDS = [
-  "sourceId", "title", "shop", "branch", "area", "platform", "platformLabel",
-  "reason", "validUntil", "useWindow", "restrictions", "menuSummary", "verifiedAt",
+  "sourceId", "title", "area", "platform", "platformLabel", "reason", "validUntil",
+  "useWindow", "restrictions", "menuSummary", "verifiedAt", "dealType",
+  "detailVerificationStatus", "weekendPolicy",
 ];
 const MAX_SCAN_AGE_MS = 6 * 60 * 60 * 1000;
 const MAX_VERIFICATION_SKEW_MS = 60 * 60 * 1000;
@@ -44,6 +56,20 @@ function parseDate(value, label) {
   const parsed = Date.parse(value);
   assert(Number.isFinite(parsed), `${label} must be an ISO date`);
   return parsed;
+}
+
+function validateDateKey(value, label) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  assert(match, `${label} must be YYYY-MM-DD`);
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  assert(
+    date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day,
+    `${label} must be a real calendar date`,
+  );
+  return Date.UTC(year, month - 1, day);
 }
 
 function validateDetailUrl(item) {
@@ -149,12 +175,13 @@ for (const kind of Object.keys(counts)) {
   }
 }
 
-assert(purchases.schemaVersion === 1, "purchases.schemaVersion must be 1");
+assert(purchases.schemaVersion === 2, "purchases.schemaVersion must be 2");
 parseDate(purchases.updatedAt, "purchases.updatedAt");
 const purchaseSourceKeys = Object.keys(purchases.sources || {}).sort();
 assert(JSON.stringify(purchaseSourceKeys) === JSON.stringify(["purchasedDeals"]), "purchases must contain exactly purchasedDeals source");
 const purchaseSource = purchases.sources.purchasedDeals;
 assert(PURCHASE_SOURCE_STATUSES.has(purchaseSource.status), `unknown purchase source status: ${purchaseSource.status}`);
+assert(typeof purchaseSource.note === "string" && purchaseSource.note.trim().length > 0, "purchasedDeals.note is required");
 assert(Array.isArray(purchases.items), "purchases.items must be an array");
 assert(purchases.items.length <= 50, "purchases.items exceeds the public inventory limit");
 
@@ -163,15 +190,22 @@ if (purchaseSource.status === "pending_sync") {
   assert(purchases.items.length === 0, "pending purchase sync must not publish items");
 } else {
   parseDate(purchaseSource.checkedAt, "purchasedDeals.checkedAt");
-  parseDate(purchaseSource.verifiedAt, "purchasedDeals.verifiedAt");
-  if (purchaseSource.status === "ok") assert(purchases.items.length > 0, "ok purchase source has no items");
-  else assert(purchases.items.length === 0, "no_match purchase source has items");
+  if (purchaseSource.status === "partial") {
+    assert(purchaseSource.verifiedAt === null, "partial purchase source must not claim complete verification");
+    assert(purchases.items.length > 0, "partial purchase source has no items");
+  } else {
+    parseDate(purchaseSource.verifiedAt, "purchasedDeals.verifiedAt");
+    if (purchaseSource.status === "ok") assert(purchases.items.length > 0, "ok purchase source has no items");
+    else assert(purchases.items.length === 0, "no_match purchase source has items");
+  }
 }
 
 const purchaseIds = new Set();
+let mappedPurchaseCount = 0;
+let verifiedDetailCount = 0;
 for (const item of purchases.items) {
   assert(item.kind === "purchased_deal", `unknown purchase kind: ${item.kind}`);
-  assert(item.availability === "unexpired_order", `purchase is not an unexpired order: ${item.sourceId}`);
+  assert(item.availability === "usable_coupon", `purchase is not verified as a usable coupon: ${item.sourceId}`);
   for (const field of REQUIRED_PURCHASE_TEXT_FIELDS) {
     assert(typeof item[field] === "string" && item[field].trim().length > 0, `missing purchase ${field}: ${item.sourceId || "unknown"}`);
   }
@@ -181,6 +215,14 @@ for (const item of purchases.items) {
   assert(["dianping", "douyin"].includes(item.platform), `unknown purchase platform: ${item.sourceId}`);
   assert(Number.isInteger(item.priorityRank) && item.priorityRank > 0, `invalid purchase priorityRank: ${item.sourceId}`);
   assert(Number.isFinite(item.purchasePriceCny) && item.purchasePriceCny > 0, `invalid actual purchase price: ${item.sourceId}`);
+  assert(Number.isInteger(item.quantity) && item.quantity > 0, `invalid purchase quantity: ${item.sourceId}`);
+  assert(PURCHASE_DEAL_TYPES.has(item.dealType), `unknown purchase dealType: ${item.sourceId}`);
+  assert(PURCHASE_DETAIL_STATUSES.has(item.detailVerificationStatus), `unknown detailVerificationStatus: ${item.sourceId}`);
+  assert(WEEKEND_POLICIES.has(item.weekendPolicy), `unknown weekendPolicy: ${item.sourceId}`);
+  for (const field of ["shop", "branch"]) {
+    assert(item[field] === null || (typeof item[field] === "string" && item[field].trim().length > 0), `invalid purchase ${field}: ${item.sourceId}`);
+    if (typeof item[field] === "string") assert(!/(?:未公开|待补充|未知|待核验)/.test(item[field]), `placeholder purchase ${field}: ${item.sourceId}`);
+  }
   if (item.comparisonPriceCny != null) {
     assert(Number.isFinite(item.comparisonPriceCny) && item.comparisonPriceCny >= item.purchasePriceCny, `invalid purchase comparison price: ${item.sourceId}`);
   }
@@ -192,10 +234,54 @@ for (const item of purchases.items) {
   if (item.score != null) assert(Number.isFinite(item.score) && item.score >= 0 && item.score <= 5, `invalid purchase score: ${item.sourceId}`);
   assert(item.menuSummary.length <= 180, `purchase menuSummary is too long: ${item.sourceId}`);
   assert(!/[*?？]/.test(item.menuSummary), `masked or uncertain purchase menuSummary: ${item.sourceId}`);
-  assert(/^\d{4}-\d{2}-\d{2}$/.test(item.validUntil), `purchase validUntil must be YYYY-MM-DD: ${item.sourceId}`);
-  const validUntilMs = Date.parse(`${item.validUntil}T23:59:59+08:00`);
-  assert(Number.isFinite(validUntilMs), `purchase validUntil must be a valid date: ${item.sourceId}`);
+  const validUntilMs = validateDateKey(item.validUntil, `${item.sourceId}.validUntil`);
   parseDate(item.verifiedAt, `${item.sourceId}.verifiedAt`);
+  const verifiedDateKey = item.verifiedAt.slice(0, 10);
+  assert(validUntilMs >= validateDateKey(verifiedDateKey, `${item.sourceId}.verifiedDate`), `purchase was already expired when verified: ${item.sourceId}`);
+
+  assert(item.weekendRuleEvidence === null || (typeof item.weekendRuleEvidence === "string" && item.weekendRuleEvidence.trim().length > 0 && item.weekendRuleEvidence.length <= 160), `invalid weekendRuleEvidence: ${item.sourceId}`);
+  if (item.weekendPolicy === "unknown") {
+    assert(item.weekendRuleEvidence === null, `unknown weekend policy must not claim evidence: ${item.sourceId}`);
+    assert(item.weekendRuleSource == null, `unknown weekend policy must not claim a source: ${item.sourceId}`);
+  } else {
+    assert(typeof item.weekendRuleEvidence === "string", `verified weekend policy needs evidence: ${item.sourceId}`);
+    assert(WEEKEND_RULE_SOURCES.has(item.weekendRuleSource), `invalid weekendRuleSource: ${item.sourceId}`);
+  }
+
+  assert(Array.isArray(item.eligibleStores), `eligibleStores must be an array: ${item.sourceId}`);
+  assert(item.eligibleStores.length <= 30, `too many eligible stores: ${item.sourceId}`);
+  const storeIds = new Set();
+  for (const [index, store] of item.eligibleStores.entries()) {
+    assert(store && typeof store === "object" && !Array.isArray(store), `invalid eligible store ${index}: ${item.sourceId}`);
+    assert(JSON.stringify(Object.keys(store).sort()) === JSON.stringify(STORE_KEYS), `unexpected eligible store fields ${index}: ${item.sourceId}`);
+    for (const field of ["shop", "branch", "area", "address"]) {
+      assert(typeof store[field] === "string" && store[field].trim().length > 0, `missing store ${field}: ${item.sourceId}`);
+      assert(!/(?:未公开|待补充|未知|待核验)/.test(store[field]), `placeholder store ${field}: ${item.sourceId}`);
+    }
+    assert(store.sourceType === "public_store", `invalid store sourceType: ${item.sourceId}`);
+    assert(Number.isFinite(store.lat) && store.lat >= 29.9 && store.lat <= 31.4, `store latitude outside Wuhan boundary: ${item.sourceId}`);
+    assert(Number.isFinite(store.lng) && store.lng >= 113.6 && store.lng <= 115.1, `store longitude outside Wuhan boundary: ${item.sourceId}`);
+    const storeId = `${store.lat.toFixed(6)},${store.lng.toFixed(6)}`;
+    assert(!storeIds.has(storeId), `duplicate eligible store: ${item.sourceId}`);
+    storeIds.add(storeId);
+  }
+  if (item.detailVerificationStatus === "order_only") {
+    assert(item.eligibleStores.length === 0 && item.shop === null && item.branch === null, `order-only item must not claim a store: ${item.sourceId}`);
+  } else if (["official_app_list_verified", "official_app_detail_verified"].includes(item.detailVerificationStatus)) {
+    assert(typeof item.shop === "string", `App-verified item needs a shop: ${item.sourceId}`);
+    if (item.detailVerificationStatus === "official_app_detail_verified") {
+      assert(typeof item.address === "string" && item.address.trim().length > 0, `App detail verification needs an address: ${item.sourceId}`);
+      assert(!/(?:未公开|待补充|未知|待核验)/.test(item.address), `placeholder purchase address: ${item.sourceId}`);
+      verifiedDetailCount += 1;
+    }
+  } else {
+    assert(item.eligibleStores.length > 0 && typeof item.shop === "string", `store-verified item needs a public store: ${item.sourceId}`);
+    verifiedDetailCount += 1;
+  }
+  if (item.detailVerificationStatus === "official_deal_verified") {
+    assert(item.weekendPolicy !== "unknown", `official deal verification needs a weekend policy: ${item.sourceId}`);
+  }
+  if (item.eligibleStores.length > 0) mappedPurchaseCount += 1;
   if (item.detailUrl != null) {
     assert(typeof item.detailUrl === "string" && item.detailUrl.trim().length > 0, `invalid purchase detailUrl: ${item.sourceId}`);
     validatePurchaseUrl(item);
@@ -204,10 +290,23 @@ for (const item of purchases.items) {
 const rankedPurchases = purchases.items.slice().sort((a, b) => a.priorityRank - b.priorityRank);
 assert(rankedPurchases.every((item, index) => item.priorityRank === index + 1), "purchase priorityRank must be sequential");
 assert(purchases.summary?.count === purchases.items.length, "purchase summary count mismatch");
+assert(purchases.summary?.mappedStoreCount === mappedPurchaseCount, "purchase mappedStoreCount mismatch");
+assert(purchases.summary?.verifiedDetailCount === verifiedDetailCount, "purchase verifiedDetailCount mismatch");
+if (purchaseSource.status === "ok") {
+  assert(verifiedDetailCount === purchases.items.length, "ok purchase source still has unverified details");
+  assert(purchases.items.every(item => item.weekendPolicy !== "unknown"), "ok purchase source still has unknown weekend rules");
+}
 
-const serialized = JSON.stringify({ data, purchases });
+const purchasesWithoutPublicStoreCoordinates = JSON.parse(JSON.stringify(purchases));
+for (const item of purchasesWithoutPublicStoreCoordinates.items || []) {
+  for (const store of item.eligibleStores || []) {
+    delete store.lat;
+    delete store.lng;
+  }
+}
+const serialized = JSON.stringify({ data, purchases: purchasesWithoutPublicStoreCoordinates });
 const privatePatterns = [
-  /"(?:latitude|longitude|token|cookie|dpid|accountId|userId|orderId|couponCode|voucherCode|phone|mobile)"\s*:/i,
+  /"(?:lat|lng|latitude|longitude|token|cookie|dpid|accountId|userId|orderId|couponCode|voucherCode|phone|mobile)"\s*:/i,
   /(?:token|cookie|latitude|longitude|dpid|userid)(?:=|%3d)/i,
   /(?:encctx|isshare|notitlebar|sharecampaignid|shareid|utm_source)(?:=|%3d)/i,
   /(?:^|\D)30\.\d{4,}(?:\D|$)/,

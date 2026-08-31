@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fff8ef">
 <meta property="og:title" content="武汉美食优惠雷达">
-<meta property="og:description" content="每日筛选武汉 PASS 可兑换免费试，并汇总尚未到订单到期日的已购美食套餐。">
+<meta property="og:description" content="每日筛选武汉 PASS 可兑换免费试，并汇总大众点评 App 已确认可使用的已购美食套餐。">
 <title>武汉美食优惠雷达</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{color-scheme:light;--ink:#251a12;--muted:#74665b;--paper:#fffdf9;--line:#eadfd3;--accent:#d85b25;--soft:#fff0df;--green:#247a58;--score-high:#e5f5ec;--score-high-ink:#176a4a;--score-mid:#fff1c9;--score-mid-ink:#885b08;--score-low:#fde5e3;--score-low-ink:#a13d36;--score-na:#eceeef;--score-na-ink:#6b7075}
+:root{color-scheme:light;--ink:#251a12;--muted:#74665b;--paper:#fffdf9;--line:#eadfd3;--accent:#d85b25;--soft:#fff0df;--green:#247a58;--score-high:#e5f5ec;--score-high-ink:#176a4a;--score-mid:#fff1c9;--score-mid-ink:#885b08;--score-low:#fde5e3;--score-low-ink:#a13d36;--score-na:#eceeef;--score-na-ink:#6b7075;--expiry-urgent:#bd3128;--expiry-urgent-bg:#fde8e6;--expiry-watch:#a96b08;--expiry-watch-bg:#fff1c9;--expiry-safe:#23754f;--expiry-safe-bg:#e5f5ec}
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,#fff6e9 0,#f8f4ef 42%,#f6f7f8 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
 main{width:min(760px,100%);margin:0 auto;padding:24px 16px 56px}
@@ -18,11 +19,14 @@ a{color:inherit}
 .eyebrow{margin:0 0 8px;color:var(--accent);font-size:13px;font-weight:700;letter-spacing:.08em}
 h1{margin:0;font-size:30px;line-height:1.18;letter-spacing:-.03em}
 .lede{margin:12px 0 0;color:var(--muted);font-size:15px;line-height:1.7}
+.quick-nav{position:sticky;top:0;z-index:600;display:flex;gap:8px;margin:0 0 12px;padding:6px;border:1px solid rgba(234,223,211,.9);border-radius:14px;background:rgba(255,253,249,.93);box-shadow:0 8px 24px rgba(53,34,20,.08);backdrop-filter:blur(12px);overflow-x:auto}
+.quick-nav a{display:inline-flex;flex:1 0 auto;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:10px;color:var(--muted);font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap}
+.quick-nav a.primary{background:var(--ink);color:#fff}
 .summary{display:flex;gap:10px;align-items:flex-start;margin:18px 0 22px;padding:14px 16px;border:1px solid #f0d6bc;border-radius:16px;background:rgba(255,248,239,.88)}
 .summary-dot{flex:0 0 auto;width:9px;height:9px;margin-top:6px;border-radius:99px;background:var(--accent);box-shadow:0 0 0 5px rgba(216,91,37,.12)}
 .summary strong{display:block;font-size:15px}
 .summary span{display:block;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.5}
-.section{margin-top:28px}
+.section{margin-top:28px;scroll-margin-top:72px}
 .section-head{display:flex;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
 .section-head h2{margin:0;font-size:21px}
 .section-head p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
@@ -35,6 +39,12 @@ h1{margin:0;font-size:30px;line-height:1.18;letter-spacing:-.03em}
 .tag-owned{background:#2b2927;color:#fff}
 .platform{background:#eef1f4;color:#3f4952}
 .vip{background:#2b2927;color:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag.weekend{background:#eef1f4;color:#3f4952}
+.tag.weekend-unknown{background:#f0ece7;color:#74665b}
+.tag.expiry-urgent{background:var(--expiry-urgent-bg);color:var(--expiry-urgent)}
+.tag.expiry-watch{background:var(--expiry-watch-bg);color:var(--expiry-watch)}
+.tag.expiry-safe{background:var(--expiry-safe-bg);color:var(--expiry-safe)}
 .price{color:var(--green);font-size:14px;font-weight:800;text-align:right}
 h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .place{margin:0;color:var(--muted);font-size:13px}
@@ -52,6 +62,15 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .metric.score-low b,.metric.score-low span{color:var(--score-low-ink)}
 .metric.score-na{background:var(--score-na)}
 .metric.score-na b,.metric.score-na span{color:var(--score-na-ink)}
+.metric.expiry-urgent{background:var(--expiry-urgent-bg)}
+.metric.expiry-urgent b,.metric.expiry-urgent span{color:var(--expiry-urgent)}
+.metric.expiry-watch{background:var(--expiry-watch-bg)}
+.metric.expiry-watch b,.metric.expiry-watch span{color:var(--expiry-watch)}
+.metric.expiry-safe{background:var(--expiry-safe-bg)}
+.metric.expiry-safe b,.metric.expiry-safe span{color:var(--expiry-safe)}
+.card.expiry-urgent{border-color:#efb8b3;box-shadow:0 8px 26px rgba(189,49,40,.10)}
+.card.expiry-watch{border-color:#efd99d}
+.card.expiry-safe{border-color:#cfe5d9}
 .reason{margin:0;padding:12px 14px;border-left:3px solid var(--accent);background:#fff8ef;color:#4d3a2d;font-size:13px;line-height:1.65}
 .rules{margin:13px 0 0;padding:0;list-style:none;color:var(--muted);font-size:13px;line-height:1.65}
 .rules li+li{margin-top:4px}
@@ -61,8 +80,19 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .notes h3{margin:0 0 10px;font-size:15px}
 .notes ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.7}
 .status{padding:28px 18px;border:1px dashed var(--line);border-radius:16px;background:#fff;text-align:center;color:var(--muted);line-height:1.65}
+.map-panel{margin:0 0 16px;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,253,249,.96)}
+.map-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.map-head strong{font-size:15px}
+.map-head span{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.5}
+.map-count{flex:0 0 auto;color:var(--accent);font-size:12px;font-weight:700}
+.purchase-map{height:280px;border-radius:14px;background:#ece8e2;overflow:hidden}
+.map-status{margin:10px 2px 0;color:var(--muted);font-size:12px;line-height:1.55}
+.map-status.error{color:#9d463f}
+.leaflet-popup-content{max-width:240px;margin:12px 14px;line-height:1.55}
+.leaflet-popup-content strong{display:block;margin-bottom:4px}
+.leaflet-popup-content ul{margin:6px 0 0;padding-left:18px}
 footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:center}
-@media(max-width:420px){main{padding-top:14px}.hero{padding-top:16px}h1{font-size:27px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric span{margin:0}.card-body{padding:16px}}
+@media(max-width:420px){main{padding-top:14px}.hero{padding-top:16px}h1{font-size:27px}.quick-nav{margin-left:-2px;margin-right:-2px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric span{margin:0}.card-body{padding:16px}.purchase-map{height:240px}}
 </style>
 </head>
 <body>
@@ -71,8 +101,12 @@ footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:c
 <section class="hero">
 <p class="eyebrow">生活 · 武汉</p>
 <h1>美食优惠雷达</h1>
-<p class="lede">每天 10:01 起筛选 PASS 可兑换免费试，并汇总尚未到订单到期日的已购美食套餐。以融侨城周边为公开距离参考，不包含家庭坐标、订单号、券码或账号数据。</p>
+<p class="lede">每天 10:01 起筛选 PASS 可兑换免费试，并汇总大众点评 App 已确认可使用的已购美食套餐。以融侨城周边为公开距离参考，不包含家庭坐标、订单号、券码或账号数据。</p>
 </section>
+<nav class="quick-nav" aria-label="页面快速跳转">
+<a href="#pass-trials">PASS 免费试 <span id="quick-pass-count"></span></a>
+<a class="primary" href="#purchased-deals">我的已购套餐 <span id="quick-purchase-count"></span></a>
+</nav>
 <div id="summary" class="summary" hidden></div>
 <div id="sections" aria-live="polite">
 <div class="status">正在读取今日结果…</div>
@@ -81,8 +115,9 @@ footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:c
 <h3>阅读提示</h3>
 <ul></ul>
 </section>
-<footer id="footer">PASS 来自公开活动页；已购套餐仅展示脱敏后的套餐信息。最终可用条件以平台和门店说明为准。</footer>
+<footer id="footer">PASS 来自公开活动页；已购套餐来自 App“可使用”列表并仅展示脱敏信息。最终使用条件以平台和门店说明为准。</footer>
 </main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const esc=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
 const fmt=value=>Number(value||0).toLocaleString("zh-CN");
@@ -91,13 +126,31 @@ const shanghaiDateKey=()=>{
   const value=type=>parts.find(part=>part.type===type)?.value||"";
   return `${value("year")}-${value("month")}-${value("day")}`;
 };
+const dateKeyToDayNumber=value=>{
+  const match=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value||""));
+  return match?Math.floor(Date.UTC(Number(match[1]),Number(match[2])-1,Number(match[3]))/86400000):NaN;
+};
+const expiryMeta=(validUntil,todayKey)=>{
+  const remaining=dateKeyToDayNumber(validUntil)-dateKeyToDayNumber(todayKey);
+  if(!Number.isFinite(remaining))return {remaining:null,className:"expiry-watch",label:"到期日待核验",short:"待核验",color:"#a96b08"};
+  if(remaining<=3)return {remaining,className:"expiry-urgent",label:remaining===0?"今天到期":remaining===1?"明天到期":`剩余 ${remaining} 天`,short:"3天内到期",color:"#bd3128"};
+  if(remaining<=7)return {remaining,className:"expiry-watch",label:`剩余 ${remaining} 天`,short:"7天内到期",color:"#a96b08"};
+  return {remaining,className:"expiry-safe",label:`剩余 ${remaining} 天`,short:"有效期充足",color:"#23754f"};
+};
+const WEEKEND_META={
+  weekdays_only:{label:"仅工作日可用",className:""},
+  weekend_available:{label:"周末可用",className:""},
+  weekend_except_saturday:{label:"周末可用（周六不可用）",className:""},
+  unknown:{label:"周末规则待核验",className:"weekend-unknown"}
+};
+const DEAL_TYPE_LABEL={package:"套餐",voucher:"代金券",drink:"饮品",single_dish:"单品",buffet:"自助餐",checkin_gift:"打卡小食"};
 const sections=document.querySelector("#sections");
 const summary=document.querySelector("#summary");
 const notes=document.querySelector("#notes");
 
 const GROUPS=[
-  {kind:"pass_free_trial",source:"passFreeTrial",dataset:"radar",title:"PASS 可兑换免费试",target:"约 5 个",desc:"必须支持 PASS 且剩余名额大于 0；近场和高价值优先。"},
-  {kind:"purchased_deal",source:"purchasedDeals",dataset:"purchases",title:"我的已购套餐",target:"订单未过期",desc:"展示尚未到订单到期日的已购美食套餐；价格为实际支付价，核销状态仍以 App 为准。"}
+  {id:"pass-trials",kind:"pass_free_trial",source:"passFreeTrial",dataset:"radar",title:"PASS 可兑换免费试",target:"约 5 个",desc:"必须支持 PASS 且剩余名额大于 0；近场和高价值优先。"},
+  {id:"purchased-deals",kind:"purchased_deal",source:"purchasedDeals",dataset:"purchases",title:"我的已购套餐",target:"按到期日排序",desc:"只展示 App“可使用”页已确认待消费的套餐；价格为当前剩余可用券实付。"}
 ];
 
 const safeUrl=value=>{
@@ -117,17 +170,20 @@ function scoreMetric(score){
   return metric(`${value.toFixed(1)} 分`,"门店评分 · 3.0分以下","score-low");
 }
 
-function renderItem(item){
+function renderItem(item,todayKey){
   const kind=item.kind||item.dealType;
   const kindMeta={
     pass_free_trial:{label:"PASS 免费试",className:""},
     purchased_deal:{label:"已购套餐",className:"tag-owned"}
   }[kind]||{label:item.tag||"优惠",className:""};
-  const secondary=item.vipOnly&&kind==="pass_free_trial"
-    ?'<span class="tag vip">橙V免费试</span>'
-    :kind==="purchased_deal"&&item.platformLabel
-      ?`<span class="tag platform">${esc(item.platformLabel)}</span>`
-      :"";
+  const expiry=kind==="purchased_deal"?expiryMeta(item.validUntil,todayKey):null;
+  const weekend=kind==="purchased_deal"?(WEEKEND_META[item.weekendPolicy]||WEEKEND_META.unknown):null;
+  const badges=[`<span class="tag ${kindMeta.className}">${esc(kindMeta.label)}</span>`];
+  if(item.vipOnly&&kind==="pass_free_trial")badges.push('<span class="tag vip">橙V免费试</span>');
+  if(kind==="purchased_deal"&&item.platformLabel)badges.push(`<span class="tag platform">${esc(item.platformLabel)}</span>`);
+  if(kind==="purchased_deal"&&item.dealType)badges.push(`<span class="tag platform">${esc(DEAL_TYPE_LABEL[item.dealType]||item.dealType)}</span>`);
+  if(expiry)badges.push(`<span class="tag ${expiry.className}">${esc(expiry.short)}</span>`);
+  if(weekend)badges.push(`<span class="tag weekend ${weekend.className}">${esc(weekend.label)}</span>`);
   const distance=item.distanceLabel||item.proximity;
   const metrics=[];
   let price="";
@@ -136,26 +192,36 @@ function renderItem(item){
     metrics.push(metric(`${fmt(item.passRemaining)} / ${fmt(item.passCapacity)}`,"PASS 剩余 / 总量"));
     metrics.push(metric(item.referenceValueCny!=null?`标称 ¥${fmt(item.referenceValueCny)}`:null,"平台标称价值"));
   }else if(kind==="purchased_deal"){
-    price=item.purchasePriceCny!=null?`已购 ¥${fmt(item.purchasePriceCny)}`:"已购买";
-    metrics.push(metric(item.purchasePriceCny!=null?`¥${fmt(item.purchasePriceCny)}`:null,"实际支付价"));
+    price=item.purchasePriceCny!=null?`可用券 ¥${fmt(item.purchasePriceCny)}`:"已购买";
+    metrics.push(metric(item.purchasePriceCny!=null?`¥${fmt(item.purchasePriceCny)}`:null,"当前可用券实付"));
+    metrics.push(metric(item.quantity?`${fmt(item.quantity)} 份`:null,"购买数量"));
+    if(item.quantity>1&&item.purchasePriceCny!=null)metrics.push(metric(`¥${fmt(item.purchasePriceCny/item.quantity)}`,"折合每份"));
     metrics.push(metric(item.comparisonPriceCny!=null?`¥${fmt(item.comparisonPriceCny)}`:null,"同页参考价"));
+    if(expiry)metrics.push(metric(expiry.label,`有效期至 ${item.validUntil}`,expiry.className));
   }
   metrics.push(metric(distance,"距公开参考点"));
   metrics.push(scoreMetric(item.score));
   const rules=[
     item.deadline?["截止",item.deadline]:null,
     item.validUntil?["有效期",item.validUntil]:null,
+    weekend?["周末",weekend.label]:null,
+    item.weekendRuleEvidence?["规则证据",item.weekendRuleEvidence]:null,
     item.useWindow?["使用",item.useWindow]:null,
     item.restrictions?["限制",item.restrictions]:null
   ].filter(Boolean).map(([label,value])=>`<li><strong>${esc(label)}：</strong>${esc(value)}</li>`).join("");
   const buttonLabel=kind==="purchased_deal"?"打开套餐详情":"打开免费试活动页";
   const button=item.detailUrl?`<a class="button" href="${safeUrl(item.detailUrl)}" target="_blank" rel="noopener noreferrer">${buttonLabel}</a>`:"";
-  const place=kind==="purchased_deal"?[item.shop,item.area,item.branch]:[item.area,item.branch,distance];
-  return `<article class="card"><div class="card-body">
-    <div class="topline"><div><span class="tag ${kindMeta.className}">${esc(kindMeta.label)}</span> ${secondary}</div><span class="price">${esc(price)}</span></div>
+  const firstStore=Array.isArray(item.eligibleStores)&&item.eligibleStores.length?item.eligibleStores[0]:null;
+  const place=kind==="purchased_deal"
+    ?[item.shop||firstStore?.shop||"门店待核验",item.branch||firstStore?.branch,item.area||firstStore?.area,item.address||firstStore?.address]
+    :[item.area,item.branch,distance];
+  const cardClass=expiry?` ${expiry.className}`:"";
+  const menuFallback=kind==="purchased_deal"?"订单页未公开菜品明细。":"活动页未公开菜品明细";
+  return `<article class="card${cardClass}"><div class="card-body">
+    <div class="topline"><div class="tags">${badges.join("")}</div><span class="price">${esc(price)}</span></div>
     <h2>${esc(item.title)}</h2>
     <p class="place">${place.filter(Boolean).map(esc).join(" · ")}</p>
-    <p class="menu"><strong>菜品：</strong>${esc(item.menuSummary||"活动页未公开菜品明细")}</p>
+    <p class="menu"><strong>菜品：</strong>${esc(item.menuSummary||menuFallback)}</p>
     <div class="metrics">${metrics.join("")}</div>
     <p class="reason">${esc(item.reason)}</p>
     ${rules?`<ul class="rules">${rules}</ul>`:""}
@@ -163,16 +229,74 @@ function renderItem(item){
   </div></article>`;
 }
 
-function renderSection(group,items,source){
+function renderPurchaseMapShell(items){
+  const mappedItems=items.filter(item=>Array.isArray(item.eligibleStores)&&item.eligibleStores.length).length;
+  return `<div class="map-panel">
+    <div class="map-head"><div><strong>已购美食分布</strong><span>只显示已核验的公开门店位置，不显示家庭参考点或访问路线。</span></div><div class="map-count">已定位 ${fmt(mappedItems)} / ${fmt(items.length)} 个套餐</div></div>
+    <div id="purchase-map" class="purchase-map" role="region" aria-label="已购美食门店地图"></div>
+    <p id="purchase-map-status" class="map-status">正在读取已核验门店位置…</p>
+  </div>`;
+}
+
+function renderSection(group,items,source,todayKey){
   let body="";
   if(source?.status==="pending_sync"){body=`<div class="status">已购套餐等待首次同步。${source.note?`<br>${esc(source.note)}`:""}</div>`}
   else if(source?.status==="login_required"){body=`<div class="status">本轮需要登录后才能核验，暂不展示未经确认的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
   else if(source?.status==="app_required"){body=`<div class="status">本轮关键条件只能在 App 内核验，暂不展示未经确认的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
   else if(source?.status==="error"){body=`<div class="status">本轮数据源不可用：${esc(source.note||"稍后重试")}</div>`}
-  else if(source?.status==="ok"&&items.length){body=`<div class="list">${items.map(renderItem).join("")}</div>`}
-  else if(group.kind==="purchased_deal"){body='<div class="status">当前没有仍在订单到期日前的已购套餐。</div>'}
+  else if(["ok","partial"].includes(source?.status)&&items.length){body=`${group.kind==="purchased_deal"?renderPurchaseMapShell(items):""}<div class="list">${items.map(item=>renderItem(item,todayKey)).join("")}</div>`}
+  else if(group.kind==="purchased_deal"){body='<div class="status">当前没有已确认仍可使用的已购套餐。</div>'}
   else{body='<div class="status">本轮没有符合条件且可用的项目。</div>'}
-  return `<section class="section"><div class="section-head"><div><h2>${group.title}</h2><p>${group.desc}</p></div><span class="target">${group.target}</span></div>${body}</section>`;
+  return `<section id="${esc(group.id)}" class="section"><div class="section-head"><div><h2>${group.title}</h2><p>${group.desc}</p></div><span class="target">${group.target}</span></div>${body}</section>`;
+}
+
+function initPurchaseMap(items,todayKey){
+  const container=document.querySelector("#purchase-map");
+  const status=document.querySelector("#purchase-map-status");
+  if(!container||!status)return;
+  const rows=[];
+  for(const item of items){
+    for(const store of Array.isArray(item.eligibleStores)?item.eligibleStores:[]){
+      if(Number.isFinite(store.lat)&&Number.isFinite(store.lng))rows.push({item,store,expiry:expiryMeta(item.validUntil,todayKey)});
+    }
+  }
+  if(!rows.length){
+    container.hidden=true;
+    status.textContent="当前还没有取得可公开展示的门店坐标；待套餐详情核验后，门店会自动出现在这里。";
+    return;
+  }
+  if(!window.L){
+    container.hidden=true;
+    status.classList.add("error");
+    status.textContent="地图资源暂时未能加载，已购套餐卡片和文字门店仍可正常查看。";
+    return;
+  }
+  try{
+    const grouped=new Map();
+    for(const row of rows){
+      const key=`${row.store.lat.toFixed(6)},${row.store.lng.toFixed(6)}`;
+      if(!grouped.has(key))grouped.set(key,{store:row.store,rows:[]});
+      grouped.get(key).rows.push(row);
+    }
+    const map=window.L.map(container,{scrollWheelZoom:false,attributionControl:true});
+    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap"}).addTo(map);
+    const bounds=[];
+    for(const group of grouped.values()){
+      const first=group.rows[0];
+      const popupItems=group.rows.map(row=>`<li>${esc(row.item.title)} · ${esc(row.expiry.label)} · ${esc((WEEKEND_META[row.item.weekendPolicy]||WEEKEND_META.unknown).label)}</li>`).join("");
+      const popup=`<strong>${esc(group.store.shop)}${group.store.branch?`（${esc(group.store.branch)}）`:""}</strong><span>${esc(group.store.address||group.store.area||"")}</span><ul>${popupItems}</ul>`;
+      window.L.circleMarker([group.store.lat,group.store.lng],{radius:9,color:first.expiry.color,weight:3,fillColor:first.expiry.color,fillOpacity:.75}).addTo(map).bindPopup(popup);
+      bounds.push([group.store.lat,group.store.lng]);
+    }
+    if(bounds.length===1)map.setView(bounds[0],14);
+    else map.fitBounds(bounds,{padding:[24,24],maxZoom:14});
+    const mappedItems=new Set(rows.map(row=>row.item.sourceId)).size;
+    status.textContent=`地图显示 ${grouped.size} 个已核验门店位置，覆盖 ${mappedItems} 个套餐；颜色与卡片到期提醒一致。`;
+  }catch{
+    container.hidden=true;
+    status.classList.add("error");
+    status.textContent="地图暂时无法显示，已购套餐卡片和文字门店仍可正常查看。";
+  }
 }
 
 const loadJson=file=>fetch(`${file}?v=${Date.now()}`,{cache:"no-store"})
@@ -185,17 +309,20 @@ Promise.all([loadJson("./latest.json"),loadJson("./purchases.json")])
       .filter(item=>item.kind==="pass_free_trial"&&item.availability==="available"&&radar.sources?.passFreeTrial?.status==="ok")
       .sort((a,b)=>(a.priorityRank??999)-(b.priorityRank??999));
     const purchasedItems=(Array.isArray(purchases.items)?purchases.items:[])
-      .filter(item=>item.kind==="purchased_deal"&&item.availability==="unexpired_order"&&item.validUntil>=todayKey&&purchases.sources?.purchasedDeals?.status==="ok")
-      .sort((a,b)=>(a.priorityRank??999)-(b.priorityRank??999));
+      .filter(item=>item.kind==="purchased_deal"&&item.availability==="usable_coupon"&&item.validUntil>=todayKey&&["ok","partial"].includes(purchases.sources?.purchasedDeals?.status))
+      .sort((a,b)=>a.validUntil.localeCompare(b.validUntil)||(a.priorityRank??999)-(b.priorityRank??999));
     const datasets={radar:{data:radar,items:radarItems},purchases:{data:purchases,items:purchasedItems}};
-    const purchaseHeadline=purchases.sources?.purchasedDeals?.status==="ok"?`已购套餐 ${fmt(purchasedItems.length)} 个`:"已购套餐待同步";
+    const purchaseHeadline=["ok","partial"].includes(purchases.sources?.purchasedDeals?.status)?`可用已购券 ${fmt(purchasedItems.length)} 张`:"已购套餐待同步";
     const updatedAt=[radar.generatedAt,purchases.updatedAt].filter(Boolean).sort().at(-1);
     summary.hidden=false;
     summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(radar.summary?.headline||`今日 PASS ${radarItems.length} 条`)}；${esc(purchaseHeadline)}</strong><span>PASS ${fmt(radarItems.length)} 条 · ${esc(purchaseHeadline)} · 更新于 ${esc(new Date(updatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
     sections.innerHTML=GROUPS.map(group=>{
       const dataset=datasets[group.dataset];
-      return renderSection(group,dataset.items.filter(item=>(item.kind||item.dealType)===group.kind),dataset.data.sources?.[group.source]);
+      return renderSection(group,dataset.items.filter(item=>(item.kind||item.dealType)===group.kind),dataset.data.sources?.[group.source],todayKey);
     }).join("");
+    document.querySelector("#quick-pass-count").textContent=`（${fmt(radarItems.length)}）`;
+    document.querySelector("#quick-purchase-count").textContent=`（${fmt(purchasedItems.length)}）`;
+    initPurchaseMap(purchasedItems,todayKey);
     const tips=[...(Array.isArray(radar.notes)?radar.notes:[]),...(Array.isArray(purchases.notes)?purchases.notes:[])];
     if(tips.length){notes.hidden=false;notes.querySelector("ul").innerHTML=tips.map(tip=>`<li>${esc(tip)}</li>`).join("")}
   })
