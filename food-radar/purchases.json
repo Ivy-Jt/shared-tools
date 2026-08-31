@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-31T11:08:30+08:00",
+  "sources": {
+    "purchasedDeals": {
+      "status": "ok",
+      "checkedAt": "2026-08-31T11:08:30+08:00",
+      "verifiedAt": "2026-08-31T11:08:30+08:00",
+      "note": "已从官方订单列表核验 3 条尚未到订单到期日、且标题明确标注橙V的套餐；支付成功不等于尚未核销。"
+    }
+  },
+  "summary": {
+    "count": 3
+  },
+  "items": [
+    {
+      "kind": "purchased_deal",
+      "sourceId": "dianping-orangev-shanye-20260905",
+      "platform": "dianping",
+      "platformLabel": "大众点评",
+      "availability": "unexpired_order",
+      "verifiedAt": "2026-08-31T11:08:30+08:00",
+      "title": "山野十足2-3人餐（橙V专享）",
+      "shop": "订单页未公开门店",
+      "branch": "订单页未公开分店",
+      "area": "武汉",
+      "priorityRank": 1,
+      "score": null,
+      "menuSummary": "订单页未公开菜品明细。",
+      "purchasePriceCny": 245,
+      "reason": "订单页显示已支付且尚未到订单到期日；是否已核销仍需在大众点评 App 确认。",
+      "validUntil": "2026-09-05",
+      "useWindow": "订单页仅公开到期日；具体可用时段待 App 核验。",
+      "restrictions": "门店、预约、节假日及退款规则未在网页订单列表公开，使用前请在 App 核对。"
+    },
+    {
+      "kind": "purchased_deal",
+      "sourceId": "dianping-orangev-bandeng-20260912",
+      "platform": "dianping",
+      "platformLabel": "大众点评",
+      "availability": "unexpired_order",
+      "verifiedAt": "2026-08-31T11:08:30+08:00",
+      "title": "【橙V专享】板凳招牌常德菜双人餐",
+      "shop": "订单页未公开门店",
+      "branch": "订单页未公开分店",
+      "area": "武汉",
+      "priorityRank": 2,
+      "score": null,
+      "menuSummary": "订单页未公开菜品明细。",
+      "purchasePriceCny": 128,
+      "reason": "订单页显示已支付且尚未到订单到期日；是否已核销仍需在大众点评 App 确认。",
+      "validUntil": "2026-09-12",
+      "useWindow": "订单页仅公开到期日；具体可用时段待 App 核验。",
+      "restrictions": "门店、预约、节假日及退款规则未在网页订单列表公开，使用前请在 App 核对。"
+    },
+    {
+      "kind": "purchased_deal",
+      "sourceId": "dianping-orangev-beefpot-20260920",
+      "platform": "dianping",
+      "platformLabel": "大众点评",
+      "availability": "unexpired_order",
+      "verifiedAt": "2026-08-31T11:08:30+08:00",
+      "title": "【橙V专享】招牌牛骨清汤锅2-3人餐（含自助凉菜/调料）",
+      "shop": "订单页未公开门店",
+      "branch": "订单页未公开分店",
+      "area": "武汉",
+      "priorityRank": 3,
+      "score": null,
+      "menuSummary": "招牌牛骨清汤锅，含自助凉菜和调料；订单页未公开其他菜品明细。",
+      "purchasePriceCny": 118,
+      "reason": "订单页显示已支付且尚未到订单到期日；是否已核销仍需在大众点评 App 确认。",
+      "validUntil": "2026-09-20",
+      "useWindow": "订单页仅公开到期日；具体可用时段待 App 核验。",
+      "restrictions": "门店、预约、节假日及退款规则未在网页订单列表公开，使用前请在 App 核对。"
+    }
+  ],
+  "notes": [
+    "已购套餐仅发布门店、菜品、实际支付价、公开评分、有效期和使用限制。",
+    "订单号、券码、账号信息、联系方式、支付凭证和带身份参数的链接不会写入公开页面。",
+    "网页订单列表只证明订单支付成功且尚未到订单到期日，不能确认券是否已经核销。",
+    "门店、评分或完整菜品未由订单页公开时，页面明确标记未公开，不凭套餐标题猜测。"
+  ]
+}

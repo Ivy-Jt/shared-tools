@@ -6,21 +6,20 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_PATH = path.join(ROOT, "food-radar", "latest.json");
+const PURCHASES_PATH = path.join(ROOT, "food-radar", "purchases.json");
 const data = JSON.parse(await readFile(DATA_PATH, "utf8"));
+const purchases = JSON.parse(await readFile(PURCHASES_PATH, "utf8"));
 
 const SOURCE_BY_KIND = {
   pass_free_trial: "passFreeTrial",
-  lv_store_gift: "lvStoreGift",
-  orange_v_paid: "orangeVPaid",
 };
 const SUMMARY_BY_KIND = {
   pass_free_trial: "passFreeTrial",
-  lv_store_gift: "lvStoreGift",
-  orange_v_paid: "orangeVPaid",
 };
-const LIMIT_BY_KIND = { pass_free_trial: 5, lv_store_gift: 3, orange_v_paid: 3 };
-const SOURCE_KEYS = ["lvStoreGift", "orangeVPaid", "passFreeTrial"];
+const LIMIT_BY_KIND = { pass_free_trial: 5 };
+const SOURCE_KEYS = ["passFreeTrial"];
 const SOURCE_STATUSES = new Set(["ok", "login_required", "app_required", "no_match", "error"]);
+const PURCHASE_SOURCE_STATUSES = new Set(["pending_sync", "ok", "no_match"]);
 const SENSITIVE_QUERY_KEYS = new Set([
   "accountid", "cookie", "dpid", "lat", "latitude", "lng", "longitude",
   "encctx", "isshare", "notitlebar", "openid", "session", "sharecampaignid",
@@ -29,6 +28,10 @@ const SENSITIVE_QUERY_KEYS = new Set([
 const REQUIRED_TEXT_FIELDS = [
   "sourceId", "title", "shop", "branch", "area", "distanceLabel", "reason",
   "deadline", "useWindow", "restrictions", "menuSummary", "detailUrl", "verifiedAt",
+];
+const REQUIRED_PURCHASE_TEXT_FIELDS = [
+  "sourceId", "title", "shop", "branch", "area", "platform", "platformLabel",
+  "reason", "validUntil", "useWindow", "restrictions", "menuSummary", "verifiedAt",
 ];
 const MAX_SCAN_AGE_MS = 6 * 60 * 60 * 1000;
 const MAX_VERIFICATION_SKEW_MS = 60 * 60 * 1000;
@@ -57,35 +60,32 @@ function validateDetailUrl(item) {
     assert(url.searchParams.get("offlineActivityId") === item.sourceId, `PASS sourceId mismatch: ${item.sourceId}`);
     const allowed = new Set(["offlineActivityId", "busiType"]);
     assert([...url.searchParams.keys()].every(key => allowed.has(key)), `unexpected PASS query: ${item.sourceId}`);
-  } else if (item.kind === "lv_store_gift") {
-    assert(url.hostname === "pmtmeishi.meituan.com", `unexpected LV gift host: ${item.sourceId}`);
-    assert(new RegExp(`^/dp/prefer/list/${item.sourceId}$`).test(url.pathname), `unexpected LV gift path: ${item.sourceId}`);
-    assert([...url.searchParams.keys()].length === 0, `LV gift link must be sanitized: ${item.sourceId}`);
-  } else {
-    assert(["m.dianping.com", "t.dianping.com"].includes(url.hostname), `unexpected Orange V host: ${item.sourceId}`);
-    const isActivityPage = url.hostname === "m.dianping.com" && url.pathname === "/app/femember-groupbuyinter-static/main.html";
-    if (isActivityPage) {
-      assert(/^\d+$/.test(item.sourceId), `Orange V activityId must be numeric: ${item.sourceId}`);
-      assert(url.searchParams.get("activityid") === item.sourceId, `Orange V activityId mismatch: ${item.sourceId}`);
-      assert([...url.searchParams.keys()].every(key => key === "activityid"), `unexpected Orange V activity query: ${item.sourceId}`);
-    } else {
-      assert(/^\/(?:shop|deal)\/[A-Za-z0-9_-]+$/.test(url.pathname), `unexpected Orange V path: ${item.sourceId}`);
-      assert([...url.searchParams.keys()].length === 0, `Orange V link must be sanitized: ${item.sourceId}`);
-    }
   }
 }
 
-assert(data.schemaVersion === 2, "schemaVersion must be 2");
+function validatePurchaseUrl(item) {
+  const url = new URL(item.detailUrl);
+  const allowedHosts = item.platform === "dianping"
+    ? new Set(["h5.dianping.com", "m.dianping.com", "t.dianping.com", "www.dianping.com"])
+    : new Set(["life.douyin.com", "v.douyin.com", "www.douyin.com"]);
+  assert(url.protocol === "https:", `non-HTTPS purchase detailUrl: ${item.sourceId}`);
+  assert(allowedHosts.has(url.hostname), `unexpected ${item.platform} purchase host: ${item.sourceId}`);
+  assert(url.username === "" && url.password === "", `credentials in purchase detailUrl: ${item.sourceId}`);
+  assert(!/(?:order|coupon|voucher|ticket|user)/i.test(url.pathname), `account-specific purchase path: ${item.sourceId}`);
+  assert([...url.searchParams.keys()].length === 0, `purchase detailUrl must not contain query parameters: ${item.sourceId}`);
+}
+
+assert(data.schemaVersion === 3, "schemaVersion must be 3");
 assert(data.city === "武汉", "city must be 武汉");
 assert(data.referenceRadiusKm === 3, "referenceRadiusKm must be 3");
 const generatedAtMs = parseDate(data.generatedAt, "generatedAt");
 assert(Date.now() - generatedAtMs <= MAX_SCAN_AGE_MS, "generatedAt is older than 6 hours");
 assert(generatedAtMs - Date.now() <= 5 * 60 * 1000, "generatedAt is unexpectedly in the future");
 assert(Array.isArray(data.items), "items must be an array");
-assert(data.items.length <= 11, "items exceed the 5 + 3 + 3 publication limit");
+assert(data.items.length <= 5, "items exceed the PASS publication limit");
 
 const actualSourceKeys = Object.keys(data.sources || {}).sort();
-assert(JSON.stringify(actualSourceKeys) === JSON.stringify(SOURCE_KEYS), "sources must contain exactly the three radar sources");
+assert(JSON.stringify(actualSourceKeys) === JSON.stringify(SOURCE_KEYS), "sources must contain exactly the PASS radar source");
 for (const [sourceKey, source] of Object.entries(data.sources)) {
   assert(SOURCE_STATUSES.has(source.status), `unknown source status: ${source.status}`);
   const sourceCheckedAtMs = parseDate(source.checkedAt, `${sourceKey}.checkedAt`);
@@ -99,8 +99,8 @@ for (const [sourceKey, source] of Object.entries(data.sources)) {
 }
 
 const sourceIds = new Set();
-const counts = { pass_free_trial: 0, lv_store_gift: 0, orange_v_paid: 0 };
-const itemsByKind = { pass_free_trial: [], lv_store_gift: [], orange_v_paid: [] };
+const counts = { pass_free_trial: 0 };
+const itemsByKind = { pass_free_trial: [] };
 
 for (const item of data.items) {
   assert(Object.hasOwn(SOURCE_BY_KIND, item.kind), `unknown kind: ${item.kind}`);
@@ -131,19 +131,6 @@ for (const item of data.items) {
     const deadlineMs = Date.parse(`${item.deadline.replace(" ", "T")}+08:00`);
     assert(Number.isFinite(deadlineMs) && deadlineMs > generatedAtMs, `expired PASS activity: ${item.sourceId}`);
   }
-  if (item.kind === "lv_store_gift") {
-    assert(item.minLevel >= 6, `LV gift below LV6: ${item.sourceId}`);
-    assert(item.noThreshold === true, `LV gift has an unverified threshold: ${item.sourceId}`);
-    assert(item.claimableVerified === true, `LV gift claimability not verified: ${item.sourceId}`);
-  }
-  if (item.kind === "orange_v_paid") {
-    assert(item.orangeVExclusive === true, `Orange V label not verified: ${item.sourceId}`);
-    assert(item.orangeVPriceVerified === true, `Orange V price not verified: ${item.sourceId}`);
-    assert(item.purchasableVerified === true, `Orange V purchase state not verified: ${item.sourceId}`);
-    assert(Number.isFinite(item.priceCny) && item.priceCny > 0, `invalid Orange V price: ${item.sourceId}`);
-    assert(Number.isFinite(item.comparisonPriceCny) && item.comparisonPriceCny > item.priceCny, `missing same-page comparison price: ${item.sourceId}`);
-    assert(Number.isFinite(item.savedCny) && Math.abs(item.savedCny - (item.comparisonPriceCny - item.priceCny)) < 0.01, `invalid Orange V savings: ${item.sourceId}`);
-  }
 }
 
 for (const kind of Object.keys(counts)) {
@@ -162,9 +149,65 @@ for (const kind of Object.keys(counts)) {
   }
 }
 
-const serialized = JSON.stringify(data);
+assert(purchases.schemaVersion === 1, "purchases.schemaVersion must be 1");
+parseDate(purchases.updatedAt, "purchases.updatedAt");
+const purchaseSourceKeys = Object.keys(purchases.sources || {}).sort();
+assert(JSON.stringify(purchaseSourceKeys) === JSON.stringify(["purchasedDeals"]), "purchases must contain exactly purchasedDeals source");
+const purchaseSource = purchases.sources.purchasedDeals;
+assert(PURCHASE_SOURCE_STATUSES.has(purchaseSource.status), `unknown purchase source status: ${purchaseSource.status}`);
+assert(Array.isArray(purchases.items), "purchases.items must be an array");
+assert(purchases.items.length <= 50, "purchases.items exceeds the public inventory limit");
+
+if (purchaseSource.status === "pending_sync") {
+  assert(purchaseSource.checkedAt === null && purchaseSource.verifiedAt === null, "pending purchase sync must not claim verification");
+  assert(purchases.items.length === 0, "pending purchase sync must not publish items");
+} else {
+  parseDate(purchaseSource.checkedAt, "purchasedDeals.checkedAt");
+  parseDate(purchaseSource.verifiedAt, "purchasedDeals.verifiedAt");
+  if (purchaseSource.status === "ok") assert(purchases.items.length > 0, "ok purchase source has no items");
+  else assert(purchases.items.length === 0, "no_match purchase source has items");
+}
+
+const purchaseIds = new Set();
+for (const item of purchases.items) {
+  assert(item.kind === "purchased_deal", `unknown purchase kind: ${item.kind}`);
+  assert(item.availability === "unexpired_order", `purchase is not an unexpired order: ${item.sourceId}`);
+  for (const field of REQUIRED_PURCHASE_TEXT_FIELDS) {
+    assert(typeof item[field] === "string" && item[field].trim().length > 0, `missing purchase ${field}: ${item.sourceId || "unknown"}`);
+  }
+  assert(/^[A-Za-z0-9][A-Za-z0-9_-]{2,80}$/.test(item.sourceId), `unsafe purchase sourceId: ${item.sourceId}`);
+  assert(!purchaseIds.has(item.sourceId), `duplicate purchase sourceId: ${item.sourceId}`);
+  purchaseIds.add(item.sourceId);
+  assert(["dianping", "douyin"].includes(item.platform), `unknown purchase platform: ${item.sourceId}`);
+  assert(Number.isInteger(item.priorityRank) && item.priorityRank > 0, `invalid purchase priorityRank: ${item.sourceId}`);
+  assert(Number.isFinite(item.purchasePriceCny) && item.purchasePriceCny > 0, `invalid actual purchase price: ${item.sourceId}`);
+  if (item.comparisonPriceCny != null) {
+    assert(Number.isFinite(item.comparisonPriceCny) && item.comparisonPriceCny >= item.purchasePriceCny, `invalid purchase comparison price: ${item.sourceId}`);
+  }
+  if (item.savedCny != null) {
+    assert(item.comparisonPriceCny != null, `purchase savings without comparison price: ${item.sourceId}`);
+    assert(Number.isFinite(item.savedCny) && Math.abs(item.savedCny - (item.comparisonPriceCny - item.purchasePriceCny)) < 0.01, `invalid purchase savings: ${item.sourceId}`);
+  }
+  assert(Object.hasOwn(item, "score"), `missing purchase score: ${item.sourceId}`);
+  if (item.score != null) assert(Number.isFinite(item.score) && item.score >= 0 && item.score <= 5, `invalid purchase score: ${item.sourceId}`);
+  assert(item.menuSummary.length <= 180, `purchase menuSummary is too long: ${item.sourceId}`);
+  assert(!/[*?？]/.test(item.menuSummary), `masked or uncertain purchase menuSummary: ${item.sourceId}`);
+  assert(/^\d{4}-\d{2}-\d{2}$/.test(item.validUntil), `purchase validUntil must be YYYY-MM-DD: ${item.sourceId}`);
+  const validUntilMs = Date.parse(`${item.validUntil}T23:59:59+08:00`);
+  assert(Number.isFinite(validUntilMs), `purchase validUntil must be a valid date: ${item.sourceId}`);
+  parseDate(item.verifiedAt, `${item.sourceId}.verifiedAt`);
+  if (item.detailUrl != null) {
+    assert(typeof item.detailUrl === "string" && item.detailUrl.trim().length > 0, `invalid purchase detailUrl: ${item.sourceId}`);
+    validatePurchaseUrl(item);
+  }
+}
+const rankedPurchases = purchases.items.slice().sort((a, b) => a.priorityRank - b.priorityRank);
+assert(rankedPurchases.every((item, index) => item.priorityRank === index + 1), "purchase priorityRank must be sequential");
+assert(purchases.summary?.count === purchases.items.length, "purchase summary count mismatch");
+
+const serialized = JSON.stringify({ data, purchases });
 const privatePatterns = [
-  /"(?:latitude|longitude|token|cookie|dpid|accountId|userId)"\s*:/i,
+  /"(?:latitude|longitude|token|cookie|dpid|accountId|userId|orderId|couponCode|voucherCode|phone|mobile)"\s*:/i,
   /(?:token|cookie|latitude|longitude|dpid|userid)(?:=|%3d)/i,
   /(?:encctx|isshare|notitlebar|sharecampaignid|shareid|utm_source)(?:=|%3d)/i,
   /(?:^|\D)30\.\d{4,}(?:\D|$)/,
@@ -172,4 +215,4 @@ const privatePatterns = [
 ];
 assert(!privatePatterns.some(pattern => pattern.test(serialized)), "private coordinate or account data detected");
 
-console.log(`RADAR_VALID pass=${counts.pass_free_trial} gift=${counts.lv_store_gift} paid=${counts.orange_v_paid}`);
+console.log(`RADAR_VALID pass=${counts.pass_free_trial} purchases=${purchases.items.length} purchase_status=${purchaseSource.status}`);

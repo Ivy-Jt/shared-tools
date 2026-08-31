@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fff8ef">
 <meta property="og:title" content="武汉美食优惠雷达">
-<meta property="og:description" content="每日筛选武汉 PASS 可兑换免费试、LV 到店礼和橙V专享价。">
+<meta property="og:description" content="每日筛选武汉 PASS 可兑换免费试，并汇总尚未到订单到期日的已购美食套餐。">
 <title>武汉美食优惠雷达</title>
 <style>
 :root{color-scheme:light;--ink:#251a12;--muted:#74665b;--paper:#fffdf9;--line:#eadfd3;--accent:#d85b25;--soft:#fff0df;--green:#247a58;--score-high:#e5f5ec;--score-high-ink:#176a4a;--score-mid:#fff1c9;--score-mid-ink:#885b08;--score-low:#fde5e3;--score-low-ink:#a13d36;--score-na:#eceeef;--score-na-ink:#6b7075}
@@ -32,8 +32,8 @@ h1{margin:0;font-size:30px;line-height:1.18;letter-spacing:-.03em}
 .card-body{padding:18px}
 .topline{display:flex;gap:8px;align-items:center;justify-content:space-between}
 .tag{display:inline-flex;align-items:center;min-height:26px;padding:4px 9px;border-radius:999px;background:var(--soft);color:#a74319;font-size:12px;font-weight:700}
-.tag-gift{background:#e8f5ef;color:#176a4a}
-.tag-paid{background:#2b2927;color:#fff}
+.tag-owned{background:#2b2927;color:#fff}
+.platform{background:#eef1f4;color:#3f4952}
 .vip{background:#2b2927;color:#fff}
 .price{color:var(--green);font-size:14px;font-weight:800;text-align:right}
 h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
@@ -57,8 +57,6 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .rules li+li{margin-top:4px}
 .button{display:flex;align-items:center;justify-content:center;min-height:46px;margin-top:16px;border-radius:12px;background:var(--ink);color:#fff;text-decoration:none;font-size:14px;font-weight:700}
 .button:active{transform:translateY(1px)}
-.status .button{max-width:340px;margin:18px auto 0}
-.entry-note{max-width:520px;margin:10px auto 0;color:#8c8177;font-size:12px;line-height:1.6}
 .notes{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.74)}
 .notes h3{margin:0 0 10px;font-size:15px}
 .notes ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.7}
@@ -73,7 +71,7 @@ footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:c
 <section class="hero">
 <p class="eyebrow">生活 · 武汉</p>
 <h1>美食优惠雷达</h1>
-<p class="lede">每天 10:01 起筛选 PASS 可兑换免费试、LV 到店礼和橙V专享价。以融侨城周边为公开距离参考，不包含家庭坐标或账号数据。</p>
+<p class="lede">每天 10:01 起筛选 PASS 可兑换免费试，并汇总尚未到订单到期日的已购美食套餐。以融侨城周边为公开距离参考，不包含家庭坐标、订单号、券码或账号数据。</p>
 </section>
 <div id="summary" class="summary" hidden></div>
 <div id="sections" aria-live="polite">
@@ -83,19 +81,23 @@ footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:c
 <h3>阅读提示</h3>
 <ul></ul>
 </section>
-<footer id="footer">数据来自公开活动页；最终可用条件以活动页面和门店说明为准。</footer>
+<footer id="footer">PASS 来自公开活动页；已购套餐仅展示脱敏后的套餐信息。最终可用条件以平台和门店说明为准。</footer>
 </main>
 <script>
 const esc=value=>String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));
 const fmt=value=>Number(value||0).toLocaleString("zh-CN");
+const shanghaiDateKey=()=>{
+  const parts=new Intl.DateTimeFormat("zh-CN",{timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const value=type=>parts.find(part=>part.type===type)?.value||"";
+  return `${value("year")}-${value("month")}-${value("day")}`;
+};
 const sections=document.querySelector("#sections");
 const summary=document.querySelector("#summary");
 const notes=document.querySelector("#notes");
 
 const GROUPS=[
-  {kind:"pass_free_trial",source:"passFreeTrial",title:"PASS 可兑换免费试",target:"约 5 个",desc:"必须支持 PASS 且剩余名额大于 0；近场和高价值优先。"},
-  {kind:"lv_store_gift",source:"lvStoreGift",title:"LV6+ 到店礼",target:"2–3 个",desc:"只收无门槛、当前可领且距离较近的到店礼。"},
-  {kind:"orange_v_paid",source:"orangeVPaid",title:"付费橙V专享价",target:"2–3 个",desc:"只收明确标注橙V专享价且当前可购买的美食套餐。",entryUrl:"https://w.dianping.com/cube/evoke/dianping.html?url=dianping%3A%2F%2Fpicassobox%3Fpicassoid%3Dpexus-freetry-index%2Findex-bundle.js%26tabpage%3D2",entryLabel:"去大众点评查看橙V活动",entryNote:"微信内会先打开大众点评官方跳转页，需再点“已下载 立即打开”；此入口仅供手动浏览，不代表套餐已核验或仍可购买。"}
+  {kind:"pass_free_trial",source:"passFreeTrial",dataset:"radar",title:"PASS 可兑换免费试",target:"约 5 个",desc:"必须支持 PASS 且剩余名额大于 0；近场和高价值优先。"},
+  {kind:"purchased_deal",source:"purchasedDeals",dataset:"purchases",title:"我的已购套餐",target:"订单未过期",desc:"展示尚未到订单到期日的已购美食套餐；价格为实际支付价，核销状态仍以 App 为准。"}
 ];
 
 const safeUrl=value=>{
@@ -119,10 +121,13 @@ function renderItem(item){
   const kind=item.kind||item.dealType;
   const kindMeta={
     pass_free_trial:{label:"PASS 免费试",className:""},
-    lv_store_gift:{label:"LV 到店礼",className:"tag-gift"},
-    orange_v_paid:{label:"橙V专享价",className:"tag-paid"}
+    purchased_deal:{label:"已购套餐",className:"tag-owned"}
   }[kind]||{label:item.tag||"优惠",className:""};
-  const secondary=item.vipOnly&&kind==="pass_free_trial"?'<span class="tag vip">橙V免费试</span>':"";
+  const secondary=item.vipOnly&&kind==="pass_free_trial"
+    ?'<span class="tag vip">橙V免费试</span>'
+    :kind==="purchased_deal"&&item.platformLabel
+      ?`<span class="tag platform">${esc(item.platformLabel)}</span>`
+      :"";
   const distance=item.distanceLabel||item.proximity;
   const metrics=[];
   let price="";
@@ -130,57 +135,68 @@ function renderItem(item){
     price="0元 · PASS";
     metrics.push(metric(`${fmt(item.passRemaining)} / ${fmt(item.passCapacity)}`,"PASS 剩余 / 总量"));
     metrics.push(metric(item.referenceValueCny!=null?`标称 ¥${fmt(item.referenceValueCny)}`:null,"平台标称价值"));
-  }else if(kind==="lv_store_gift"){
-    price="无门槛领取";
-    metrics.push(metric(item.minLevel?`LV${fmt(item.minLevel)}+`:null,"领取等级"));
-    metrics.push(metric(item.noThreshold?"无门槛":"条件待核验","领取条件"));
-  }else if(kind==="orange_v_paid"){
-    price=item.priceCny!=null?`橙V ¥${fmt(item.priceCny)}`:"橙V专享";
-    metrics.push(metric(item.priceCny!=null?`¥${fmt(item.priceCny)}`:null,"橙V专享价"));
-    metrics.push(metric(item.savedCny!=null?`省 ¥${fmt(item.savedCny)}`:null,"同页可核验优惠"));
+  }else if(kind==="purchased_deal"){
+    price=item.purchasePriceCny!=null?`已购 ¥${fmt(item.purchasePriceCny)}`:"已购买";
+    metrics.push(metric(item.purchasePriceCny!=null?`¥${fmt(item.purchasePriceCny)}`:null,"实际支付价"));
+    metrics.push(metric(item.comparisonPriceCny!=null?`¥${fmt(item.comparisonPriceCny)}`:null,"同页参考价"));
   }
   metrics.push(metric(distance,"距公开参考点"));
   metrics.push(scoreMetric(item.score));
   const rules=[
     item.deadline?["截止",item.deadline]:null,
+    item.validUntil?["有效期",item.validUntil]:null,
     item.useWindow?["使用",item.useWindow]:null,
     item.restrictions?["限制",item.restrictions]:null
   ].filter(Boolean).map(([label,value])=>`<li><strong>${esc(label)}：</strong>${esc(value)}</li>`).join("");
-  const buttonLabel=kind==="orange_v_paid"?"打开橙V套餐页":kind==="lv_store_gift"?"打开到店礼页面":"打开免费试活动页";
+  const buttonLabel=kind==="purchased_deal"?"打开套餐详情":"打开免费试活动页";
+  const button=item.detailUrl?`<a class="button" href="${safeUrl(item.detailUrl)}" target="_blank" rel="noopener noreferrer">${buttonLabel}</a>`:"";
+  const place=kind==="purchased_deal"?[item.shop,item.area,item.branch]:[item.area,item.branch,distance];
   return `<article class="card"><div class="card-body">
     <div class="topline"><div><span class="tag ${kindMeta.className}">${esc(kindMeta.label)}</span> ${secondary}</div><span class="price">${esc(price)}</span></div>
     <h2>${esc(item.title)}</h2>
-    <p class="place">${[item.area,item.branch,distance].filter(Boolean).map(esc).join(" · ")}</p>
+    <p class="place">${place.filter(Boolean).map(esc).join(" · ")}</p>
     <p class="menu"><strong>菜品：</strong>${esc(item.menuSummary||"活动页未公开菜品明细")}</p>
     <div class="metrics">${metrics.join("")}</div>
     <p class="reason">${esc(item.reason)}</p>
     ${rules?`<ul class="rules">${rules}</ul>`:""}
-    <a class="button" href="${safeUrl(item.detailUrl)}" target="_blank" rel="noopener noreferrer">${buttonLabel}</a>
+    ${button}
   </div></article>`;
 }
 
 function renderSection(group,items,source){
   let body="";
-  const manualEntry=group.entryUrl?`<a class="button" href="${safeUrl(group.entryUrl)}" target="_blank" rel="noopener noreferrer">${esc(group.entryLabel)}</a><p class="entry-note">${esc(group.entryNote)}</p>`:"";
-  if(source?.status==="login_required"){body=`<div class="status">需要登录账号核验，暂不展示未经验证的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
-  else if(source?.status==="app_required"){body=`<div class="status">官方入口已确认，但关键资格、价格或领取/购买状态仍需在大众点评 App 内核验；暂不展示未经验证的候选。${source.note?`<br>${esc(source.note)}`:""}${manualEntry}</div>`}
+  if(source?.status==="pending_sync"){body=`<div class="status">已购套餐等待首次同步。${source.note?`<br>${esc(source.note)}`:""}</div>`}
+  else if(source?.status==="login_required"){body=`<div class="status">本轮需要登录后才能核验，暂不展示未经确认的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
+  else if(source?.status==="app_required"){body=`<div class="status">本轮关键条件只能在 App 内核验，暂不展示未经确认的候选。${source.note?`<br>${esc(source.note)}`:""}</div>`}
   else if(source?.status==="error"){body=`<div class="status">本轮数据源不可用：${esc(source.note||"稍后重试")}</div>`}
   else if(source?.status==="ok"&&items.length){body=`<div class="list">${items.map(renderItem).join("")}</div>`}
+  else if(group.kind==="purchased_deal"){body='<div class="status">当前没有仍在订单到期日前的已购套餐。</div>'}
   else{body='<div class="status">本轮没有符合条件且可用的项目。</div>'}
   return `<section class="section"><div class="section-head"><div><h2>${group.title}</h2><p>${group.desc}</p></div><span class="target">${group.target}</span></div>${body}</section>`;
 }
 
-fetch(`./latest.json?v=${Date.now()}`,{cache:"no-store"})
-  .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()})
-  .then(data=>{
-    const sourceKeyByKind={pass_free_trial:"passFreeTrial",lv_store_gift:"lvStoreGift",orange_v_paid:"orangeVPaid"};
-    const items=(Array.isArray(data.items)?data.items:[])
-      .filter(item=>item.availability==="available"&&data.sources?.[sourceKeyByKind[item.kind]]?.status==="ok")
+const loadJson=file=>fetch(`${file}?v=${Date.now()}`,{cache:"no-store"})
+  .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()});
+
+Promise.all([loadJson("./latest.json"),loadJson("./purchases.json")])
+  .then(([radar,purchases])=>{
+    const todayKey=shanghaiDateKey();
+    const radarItems=(Array.isArray(radar.items)?radar.items:[])
+      .filter(item=>item.kind==="pass_free_trial"&&item.availability==="available"&&radar.sources?.passFreeTrial?.status==="ok")
       .sort((a,b)=>(a.priorityRank??999)-(b.priorityRank??999));
+    const purchasedItems=(Array.isArray(purchases.items)?purchases.items:[])
+      .filter(item=>item.kind==="purchased_deal"&&item.availability==="unexpired_order"&&item.validUntil>=todayKey&&purchases.sources?.purchasedDeals?.status==="ok")
+      .sort((a,b)=>(a.priorityRank??999)-(b.priorityRank??999));
+    const datasets={radar:{data:radar,items:radarItems},purchases:{data:purchases,items:purchasedItems}};
+    const purchaseHeadline=purchases.sources?.purchasedDeals?.status==="ok"?`已购套餐 ${fmt(purchasedItems.length)} 个`:"已购套餐待同步";
+    const updatedAt=[radar.generatedAt,purchases.updatedAt].filter(Boolean).sort().at(-1);
     summary.hidden=false;
-    summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(data.summary?.headline||`今日展示 ${items.length} 条`)}</strong><span>筛出 ${fmt(items.length)} 条已核验结果 · 更新于 ${esc(new Date(data.generatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
-    sections.innerHTML=GROUPS.map(group=>renderSection(group,items.filter(item=>(item.kind||item.dealType)===group.kind),data.sources?.[group.source])).join("");
-    const tips=Array.isArray(data.notes)?data.notes:[];
+    summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(radar.summary?.headline||`今日 PASS ${radarItems.length} 条`)}；${esc(purchaseHeadline)}</strong><span>PASS ${fmt(radarItems.length)} 条 · ${esc(purchaseHeadline)} · 更新于 ${esc(new Date(updatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
+    sections.innerHTML=GROUPS.map(group=>{
+      const dataset=datasets[group.dataset];
+      return renderSection(group,dataset.items.filter(item=>(item.kind||item.dealType)===group.kind),dataset.data.sources?.[group.source]);
+    }).join("");
+    const tips=[...(Array.isArray(radar.notes)?radar.notes:[]),...(Array.isArray(purchases.notes)?purchases.notes:[])];
     if(tips.length){notes.hidden=false;notes.querySelector("ul").innerHTML=tips.map(tip=>`<li>${esc(tip)}</li>`).join("")}
   })
   .catch(()=>{sections.innerHTML='<div class="status">今日结果暂时加载失败，请稍后刷新。</div>'});

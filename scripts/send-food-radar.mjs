@@ -24,8 +24,6 @@ try {
 const data = JSON.parse(await readFile(DATA_PATH, "utf8"));
 const sourceKeyByKind = {
   pass_free_trial: "passFreeTrial",
-  lv_store_gift: "lvStoreGift",
-  orange_v_paid: "orangeVPaid",
 };
 const items = Array.isArray(data.items)
   ? data.items
@@ -33,11 +31,7 @@ const items = Array.isArray(data.items)
     .sort((a, b) => a.priorityRank - b.priorityRank)
   : [];
 const passItems = items.filter(item => item.kind === "pass_free_trial").slice(0, 5);
-const giftItems = items.filter(item => item.kind === "lv_store_gift").slice(0, 3);
-const paidItems = items.filter(item => item.kind === "orange_v_paid").slice(0, 3);
-const selected = [...passItems, ...giftItems, ...paidItems];
-const giftStatus = data.sources?.lvStoreGift?.status;
-const paidStatus = data.sources?.orangeVPaid?.status;
+const selected = [...passItems];
 const scanDate = String(data.generatedAt || "").slice(0, 10);
 
 if (selected.length === 0) {
@@ -56,8 +50,6 @@ const fingerprintInput = {
     distanceKm: item.distanceKm,
     referenceValueCny: item.referenceValueCny,
     score: item.score,
-    priceCny: item.priceCny,
-    savedCny: item.savedCny,
     menuSummary: item.menuSummary,
     deadline: item.deadline,
     useWindow: item.useWindow,
@@ -78,7 +70,6 @@ if (!dryRun) {
   } catch {}
 }
 
-const statusCount = (items, status) => items.length || (status === "app_required" ? "待App核验" : 0);
 const scoreLabel = score => {
   if (score == null) return "⚪暂无评分";
   const value = Number(score);
@@ -89,26 +80,12 @@ const itemLines = (item, headline) => [
   `- ${headline}｜${scoreLabel(item.score)}`,
   `  - 菜品：${item.menuSummary}`,
 ];
-const title = `🍜 生活｜雷达：P${passItems.length}·礼${statusCount(giftItems, giftStatus)}·橙V${statusCount(paidItems, paidStatus)}`;
+const title = `🍜 生活｜雷达：PASS ${passItems.length}`;
 const sectionLines = [];
 if (passItems.length) {
   sectionLines.push("**PASS 可兑换**", ...passItems.flatMap(item => itemLines(item,
     `余${item.passRemaining}｜${item.title}（${item.area}${item.distanceLabel ? `，${item.distanceLabel}` : ""}）`
   )), "");
-}
-if (giftItems.length) {
-  sectionLines.push("**LV6+ 到店礼**", ...giftItems.flatMap(item => itemLines(item,
-    `${item.title}（${item.area}${item.distanceLabel ? `，${item.distanceLabel}` : ""}）`
-  )), "");
-} else if (giftStatus === "app_required") {
-  sectionLines.push("**LV6+ 到店礼**", "- 本轮仍需 App 内核验，不发送未确认候选。", "");
-}
-if (paidItems.length) {
-  sectionLines.push("**付费橙V专享价**", ...paidItems.flatMap(item => itemLines(item,
-    `¥${item.priceCny}｜${item.title}（${item.area}）`
-  )), "");
-} else if (paidStatus === "app_required") {
-  sectionLines.push("**付费橙V专享价**", "- 本轮仍需 App 内核验，不发送普通团购冒充的候选。", "");
 }
 const lines = [
   `今天筛出 ${selected.length} 条已核验结果。`,
@@ -118,7 +95,7 @@ const lines = [
 ];
 const payload = {
   title,
-  short: `PASS ${passItems.length} · 到店礼 ${statusCount(giftItems, giftStatus)} · 橙V价 ${statusCount(paidItems, paidStatus)}`,
+  short: `PASS ${passItems.length}`,
   desp: lines.join("\n"),
   noip: "1",
 };
