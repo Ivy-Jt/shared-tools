@@ -50,6 +50,20 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .place{margin:0;color:var(--muted);font-size:13px}
 .menu{margin:13px 0 0;padding:11px 12px;border-radius:12px;background:#f8f5f1;color:#4d3a2d;font-size:13px;line-height:1.65}
 .menu strong{color:var(--ink)}
+.menu-details,.confirmed-stores{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.menu-details>summary,.confirmed-stores>summary{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:12px 13px;cursor:pointer;color:var(--ink);font-size:13px;font-weight:800;list-style:none}
+.menu-details>summary::-webkit-details-marker,.confirmed-stores>summary::-webkit-details-marker{display:none}
+.menu-details>summary::after,.confirmed-stores>summary::after{content:"收起";flex:0 0 auto;color:var(--accent);font-size:11px}
+.menu-details:not([open])>summary::after,.confirmed-stores:not([open])>summary::after{content:"展开"}
+.menu-groups{display:grid;gap:10px;padding:0 10px 10px}
+.menu-group{padding:11px;border-radius:11px;background:#f8f5f1}
+.menu-group h3{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:0 0 7px;font-size:13px}
+.menu-group h3 span{color:var(--accent);font-size:11px}
+.menu-items{margin:0;padding:0;list-style:none;color:#4d3a2d;font-size:12px;line-height:1.55}
+.menu-items li{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.menu-items li+li{margin-top:5px}
+.menu-item-meta{flex:0 0 auto;color:var(--muted);text-align:right}
+.detail-note{margin:12px 0 0;padding:10px 12px;border-radius:11px;background:#fff4e5;color:#82510b;font-size:12px;line-height:1.6}
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:16px 0}
 .metric{padding:10px;border-radius:12px;background:#f8f5f1}
 .metric b{display:block;font-size:15px}
@@ -95,6 +109,8 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .store-meta{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
 .store-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .store-links a{color:var(--accent);font-size:12px;font-weight:700;text-decoration:none}
+.confirmed-stores .store-row.current{outline:2px solid rgba(216,91,37,.22);background:#fff8ef}
+.current-mark{margin-left:5px;color:var(--accent);font-size:10px;font-weight:800}
 .notes{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.74)}
 .notes h3{margin:0 0 10px;font-size:15px}
 .notes ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.7}
@@ -198,6 +214,38 @@ function scoreClass(score){
   return "score-low";
 }
 
+function renderMenuGroups(item){
+  const groups=Array.isArray(item.menuGroups)?item.menuGroups:[];
+  if(!groups.length)return "";
+  const itemCount=groups.reduce((count,group)=>count+(Array.isArray(group.items)?group.items.length:0),0);
+  const rows=groups.map(group=>{
+    const items=(Array.isArray(group.items)?group.items:[]).map(entry=>{
+      const meta=[entry.quantityText,entry.displayValueCny!=null?`展示价 ¥${fmt(entry.displayValueCny)}`:null].filter(Boolean).join(" · ");
+      return `<li><span>${esc(entry.name)}</span>${meta?`<span class="menu-item-meta">${esc(meta)}</span>`:""}</li>`;
+    }).join("");
+    return `<div class="menu-group"><h3>${esc(group.group)}${group.selectionRule?`<span>${esc(group.selectionRule)}</span>`:""}</h3><ul class="menu-items">${items}</ul></div>`;
+  }).join("");
+  return `<details class="menu-details" open><summary>完整套餐明细（${fmt(itemCount)} 项）</summary><div class="menu-groups">${rows}</div></details>`;
+}
+
+function renderConfirmedStores(item){
+  const stores=Array.isArray(item.confirmedStores)?item.confirmedStores:[];
+  if(!stores.length)return "";
+  const rows=stores.map(store=>{
+    const score=store.score==null?"暂无评分":`${Number(store.score).toFixed(1)} 分`;
+    const location=[store.area,store.address].filter(Boolean).join(" · ");
+    const mapLink=store.mapSearchUrl?`<div class="store-links"><a href="${safeUrl(store.mapSearchUrl)}" target="_blank" rel="noopener noreferrer">地图查看</a></div>`:"";
+    return `<div class="store-row${store.currentDetail?" current":""}">
+      <div class="store-row-head"><strong>${esc(store.shop)}（${esc(store.branch)}）${store.currentDetail?'<span class="current-mark">当前详情门店</span>':""}</strong><span class="store-score ${scoreClass(store.score)}">${esc(score)}</span></div>
+      ${location?`<p class="store-meta">${esc(location)}</p>`:""}
+      ${store.businessHours?`<p class="store-meta">门店营业时间：${esc(store.businessHours)}</p>`:""}
+      ${store.scoreSource?`<p class="store-meta">评分来源：${esc(store.scoreSource)}${store.reviewCount!=null?` · ${fmt(store.reviewCount)} 条评价/评分`:""}</p>`:""}
+      ${mapLink}
+    </div>`;
+  }).join("");
+  return `<details class="confirmed-stores" open><summary>App 已确认适用门店（${fmt(stores.length)} 家）</summary><div class="store-list">${rows}</div></details>`;
+}
+
 function renderCandidateStores(item){
   const candidates=Array.isArray(item.candidateStores)?item.candidateStores:[];
   if(!candidates.length)return "";
@@ -253,7 +301,8 @@ function renderItem(item,todayKey){
     metrics.push(metric(item.purchasePriceCny!=null?`¥${fmt(item.purchasePriceCny)}`:null,"当前可用券实付"));
     metrics.push(metric(item.quantity?`${fmt(item.quantity)} 份`:null,"购买数量"));
     if(item.quantity>1&&item.purchasePriceCny!=null)metrics.push(metric(`¥${fmt(item.purchasePriceCny/item.quantity)}`,"折合每份"));
-    metrics.push(metric(item.comparisonPriceCny!=null?`¥${fmt(item.comparisonPriceCny)}`:null,"同页参考价"));
+    metrics.push(metric(item.comparisonPriceCny!=null?`¥${fmt(item.comparisonPriceCny)}`:null,"App 同页展示价"));
+    metrics.push(metric(item.savedCny!=null?`¥${fmt(item.savedCny)}`:null,"实付较展示价节省"));
     if(expiry)metrics.push(metric(expiry.label,`有效期至 ${item.validUntil}`,expiry.className));
   }
   metrics.push(metric(distance,"距公开参考点"));
@@ -264,12 +313,20 @@ function renderItem(item,todayKey){
     weekend?["周末",weekend.label]:null,
     item.weekendRuleEvidence?["规则证据",item.weekendRuleEvidence]:null,
     item.useWindow?["使用",item.useWindow]:null,
-    item.restrictions?["限制",item.restrictions]:null
+    item.holidayPolicy?["节假日",item.holidayPolicy]:null,
+    item.reservationPolicy?["预约",item.reservationPolicy]:null,
+    item.roomPolicy?["包间",item.roomPolicy]:null,
+    item.stackingPolicy?["叠加",item.stackingPolicy]:null,
+    item.surchargePolicy?["加价",item.surchargePolicy]:null,
+    item.refundPolicy?["退款",item.refundPolicy]:null,
+    item.restrictions?["其他限制",item.restrictions]:null
   ].filter(Boolean).map(([label,value])=>`<li><strong>${esc(label)}：</strong>${esc(value)}</li>`).join("");
   const buttonLabel=kind==="purchased_deal"?"打开套餐详情":"打开免费试活动页";
   const button=item.detailUrl?`<a class="button" href="${safeUrl(item.detailUrl)}" target="_blank" rel="noopener noreferrer">${buttonLabel}</a>`:"";
   const mapButton=kind==="purchased_deal"&&item.mapSearchUrl?`<a class="button button-secondary" href="${safeUrl(item.mapSearchUrl)}" target="_blank" rel="noopener noreferrer">在地图搜索已确认门店</a>`:"";
   const candidateStores=kind==="purchased_deal"?renderCandidateStores(item):"";
+  const confirmedStores=kind==="purchased_deal"?renderConfirmedStores(item):"";
+  const menuGroups=kind==="purchased_deal"?renderMenuGroups(item):"";
   const firstStore=Array.isArray(item.eligibleStores)&&item.eligibleStores.length?item.eligibleStores[0]:null;
   const place=kind==="purchased_deal"
     ?[item.shop||firstStore?.shop||"门店待核验",item.branch||firstStore?.branch,item.area||firstStore?.area,item.address||firstStore?.address]
@@ -280,10 +337,13 @@ function renderItem(item,todayKey){
     <div class="topline"><div class="tags">${badges.join("")}</div><span class="price">${esc(price)}</span></div>
     <h2>${esc(item.title)}</h2>
     <p class="place">${place.filter(Boolean).map(esc).join(" · ")}</p>
-    <p class="menu"><strong>菜品：</strong>${esc(item.menuSummary||menuFallback)}</p>
+    <p class="menu"><strong>菜品概览：</strong>${esc(item.menuSummary||menuFallback)}</p>
+    ${menuGroups}
     <div class="metrics">${metrics.join("")}</div>
     <p class="reason">${esc(item.reason)}</p>
     ${rules?`<ul class="rules">${rules}</ul>`:""}
+    ${item.detailCompletenessNote?`<p class="detail-note">${esc(item.detailCompletenessNote)}</p>`:""}
+    ${confirmedStores}
     ${candidateStores}
     ${mapButton}
     ${button}
@@ -294,8 +354,9 @@ function renderPurchaseMapShell(items){
   const mappedItems=items.filter(item=>Array.isArray(item.eligibleStores)&&item.eligibleStores.length).length;
   const planningCount=items.reduce((count,item)=>count+(Array.isArray(item.planningLocations)?item.planningLocations.length:0),0);
   const candidateCount=items.reduce((count,item)=>count+(Array.isArray(item.candidateStores)?item.candidateStores.length:0),0);
+  const confirmedCount=items.reduce((count,item)=>count+(Array.isArray(item.confirmedStores)?item.confirmedStores.length:0),0);
   return `<div class="map-panel">
-    <div class="map-head"><div><strong>已购美食分布</strong><span>实心点为已核验门店；虚线点为有公开 WGS84 证据的路口近似位置。公开候选分店不会自动落点。</span></div><div class="map-count">精确 ${fmt(mappedItems)} / ${fmt(items.length)}<br>近似 ${fmt(planningCount)} · 候选 ${fmt(candidateCount)}</div></div>
+    <div class="map-head"><div><strong>已购美食分布</strong><span>实心点为已核验门店；虚线点为有公开 WGS84 证据的路口近似位置。App 已确认但尚无可靠坐标的门店只在卡片中展示，不伪造地图点。</span></div><div class="map-count">App 确认 ${fmt(confirmedCount)} 家<br>精确 ${fmt(mappedItems)} · 近似 ${fmt(planningCount)} · 候选 ${fmt(candidateCount)}</div></div>
     <div id="purchase-map" class="purchase-map" role="region" aria-label="已购美食门店地图"></div>
     <p id="purchase-map-status" class="map-status">正在读取已核验门店位置…</p>
   </div>`;

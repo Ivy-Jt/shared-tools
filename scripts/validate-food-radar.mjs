@@ -36,6 +36,12 @@ const CANDIDATE_STORE_KEYS = [
   "address", "area", "branch", "couponEligibility", "mapSearchUrl", "publicHours",
   "publicInfoSource", "publicInfoUrl", "relationship", "reviewCount", "score", "shop",
 ];
+const CONFIRMED_STORE_KEYS = [
+  "address", "area", "branch", "businessHours", "currentDetail", "mapSearchUrl",
+  "reviewCount", "score", "scoreSource", "shop",
+];
+const MENU_GROUP_KEYS = ["group", "items", "selectionRule"];
+const MENU_ITEM_KEYS = ["displayValueCny", "name", "quantityText"];
 const PLANNING_LOCATION_KEYS = ["accuracy", "area", "branch", "label", "lat", "lng", "note", "shop", "sourceType", "sourceUrl"];
 const PUBLIC_INFO_HOSTS = new Set(["gs.ctrip.com", "m.dianping.com", "maps.apple.com", "uri.amap.com"]);
 const MAP_SEARCH_HOSTS = new Set(["maps.apple.com", "uri.amap.com"]);
@@ -52,6 +58,10 @@ const REQUIRED_PURCHASE_TEXT_FIELDS = [
   "sourceId", "title", "area", "platform", "platformLabel", "reason", "validUntil",
   "useWindow", "restrictions", "menuSummary", "verifiedAt", "dealType",
   "detailVerificationStatus", "weekendPolicy",
+];
+const PURCHASE_RULE_FIELDS = [
+  "holidayPolicy", "reservationPolicy", "roomPolicy", "stackingPolicy",
+  "surchargePolicy", "refundPolicy", "detailCompletenessNote",
 ];
 const MAX_SCAN_AGE_MS = 6 * 60 * 60 * 1000;
 const MAX_VERIFICATION_SKEW_MS = 60 * 60 * 1000;
@@ -210,7 +220,7 @@ for (const kind of Object.keys(counts)) {
   }
 }
 
-assert(purchases.schemaVersion === 2, "purchases.schemaVersion must be 2");
+assert(purchases.schemaVersion === 3, "purchases.schemaVersion must be 3");
 parseDate(purchases.updatedAt, "purchases.updatedAt");
 const purchaseSourceKeys = Object.keys(purchases.sources || {}).sort();
 assert(JSON.stringify(purchaseSourceKeys) === JSON.stringify(["publicStores", "purchasedDeals"]), "purchases must contain purchasedDeals and publicStores sources");
@@ -246,6 +256,7 @@ let mappedPurchaseCount = 0;
 let verifiedDetailCount = 0;
 let publicCandidateStoreCount = 0;
 let planningLocationCount = 0;
+let confirmedStoreCount = 0;
 for (const item of purchases.items) {
   assert(item.kind === "purchased_deal", `unknown purchase kind: ${item.kind}`);
   assert(item.availability === "usable_coupon", `purchase is not verified as a usable coupon: ${item.sourceId}`);
@@ -277,6 +288,28 @@ for (const item of purchases.items) {
   if (item.score != null) assert(Number.isFinite(item.score) && item.score >= 0 && item.score <= 5, `invalid purchase score: ${item.sourceId}`);
   assert(item.menuSummary.length <= 180, `purchase menuSummary is too long: ${item.sourceId}`);
   assert(!/[*?？]/.test(item.menuSummary), `masked or uncertain purchase menuSummary: ${item.sourceId}`);
+  for (const field of PURCHASE_RULE_FIELDS) {
+    assert(Object.hasOwn(item, field), `missing purchase ${field}: ${item.sourceId}`);
+    assert(item[field] === null || (typeof item[field] === "string" && item[field].trim().length > 0 && item[field].length <= 500), `invalid purchase ${field}: ${item.sourceId}`);
+  }
+  assert(Array.isArray(item.menuGroups) && item.menuGroups.length > 0 && item.menuGroups.length <= 20, `invalid menuGroups: ${item.sourceId}`);
+  let menuItemCount = 0;
+  for (const [groupIndex, group] of item.menuGroups.entries()) {
+    assert(group && typeof group === "object" && !Array.isArray(group), `invalid menu group ${groupIndex}: ${item.sourceId}`);
+    assert(JSON.stringify(Object.keys(group).sort()) === JSON.stringify(MENU_GROUP_KEYS), `unexpected menu group fields ${groupIndex}: ${item.sourceId}`);
+    assert(typeof group.group === "string" && group.group.trim().length > 0, `missing menu group name: ${item.sourceId}`);
+    assert(group.selectionRule === null || (typeof group.selectionRule === "string" && group.selectionRule.trim().length > 0), `invalid selectionRule: ${item.sourceId}`);
+    assert(Array.isArray(group.items) && group.items.length > 0 && group.items.length <= 20, `invalid menu group items: ${item.sourceId}`);
+    for (const [itemIndex, menuItem] of group.items.entries()) {
+      assert(menuItem && typeof menuItem === "object" && !Array.isArray(menuItem), `invalid menu item ${groupIndex}.${itemIndex}: ${item.sourceId}`);
+      assert(JSON.stringify(Object.keys(menuItem).sort()) === JSON.stringify(MENU_ITEM_KEYS), `unexpected menu item fields ${groupIndex}.${itemIndex}: ${item.sourceId}`);
+      assert(typeof menuItem.name === "string" && menuItem.name.trim().length > 0 && !/[*?？]/.test(menuItem.name), `invalid menu item name: ${item.sourceId}`);
+      assert(typeof menuItem.quantityText === "string" && menuItem.quantityText.trim().length > 0, `invalid menu item quantity: ${item.sourceId}`);
+      assert(menuItem.displayValueCny === null || (Number.isFinite(menuItem.displayValueCny) && menuItem.displayValueCny >= 0), `invalid menu item value: ${item.sourceId}`);
+      menuItemCount += 1;
+    }
+  }
+  assert(menuItemCount <= 60, `too many menu items: ${item.sourceId}`);
   const validUntilMs = validateDateKey(item.validUntil, `${item.sourceId}.validUntil`);
   parseDate(item.verifiedAt, `${item.sourceId}.verifiedAt`);
   const verifiedDateKey = item.verifiedAt.slice(0, 10);
@@ -290,6 +323,34 @@ for (const item of purchases.items) {
     assert(typeof item.weekendRuleEvidence === "string", `verified weekend policy needs evidence: ${item.sourceId}`);
     assert(WEEKEND_RULE_SOURCES.has(item.weekendRuleSource), `invalid weekendRuleSource: ${item.sourceId}`);
   }
+
+  assert(Array.isArray(item.confirmedStores) && item.confirmedStores.length > 0 && item.confirmedStores.length <= 30, `invalid confirmedStores: ${item.sourceId}`);
+  const confirmedBranches = new Set();
+  let currentDetailStore = null;
+  for (const [index, store] of item.confirmedStores.entries()) {
+    assert(store && typeof store === "object" && !Array.isArray(store), `invalid confirmed store ${index}: ${item.sourceId}`);
+    assert(JSON.stringify(Object.keys(store).sort()) === JSON.stringify(CONFIRMED_STORE_KEYS), `unexpected confirmed store fields ${index}: ${item.sourceId}`);
+    for (const field of ["shop", "branch", "area", "address"]) {
+      assert(typeof store[field] === "string" && store[field].trim().length > 0, `missing confirmed store ${field}: ${item.sourceId}`);
+    }
+    assert(store.businessHours === null || (typeof store.businessHours === "string" && store.businessHours.trim().length > 0), `invalid confirmed businessHours: ${item.sourceId}`);
+    assert(store.score === null || (Number.isFinite(store.score) && store.score >= 0 && store.score <= 5), `invalid confirmed store score: ${item.sourceId}`);
+    assert(store.reviewCount === null || (Number.isInteger(store.reviewCount) && store.reviewCount >= 0), `invalid confirmed store reviewCount: ${item.sourceId}`);
+    assert(store.scoreSource === null || (typeof store.scoreSource === "string" && store.scoreSource.trim().length > 0), `invalid confirmed scoreSource: ${item.sourceId}`);
+    assert(typeof store.currentDetail === "boolean", `invalid confirmed currentDetail: ${item.sourceId}`);
+    validatePublicStoreUrl(store.mapSearchUrl, `confirmed mapSearchUrl: ${item.sourceId}`, MAP_SEARCH_HOSTS);
+    const branchId = `${store.shop}:${store.branch}`;
+    assert(!confirmedBranches.has(branchId), `duplicate confirmed branch: ${item.sourceId}`);
+    confirmedBranches.add(branchId);
+    if (store.currentDetail) {
+      assert(currentDetailStore === null, `multiple current detail stores: ${item.sourceId}`);
+      currentDetailStore = store;
+    }
+    confirmedStoreCount += 1;
+  }
+  assert(currentDetailStore !== null, `missing current detail store: ${item.sourceId}`);
+  assert(currentDetailStore.shop === item.shop && currentDetailStore.branch === item.branch && currentDetailStore.area === item.area && currentDetailStore.address === item.address, `current store must match item place: ${item.sourceId}`);
+  assert(currentDetailStore.score === item.score, `current store score must match item score: ${item.sourceId}`);
 
   assert(Array.isArray(item.eligibleStores), `eligibleStores must be an array: ${item.sourceId}`);
   assert(item.eligibleStores.length <= 30, `too many eligible stores: ${item.sourceId}`);
@@ -353,9 +414,9 @@ for (const item of purchases.items) {
     publicCandidateStoreCount += 1;
   }
   if (item.candidateStores.length > 0) {
-    assert(item.branch === null, `candidate stores must remain separate from a confirmed branch: ${item.sourceId}`);
-    assert(item.score === null, `candidate score must not become the purchase score: ${item.sourceId}`);
-    assert(item.weekendPolicy === "unknown", `public hours must not become a coupon weekend rule: ${item.sourceId}`);
+    for (const store of item.candidateStores) {
+      assert(!confirmedBranches.has(`${store.shop}:${store.branch}`), `candidate store duplicates an App-confirmed branch: ${item.sourceId}`);
+    }
   }
   if (item.mapSearchUrl != null) {
     assert(item.detailVerificationStatus === "official_app_detail_verified", `item mapSearchUrl needs an App-confirmed branch: ${item.sourceId}`);
@@ -369,6 +430,7 @@ for (const item of purchases.items) {
     if (item.detailVerificationStatus === "official_app_detail_verified") {
       assert(typeof item.address === "string" && item.address.trim().length > 0, `App detail verification needs an address: ${item.sourceId}`);
       assert(!/(?:未公开|待补充|未知|待核验)/.test(item.address), `placeholder purchase address: ${item.sourceId}`);
+      assert(item.menuGroups.length > 0 && item.confirmedStores.length > 0, `App detail verification needs menu and confirmed stores: ${item.sourceId}`);
       verifiedDetailCount += 1;
     }
   } else {
@@ -391,6 +453,7 @@ assert(purchases.summary?.mappedStoreCount === mappedPurchaseCount, "purchase ma
 assert(purchases.summary?.planningLocationCount === planningLocationCount, "purchase planningLocationCount mismatch");
 assert(purchases.summary?.verifiedDetailCount === verifiedDetailCount, "purchase verifiedDetailCount mismatch");
 assert(purchases.summary?.publicCandidateStoreCount === publicCandidateStoreCount, "purchase publicCandidateStoreCount mismatch");
+assert(purchases.summary?.confirmedStoreCount === confirmedStoreCount, "purchase confirmedStoreCount mismatch");
 if (publicStoreSource.status === "partial") assert(publicCandidateStoreCount > 0, "partial publicStores source has no candidate stores");
 if (publicStoreSource.status === "error") assert(publicCandidateStoreCount === 0 && planningLocationCount === 0, "failed publicStores source must not publish locations");
 if (purchaseSource.status === "ok") {
