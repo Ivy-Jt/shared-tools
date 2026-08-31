@@ -37,13 +37,14 @@ const CANDIDATE_STORE_KEYS = [
   "publicInfoSource", "publicInfoUrl", "relationship", "reviewCount", "score", "shop",
 ];
 const CONFIRMED_STORE_KEYS = [
-  "address", "area", "branch", "businessHours", "currentDetail", "mapSearchUrl",
-  "reviewCount", "score", "scoreSource", "shop",
+  "address", "area", "branch", "businessHours", "coordinateAccuracy", "coordinateSource",
+  "coordinateSourceUrl", "currentDetail", "lat", "lng", "mapSearchUrl", "reviewCount",
+  "score", "scoreSource", "shop",
 ];
 const MENU_GROUP_KEYS = ["group", "items", "selectionRule"];
 const MENU_ITEM_KEYS = ["displayValueCny", "name", "quantityText"];
 const PLANNING_LOCATION_KEYS = ["accuracy", "area", "branch", "label", "lat", "lng", "note", "shop", "sourceType", "sourceUrl"];
-const PUBLIC_INFO_HOSTS = new Set(["gs.ctrip.com", "m.dianping.com", "maps.apple.com", "uri.amap.com"]);
+const PUBLIC_INFO_HOSTS = new Set(["gs.ctrip.com", "m.dianping.com", "maps.apple.com", "uri.amap.com", "www.bing.com"]);
 const MAP_SEARCH_HOSTS = new Set(["maps.apple.com", "uri.amap.com"]);
 const SENSITIVE_QUERY_KEYS = new Set([
   "accountid", "cookie", "dpid", "lat", "latitude", "lng", "longitude",
@@ -143,6 +144,9 @@ function validatePublicStoreUrl(value, label, allowedHosts) {
     assert(/^\/shop\/\d+$/.test(url.pathname) && queryKeys.length === 0, `unexpected Dianping store URL in ${label}`);
   } else if (url.hostname === "gs.ctrip.com") {
     assert(/^\/html5\/you\/foods\/fooddetail\/\d+\/\d+\.html$/.test(url.pathname) && queryKeys.length === 0, `unexpected Ctrip store URL in ${label}`);
+  } else if (url.hostname === "www.bing.com") {
+    assert(url.pathname === "/maps" && JSON.stringify(queryKeys) === JSON.stringify(["q"]), `unexpected Bing Maps URL in ${label}`);
+    assert(url.searchParams.get("q")?.trim().length > 0, `missing Bing Maps query in ${label}`);
   }
 }
 
@@ -220,7 +224,7 @@ for (const kind of Object.keys(counts)) {
   }
 }
 
-assert(purchases.schemaVersion === 3, "purchases.schemaVersion must be 3");
+assert(purchases.schemaVersion === 4, "purchases.schemaVersion must be 4");
 parseDate(purchases.updatedAt, "purchases.updatedAt");
 const purchaseSourceKeys = Object.keys(purchases.sources || {}).sort();
 assert(JSON.stringify(purchaseSourceKeys) === JSON.stringify(["publicStores", "purchasedDeals"]), "purchases must contain purchasedDeals and publicStores sources");
@@ -252,7 +256,7 @@ if (purchaseSource.status === "pending_sync") {
 }
 
 const purchaseIds = new Set();
-let mappedPurchaseCount = 0;
+let mappedStoreCount = 0;
 let verifiedDetailCount = 0;
 let publicCandidateStoreCount = 0;
 let planningLocationCount = 0;
@@ -260,7 +264,7 @@ let confirmedStoreCount = 0;
 for (const item of purchases.items) {
   assert(item.kind === "purchased_deal", `unknown purchase kind: ${item.kind}`);
   assert(item.availability === "usable_coupon", `purchase is not verified as a usable coupon: ${item.sourceId}`);
-  for (const field of REQUIRED_PURCHASE_TEXT_FIELDS) {
+  for (const field of [...REQUIRED_PURCHASE_TEXT_FIELDS, "foodType"]) {
     assert(typeof item[field] === "string" && item[field].trim().length > 0, `missing purchase ${field}: ${item.sourceId || "unknown"}`);
   }
   assert(/^[A-Za-z0-9][A-Za-z0-9_-]{2,80}$/.test(item.sourceId), `unsafe purchase sourceId: ${item.sourceId}`);
@@ -338,7 +342,12 @@ for (const item of purchases.items) {
     assert(store.reviewCount === null || (Number.isInteger(store.reviewCount) && store.reviewCount >= 0), `invalid confirmed store reviewCount: ${item.sourceId}`);
     assert(store.scoreSource === null || (typeof store.scoreSource === "string" && store.scoreSource.trim().length > 0), `invalid confirmed scoreSource: ${item.sourceId}`);
     assert(typeof store.currentDetail === "boolean", `invalid confirmed currentDetail: ${item.sourceId}`);
+    assert(["store", "address"].includes(store.coordinateAccuracy), `invalid confirmed coordinateAccuracy: ${item.sourceId}`);
+    assert(typeof store.coordinateSource === "string" && store.coordinateSource.trim().length > 0, `missing confirmed coordinateSource: ${item.sourceId}`);
+    assert(Number.isFinite(store.lat) && store.lat >= 29.9 && store.lat <= 31.4, `confirmed latitude outside Wuhan boundary: ${item.sourceId}`);
+    assert(Number.isFinite(store.lng) && store.lng >= 113.6 && store.lng <= 115.1, `confirmed longitude outside Wuhan boundary: ${item.sourceId}`);
     validatePublicStoreUrl(store.mapSearchUrl, `confirmed mapSearchUrl: ${item.sourceId}`, MAP_SEARCH_HOSTS);
+    validatePublicStoreUrl(store.coordinateSourceUrl, `confirmed coordinateSourceUrl: ${item.sourceId}`, PUBLIC_INFO_HOSTS);
     const branchId = `${store.shop}:${store.branch}`;
     assert(!confirmedBranches.has(branchId), `duplicate confirmed branch: ${item.sourceId}`);
     confirmedBranches.add(branchId);
@@ -347,6 +356,7 @@ for (const item of purchases.items) {
       currentDetailStore = store;
     }
     confirmedStoreCount += 1;
+    mappedStoreCount += 1;
   }
   assert(currentDetailStore !== null, `missing current detail store: ${item.sourceId}`);
   assert(currentDetailStore.shop === item.shop && currentDetailStore.branch === item.branch && currentDetailStore.area === item.area && currentDetailStore.address === item.address, `current store must match item place: ${item.sourceId}`);
@@ -440,7 +450,6 @@ for (const item of purchases.items) {
   if (item.detailVerificationStatus === "official_deal_verified") {
     assert(item.weekendPolicy !== "unknown", `official deal verification needs a weekend policy: ${item.sourceId}`);
   }
-  if (item.eligibleStores.length > 0) mappedPurchaseCount += 1;
   if (item.detailUrl != null) {
     assert(typeof item.detailUrl === "string" && item.detailUrl.trim().length > 0, `invalid purchase detailUrl: ${item.sourceId}`);
     validatePurchaseUrl(item);
@@ -449,7 +458,7 @@ for (const item of purchases.items) {
 const rankedPurchases = purchases.items.slice().sort((a, b) => a.priorityRank - b.priorityRank);
 assert(rankedPurchases.every((item, index) => item.priorityRank === index + 1), "purchase priorityRank must be sequential");
 assert(purchases.summary?.count === purchases.items.length, "purchase summary count mismatch");
-assert(purchases.summary?.mappedStoreCount === mappedPurchaseCount, "purchase mappedStoreCount mismatch");
+assert(purchases.summary?.mappedStoreCount === mappedStoreCount, "purchase mappedStoreCount mismatch");
 assert(purchases.summary?.planningLocationCount === planningLocationCount, "purchase planningLocationCount mismatch");
 assert(purchases.summary?.verifiedDetailCount === verifiedDetailCount, "purchase verifiedDetailCount mismatch");
 assert(purchases.summary?.publicCandidateStoreCount === publicCandidateStoreCount, "purchase publicCandidateStoreCount mismatch");
@@ -463,6 +472,10 @@ if (purchaseSource.status === "ok") {
 
 const purchasesWithoutPublicStoreCoordinates = JSON.parse(JSON.stringify(purchases));
 for (const item of purchasesWithoutPublicStoreCoordinates.items || []) {
+  for (const store of item.confirmedStores || []) {
+    delete store.lat;
+    delete store.lng;
+  }
   for (const store of item.eligibleStores || []) {
     delete store.lat;
     delete store.lng;

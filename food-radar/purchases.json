@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 3,
-  "updatedAt": "2026-08-31T15:11:00+08:00",
+  "schemaVersion": 4,
+  "updatedAt": "2026-08-31T15:53:19+08:00",
   "sources": {
     "purchasedDeals": {
       "status": "partial",
@@ -10,15 +10,15 @@
     },
     "publicStores": {
       "status": "partial",
-      "checkedAt": "2026-08-31T14:03:18+08:00",
+      "checkedAt": "2026-08-31T15:53:19+08:00",
       "verifiedAt": null,
-      "note": "App 已确认 11 家适用门店；公开资料另保留 2 家尚未确认券适用性的候选门店。仅 1 个门店有可公开核验的路口近似坐标，其他门店不伪造地图点。"
+      "note": "App 已确认 11 家适用门店；8 家已匹配公开门店坐标，3 家匹配到所在商场或楼宇地址坐标。坐标统一转换为 WGS84 后展示，地址级点保持近似标记；另保留 2 家尚未确认券适用性的候选门店。"
     }
   },
   "summary": {
     "count": 7,
-    "mappedStoreCount": 0,
-    "planningLocationCount": 1,
+    "mappedStoreCount": 11,
+    "planningLocationCount": 0,
     "verifiedDetailCount": 7,
     "confirmedStoreCount": 11,
     "publicCandidateStoreCount": 2
@@ -38,7 +38,8 @@
       "address": "汉街三街区万达环球国际中心停车场内",
       "priorityRank": 1,
       "score": 4.8,
-      "menuSummary": "招牌菜二选一，另含虾酱啫花菜、烧腊双拼、金汤鱼翅鱼肚、米饭、茶和纸巾。",
+      "foodType": "粤菜",
+      "menuSummary": "鲍鱼焖鸡煲或黄骨鱼二选一，配虾酱啫花菜、烧腊双拼和鱼翅鱼肚。",
       "menuGroups": [
         {"group": "渔港招牌菜", "selectionRule": "2选1", "items": [
           {"name": "天天鲍鱼焖鸡煲", "quantityText": "1份", "displayValueCny": 98},
@@ -76,7 +77,7 @@
       "weekendRuleEvidence": "App 当前详情显示“周一至周日”。",
       "weekendRuleSource": "official_app",
       "confirmedStores": [
-        {"shop": "天天渔港·30年老字号·粤式酒楼", "branch": "汉街店", "area": "武昌·汉街", "address": "汉街三街区万达环球国际中心停车场内", "businessHours": "10:00–14:30、16:30–21:30", "score": 4.8, "reviewCount": 5, "scoreSource": "携程公开门店页", "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=天天渔港·粤式酒楼 汉街店&city=420100&view=map&src=food-radar&callnative=0"}
+        {"shop": "天天渔港·30年老字号·粤式酒楼", "branch": "汉街店", "area": "武昌·汉街", "address": "汉街三街区万达环球国际中心停车场内", "businessHours": "10:00–14:30、16:30–21:30", "score": 4.8, "reviewCount": 5, "scoreSource": "携程公开门店页", "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=天天渔港·粤式酒楼 汉街店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.5603544, "lng": 114.3306623, "coordinateAccuracy": "store", "coordinateSource": "Bing 地图公开门店结果（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://www.bing.com/maps?q=武汉 天天渔港 汉街店"}
       ],
       "eligibleStores": [],
       "planningLocations": [],
@@ -96,7 +97,8 @@
       "address": "欢乐大道46号",
       "priorityRank": 3,
       "score": 4.6,
-      "menuSummary": "招牌三选一、特色菜二选一，另含汽锅肉丸汤、时蔬、茶位和纸巾。",
+      "foodType": "湖北菜",
+      "menuSummary": "石斑鱼、生炒牛肉或小炒鸡三选一，另配肉丸汤、时蔬和特色菜。",
       "menuGroups": [
         {"group": "招牌", "selectionRule": "3选1", "items": [
           {"name": "砂锅臭石斑鱼", "quantityText": "1份", "displayValueCny": 88},
@@ -135,8 +137,8 @@
       "weekendRuleEvidence": null,
       "weekendRuleSource": null,
       "confirmedStores": [
-        {"shop": "翠蝈蝈的饭馆·湖北山野菜", "branch": "岳家嘴店", "area": "洪山·岳家嘴", "address": "欢乐大道46号", "businessHours": "11:00–14:00、17:00–21:00", "score": 4.6, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": true, "mapSearchUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F96959FA759C"},
-        {"shop": "翠蝈蝈的饭馆·湖北山野菜", "branch": "东湖店", "area": "洪山·东湖", "address": "鲁磨路大学村27号", "businessHours": null, "score": 4.2, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F95AF60C4CBC"}
+        {"shop": "翠蝈蝈的饭馆·湖北山野菜", "branch": "岳家嘴店", "area": "洪山·岳家嘴", "address": "欢乐大道46号", "businessHours": "11:00–14:00、17:00–21:00", "score": 4.6, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": true, "mapSearchUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F96959FA759C", "lat": 30.5855392, "lng": 114.3636626, "coordinateAccuracy": "store", "coordinateSource": "Apple 地图公开门店页（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F96959FA759C"},
+        {"shop": "翠蝈蝈的饭馆·湖北山野菜", "branch": "东湖店", "area": "洪山·东湖", "address": "鲁磨路大学村27号", "businessHours": null, "score": 4.2, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F95AF60C4CBC", "lat": 30.5397259, "lng": 114.4099902, "coordinateAccuracy": "store", "coordinateSource": "Apple 地图公开门店页（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F95AF60C4CBC"}
       ],
       "eligibleStores": [],
       "planningLocations": [],
@@ -158,7 +160,8 @@
       "address": "水果湖街道中北路118号复地东湖国际四期3号商业栋101-2",
       "priorityRank": 4,
       "score": 3.9,
-      "menuSummary": "主菜五选二、饮品九选二，另含米饭和一次性餐具；主菜与饮品均不可重复选。",
+      "foodType": "粤味啫啫煲",
+      "menuSummary": "豆花鱼、热干面扣肉、啫猪肝等主菜五选二，饮品九选二。",
       "menuGroups": [
         {"group": "主菜", "selectionRule": "5选2，不可重复选", "items": [
           {"name": "必点·双椒豆花鱼", "quantityText": "1份", "displayValueCny": 59},
@@ -204,8 +207,8 @@
       "weekendRuleEvidence": "App 当前详情显示“周一至周日”。",
       "weekendRuleSource": "official_app",
       "confirmedStores": [
-        {"shop": "悍焰粤香汉味串烧鸡大排档", "branch": "东湖国际店", "area": "武昌·东湖国际", "address": "水果湖街道中北路118号复地东湖国际四期3号商业栋101-2", "businessHours": "11:00–14:00、16:30–00:00", "score": 3.9, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=悍焰粤香汉味串烧鸡大排档 东湖国际店&city=420100&view=map&src=food-radar&callnative=0"},
-        {"shop": "悍焰串烧鸡啫啫煲大排档", "branch": "湖北大学店", "area": "武昌·湖北大学", "address": "徐家棚街道友谊大道合伙人大厦裙楼", "businessHours": null, "score": 4, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://uri.amap.com/search?keyword=悍焰串烧鸡啫啫煲大排档 湖北大学店&city=420100&view=map&src=food-radar&callnative=0"}
+        {"shop": "悍焰粤香汉味串烧鸡大排档", "branch": "东湖国际店", "area": "武昌·东湖国际", "address": "水果湖街道中北路118号复地东湖国际四期3号商业栋101-2", "businessHours": "11:00–14:00、16:30–00:00", "score": 3.9, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=悍焰粤香汉味串烧鸡大排档 东湖国际店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.561747, "lng": 114.3509769, "coordinateAccuracy": "address", "coordinateSource": "Bing 地图公开门牌地址（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://www.bing.com/maps?q=武汉市中北路118号复地东湖国际四期3号商业栋"},
+        {"shop": "悍焰串烧鸡啫啫煲大排档", "branch": "湖北大学店", "area": "武昌·湖北大学", "address": "徐家棚街道友谊大道合伙人大厦裙楼", "businessHours": null, "score": 4, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://uri.amap.com/search?keyword=悍焰串烧鸡啫啫煲大排档 湖北大学店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.5809193, "lng": 114.3237824, "coordinateAccuracy": "address", "coordinateSource": "Bing 地图公开楼宇地址（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://www.bing.com/maps?q=武汉 友谊大道 V%2B合伙人大厦"}
       ],
       "eligibleStores": [],
       "planningLocations": [],
@@ -225,7 +228,8 @@
       "address": "街道口流行视窗广场一楼",
       "priorityRank": 2,
       "score": null,
-      "menuSummary": "云贵现舂酸汤锅，配牛雪花、清远鸡、梅花肉、菌菇、豆油皮、蛋饺、蔬菜面与自助小食。",
+      "foodType": "酸汤火锅",
+      "menuSummary": "酸汤锅配牛雪花、清远鸡、梅花肉、菌菇、豆油皮和蔬菜面。",
       "menuGroups": [
         {"group": "招牌锅底", "selectionRule": null, "items": [
           {"name": "云贵现舂酸汤锅", "quantityText": "1份", "displayValueCny": 48}
@@ -268,7 +272,7 @@
       "weekendRuleEvidence": "App 当前详情显示“周一至周日”。",
       "weekendRuleSource": "official_app",
       "confirmedStores": [
-        {"shop": "在楚地·一品药膳鸡", "branch": "武汉旗舰店", "area": "洪山·街道口", "address": "街道口流行视窗广场一楼", "businessHours": "全天营业", "score": null, "reviewCount": null, "scoreSource": null, "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=在楚地·一品药膳鸡 武汉旗舰店&city=420100&view=map&src=food-radar&callnative=0"}
+        {"shop": "在楚地·一品药膳鸡", "branch": "武汉旗舰店", "area": "洪山·街道口", "address": "街道口流行视窗广场一楼", "businessHours": "全天营业", "score": null, "reviewCount": null, "scoreSource": null, "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=在楚地·一品药膳鸡 武汉旗舰店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.5282452, "lng": 114.3483678, "coordinateAccuracy": "address", "coordinateSource": "Bing 地图公开商场地址（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://www.bing.com/maps?q=流行视窗购物广场 街道口店"}
       ],
       "eligibleStores": [],
       "planningLocations": [],
@@ -288,7 +292,8 @@
       "address": "和平大道619号武昌万象城L7楼4号电梯左侧约30米",
       "priorityRank": 5,
       "score": null,
-      "menuSummary": "三组菜各二选一，另含五常大米、纸巾和茉莉白茶。",
+      "foodType": "湖南菜",
+      "menuSummary": "肥肠或牛肉钵、辣椒炒肉或鸡腿、粉皮酸包菜或金钱蛋，各二选一。",
       "menuGroups": [
         {"group": "妈妈的拿手菜", "selectionRule": "2选1", "items": [
           {"name": "石门干锅肥肠", "quantityText": "1份", "displayValueCny": 58.6},
@@ -329,7 +334,7 @@
       "weekendRuleEvidence": "App 当前详情显示“周一至周日”。",
       "weekendRuleSource": "official_app",
       "confirmedStores": [
-        {"shop": "板凳 BanDeng·湖南常德菜", "branch": "武昌万象城—大师店", "area": "武昌·徐家棚", "address": "和平大道619号武昌万象城L7楼4号电梯左侧约30米", "businessHours": "11:00–15:00、16:30–21:00", "score": null, "reviewCount": null, "scoreSource": null, "currentDetail": true, "mapSearchUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F9A6FB7BB32D"}
+        {"shop": "板凳 BanDeng·湖南常德菜", "branch": "武昌万象城—大师店", "area": "武昌·徐家棚", "address": "和平大道619号武昌万象城L7楼4号电梯左侧约30米", "businessHours": "11:00–15:00、16:30–21:00", "score": null, "reviewCount": null, "scoreSource": null, "currentDetail": true, "mapSearchUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F9A6FB7BB32D", "lat": 30.5868213, "lng": 114.3216592, "coordinateAccuracy": "store", "coordinateSource": "Apple 地图公开门店页（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://maps.apple.com/place?_provider=57879&place-id=H2710I3F9A6FB7BB32D"}
       ],
       "eligibleStores": [],
       "planningLocations": [],
@@ -351,7 +356,8 @@
       "address": "和平大道659号武汉滨江天街6楼48-49商铺",
       "priorityRank": 6,
       "score": 4.4,
-      "menuSummary": "黄油鸡、蒜蓉烤饼、卡拉奇比亚尼米饭、玛莎拉奶茶、海得拉巴柠檬水及服务费。",
+      "foodType": "巴基斯坦菜",
+      "menuSummary": "黄油鸡、蒜蓉烤饼、比亚尼米饭、玛莎拉奶茶和柠檬水。",
       "menuGroups": [
         {"group": "招牌特色必点", "selectionRule": null, "items": [
           {"name": "黄油鸡 Butter chicken", "quantityText": "1份／400克", "displayValueCny": 58},
@@ -383,9 +389,9 @@
       "weekendRuleEvidence": "App 使用须知明确写明周六不可用，未排除周日。",
       "weekendRuleSource": "official_app",
       "confirmedStores": [
-        {"shop": "木尔坦·Multan巴基斯坦餐厅", "branch": "武昌滨江天街店", "area": "武昌·滨江天街", "address": "和平大道659号武汉滨江天街6楼48-49商铺", "businessHours": "11:00–22:00", "score": 4.4, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=木尔坦·Multan巴基斯坦餐厅 武昌滨江天街店&city=420100&view=map&src=food-radar&callnative=0"},
-        {"shop": "木尔坦·Multan巴基斯坦餐厅", "branch": "大智嘉园店", "area": "江岸·大智路", "address": "大智路137号大智嘉园内", "businessHours": null, "score": 4.7, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://uri.amap.com/search?keyword=木尔坦·Multan巴基斯坦餐厅 大智嘉园店&city=420100&view=map&src=food-radar&callnative=0"},
-        {"shop": "木尔坦·Multan巴基斯坦餐厅", "branch": "菱角湖万达店", "area": "江汉·菱角湖", "address": "兴唐街菱角湖万达广场3楼3-22号商铺", "businessHours": null, "score": 4.4, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://uri.amap.com/search?keyword=木尔坦·Multan巴基斯坦餐厅 菱角湖万达店&city=420100&view=map&src=food-radar&callnative=0"}
+        {"shop": "木尔坦·Multan巴基斯坦餐厅", "branch": "武昌滨江天街店", "area": "武昌·滨江天街", "address": "和平大道659号武汉滨江天街6楼48-49商铺", "businessHours": "11:00–22:00", "score": 4.4, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=木尔坦·Multan巴基斯坦餐厅 武昌滨江天街店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.5934334, "lng": 114.3265496, "coordinateAccuracy": "store", "coordinateSource": "大众点评公开门店页导航坐标（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://m.dianping.com/shop/1029212146756883"},
+        {"shop": "木尔坦·Multan巴基斯坦餐厅", "branch": "大智嘉园店", "area": "江岸·大智路", "address": "大智路137号大智嘉园内", "businessHours": null, "score": 4.7, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://uri.amap.com/search?keyword=木尔坦·Multan巴基斯坦餐厅 大智嘉园店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.5933422, "lng": 114.2887108, "coordinateAccuracy": "store", "coordinateSource": "大众点评公开门店页导航坐标（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://m.dianping.com/shop/1728267253"},
+        {"shop": "木尔坦·Multan巴基斯坦餐厅", "branch": "菱角湖万达店", "area": "江汉·菱角湖", "address": "兴唐街菱角湖万达广场3楼3-22号商铺", "businessHours": null, "score": 4.4, "reviewCount": null, "scoreSource": "大众点评 App 适用门店列表", "currentDetail": false, "mapSearchUrl": "https://uri.amap.com/search?keyword=木尔坦·Multan巴基斯坦餐厅 菱角湖万达店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.6130882, "lng": 114.2637718, "coordinateAccuracy": "store", "coordinateSource": "大众点评公开门店页导航坐标（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://m.dianping.com/shop/1474796841"}
       ],
       "eligibleStores": [],
       "planningLocations": [],
@@ -405,7 +411,8 @@
       "address": "工业一路与恩施街交叉口东北角",
       "priorityRank": 7,
       "score": null,
-      "menuSummary": "牛骨清汤锅、吊龙、匙仁、手打牛肉丸、午餐肉、三种蔬菜面食、调料与纸巾。",
+      "foodType": "潮汕牛肉火锅",
+      "menuSummary": "牛骨清汤锅、吊龙、匙仁、手打牛肉丸、午餐肉和蔬菜。",
       "menuGroups": [
         {"group": "锅底与现切牛肉", "selectionRule": null, "items": [
           {"name": "招牌牛骨清汤锅", "quantityText": "1份", "displayValueCny": 25},
@@ -448,12 +455,10 @@
       "weekendRuleEvidence": "App 当前详情显示“周一至周日”。",
       "weekendRuleSource": "official_app",
       "confirmedStores": [
-        {"shop": "熊记潮牛·潮汕牛肉火锅", "branch": "青山恩施街店", "area": "青山·恩施街", "address": "工业一路与恩施街交叉口东北角", "businessHours": "00:00–01:00、11:00–24:00", "score": null, "reviewCount": null, "scoreSource": null, "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=熊记潮牛 潮汕牛肉火锅 青山恩施街店&city=420100&view=map&src=food-radar&callnative=0"}
+        {"shop": "熊记潮牛·潮汕牛肉火锅", "branch": "青山恩施街店", "area": "青山·恩施街", "address": "工业一路与恩施街交叉口东北角", "businessHours": "00:00–01:00、11:00–24:00", "score": null, "reviewCount": null, "scoreSource": null, "currentDetail": true, "mapSearchUrl": "https://uri.amap.com/search?keyword=熊记潮牛 潮汕牛肉火锅 青山恩施街店&city=420100&view=map&src=food-radar&callnative=0", "lat": 30.623868, "lng": 114.3861802, "coordinateAccuracy": "store", "coordinateSource": "Bing 地图公开门店结果（GCJ-02 转 WGS84）", "coordinateSourceUrl": "https://www.bing.com/maps?q=武汉 熊记潮牛 青山恩施街店"}
       ],
       "eligibleStores": [],
-      "planningLocations": [
-        {"accuracy": "intersection", "area": "青山·恩施街", "branch": "青山恩施街店", "label": "熊记潮牛·潮汕牛肉火锅（青山恩施街店）", "lat": 30.6235563, "lng": 114.3860147, "note": "工业一路与恩施街交叉口公开路口近似点，非门店中心点。", "shop": "熊记潮牛·潮汕牛肉火锅", "sourceType": "openstreetmap", "sourceUrl": "https://www.openstreetmap.org/node/1212025360"}
-      ],
+      "planningLocations": [],
       "candidateStores": []
     }
   ],
@@ -461,7 +466,7 @@
     "已购套餐只展示本轮在大众点评 App“可使用”列表中仍待消费的 7 张券；不依据网页版“支付成功”推断库存。",
     "红色为 3 天内到期，黄色为 7 天内到期，绿色为 7 天以上；页面按到期日自动排序。",
     "评分按门店逐家展示：4.0 分及以上为绿色，3.0–3.9 分为黄色，3.0 分以下为红色；未公开评分显示灰色。",
-    "App 已确认适用门店与公开候选分店严格分开；只有可靠坐标才进入地图，公开路口近似点以虚线显示。",
+    "地图覆盖 11 家 App 已确认适用门店：公开门店坐标用实心点，商场或楼宇地址坐标用虚线点；全部统一为 WGS84。",
     "未执行核销、退款、购买、预约、导航或联系商家；未持久化券码、二维码、订单号、账号标识或实时位置。"
   ]
 }
