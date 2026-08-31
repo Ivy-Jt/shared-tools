@@ -75,7 +75,26 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .rules{margin:13px 0 0;padding:0;list-style:none;color:var(--muted);font-size:13px;line-height:1.65}
 .rules li+li{margin-top:4px}
 .button{display:flex;align-items:center;justify-content:center;min-height:46px;margin-top:16px;border-radius:12px;background:var(--ink);color:#fff;text-decoration:none;font-size:14px;font-weight:700}
+.button-secondary{border:1px solid var(--line);background:#fff;color:var(--ink)}
 .button:active{transform:translateY(1px)}
+.store-clues{margin-top:14px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.store-clues summary{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:12px 13px;cursor:pointer;color:var(--ink);font-size:13px;font-weight:800;list-style:none}
+.store-clues summary::-webkit-details-marker{display:none}
+.store-clues summary::after{content:"展开";flex:0 0 auto;color:var(--accent);font-size:11px;font-weight:700}
+.store-clues[open] summary::after{content:"收起"}
+.store-clues summary span{color:var(--muted);font-size:11px;font-weight:500}
+.store-list{display:grid;gap:9px;padding:0 10px 10px}
+.store-row{padding:11px;border-radius:11px;background:#f8f5f1}
+.store-row-head{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.store-row strong{font-size:13px}
+.store-score{flex:0 0 auto;padding:3px 7px;border-radius:999px;font-size:11px;font-weight:800}
+.store-score.score-high{background:var(--score-high);color:var(--score-high-ink)}
+.store-score.score-mid{background:var(--score-mid);color:var(--score-mid-ink)}
+.store-score.score-low{background:var(--score-low);color:var(--score-low-ink)}
+.store-score.score-na{background:var(--score-na);color:var(--score-na-ink)}
+.store-meta{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
+.store-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.store-links a{color:var(--accent);font-size:12px;font-weight:700;text-decoration:none}
 .notes{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.74)}
 .notes h3{margin:0 0 10px;font-size:15px}
 .notes ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.7}
@@ -90,6 +109,7 @@ h2{margin:13px 0 5px;font-size:19px;line-height:1.42}
 .map-status.error{color:#9d463f}
 .leaflet-popup-content{max-width:240px;margin:12px 14px;line-height:1.55}
 .leaflet-popup-content strong{display:block;margin-bottom:4px}
+.leaflet-popup-content span{display:block}
 .leaflet-popup-content ul{margin:6px 0 0;padding-left:18px}
 footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:center}
 @media(max-width:420px){main{padding-top:14px}.hero{padding-top:16px}h1{font-size:27px}.quick-nav{margin-left:-2px;margin-right:-2px}.metrics{grid-template-columns:1fr}.metric{display:flex;align-items:center;justify-content:space-between}.metric span{margin:0}.card-body{padding:16px}.purchase-map{height:240px}}
@@ -170,6 +190,43 @@ function scoreMetric(score){
   return metric(`${value.toFixed(1)} 分`,"门店评分 · 3.0分以下","score-low");
 }
 
+function scoreClass(score){
+  const value=Number(score);
+  if(score===null||score===undefined||!Number.isFinite(value))return "score-na";
+  if(value>=4)return "score-high";
+  if(value>=3)return "score-mid";
+  return "score-low";
+}
+
+function renderCandidateStores(item){
+  const candidates=Array.isArray(item.candidateStores)?item.candidateStores:[];
+  if(!candidates.length)return "";
+  const scores=candidates.filter(store=>store.score!=null).map(store=>Number(store.score)).filter(Number.isFinite).sort((a,b)=>a-b);
+  const scoreSummary=scores.length
+    ?scores[0]===scores.at(-1)?`${scores[0].toFixed(1)} 分`:`${scores[0].toFixed(1)}–${scores.at(-1).toFixed(1)} 分`
+    :"暂无公开评分";
+  const rows=candidates.map(store=>{
+    const score=store.score==null?"暂无评分":`${Number(store.score).toFixed(1)} 分`;
+    const storeTitle=store.shop&&store.shop!==item.shop?`${store.shop}（${store.branch}）`:store.branch;
+    const source=[store.publicInfoSource,store.reviewCount!=null?`${fmt(store.reviewCount)} 条评价/评分`:null].filter(Boolean).join(" · ");
+    const location=[store.area,store.address].filter(Boolean).join(" · ");
+    const infoUrl=safeUrl(store.publicInfoUrl);
+    const mapUrl=safeUrl(store.mapSearchUrl);
+    const sameUrl=String(store.publicInfoUrl||"")===String(store.mapSearchUrl||"");
+    const links=sameUrl
+      ?`<a href="${mapUrl}" target="_blank" rel="noopener noreferrer">查看门店与地图</a>`
+      :`<a href="${infoUrl}" target="_blank" rel="noopener noreferrer">公开门店资料</a><a href="${mapUrl}" target="_blank" rel="noopener noreferrer">地图查看</a>`;
+    return `<div class="store-row">
+      <div class="store-row-head"><strong>${esc(storeTitle)}</strong><span class="store-score ${scoreClass(store.score)}">${esc(score)}</span></div>
+      ${location?`<p class="store-meta">${esc(location)}</p>`:""}
+      ${store.publicHours?`<p class="store-meta">门店营业时间（不代表券可用时段）：${esc(store.publicHours)}</p>`:""}
+      ${source?`<p class="store-meta">来源：${esc(source)}</p>`:""}
+      <div class="store-links">${links}</div>
+    </div>`;
+  }).join("");
+  return `<details class="store-clues"><summary><span>公开门店线索（${fmt(candidates.length)} 家 · ${esc(scoreSummary)}）<br>套餐适用性待 App 确认</span></summary><div class="store-list">${rows}</div></details>`;
+}
+
 function renderItem(item,todayKey){
   const kind=item.kind||item.dealType;
   const kindMeta={
@@ -211,6 +268,8 @@ function renderItem(item,todayKey){
   ].filter(Boolean).map(([label,value])=>`<li><strong>${esc(label)}：</strong>${esc(value)}</li>`).join("");
   const buttonLabel=kind==="purchased_deal"?"打开套餐详情":"打开免费试活动页";
   const button=item.detailUrl?`<a class="button" href="${safeUrl(item.detailUrl)}" target="_blank" rel="noopener noreferrer">${buttonLabel}</a>`:"";
+  const mapButton=kind==="purchased_deal"&&item.mapSearchUrl?`<a class="button button-secondary" href="${safeUrl(item.mapSearchUrl)}" target="_blank" rel="noopener noreferrer">在地图搜索已确认门店</a>`:"";
+  const candidateStores=kind==="purchased_deal"?renderCandidateStores(item):"";
   const firstStore=Array.isArray(item.eligibleStores)&&item.eligibleStores.length?item.eligibleStores[0]:null;
   const place=kind==="purchased_deal"
     ?[item.shop||firstStore?.shop||"门店待核验",item.branch||firstStore?.branch,item.area||firstStore?.area,item.address||firstStore?.address]
@@ -225,14 +284,18 @@ function renderItem(item,todayKey){
     <div class="metrics">${metrics.join("")}</div>
     <p class="reason">${esc(item.reason)}</p>
     ${rules?`<ul class="rules">${rules}</ul>`:""}
+    ${candidateStores}
+    ${mapButton}
     ${button}
   </div></article>`;
 }
 
 function renderPurchaseMapShell(items){
   const mappedItems=items.filter(item=>Array.isArray(item.eligibleStores)&&item.eligibleStores.length).length;
+  const planningCount=items.reduce((count,item)=>count+(Array.isArray(item.planningLocations)?item.planningLocations.length:0),0);
+  const candidateCount=items.reduce((count,item)=>count+(Array.isArray(item.candidateStores)?item.candidateStores.length:0),0);
   return `<div class="map-panel">
-    <div class="map-head"><div><strong>已购美食分布</strong><span>只显示已核验的公开门店位置，不显示家庭参考点或访问路线。</span></div><div class="map-count">已定位 ${fmt(mappedItems)} / ${fmt(items.length)} 个套餐</div></div>
+    <div class="map-head"><div><strong>已购美食分布</strong><span>实心点为已核验门店；虚线点为有公开 WGS84 证据的路口近似位置。公开候选分店不会自动落点。</span></div><div class="map-count">精确 ${fmt(mappedItems)} / ${fmt(items.length)}<br>近似 ${fmt(planningCount)} · 候选 ${fmt(candidateCount)}</div></div>
     <div id="purchase-map" class="purchase-map" role="region" aria-label="已购美食门店地图"></div>
     <p id="purchase-map-status" class="map-status">正在读取已核验门店位置…</p>
   </div>`;
@@ -257,12 +320,19 @@ function initPurchaseMap(items,todayKey){
   const rows=[];
   for(const item of items){
     for(const store of Array.isArray(item.eligibleStores)?item.eligibleStores:[]){
-      if(Number.isFinite(store.lat)&&Number.isFinite(store.lng))rows.push({item,store,expiry:expiryMeta(item.validUntil,todayKey)});
+      if(Number.isFinite(store.lat)&&Number.isFinite(store.lng))rows.push({item,store,approximate:false,expiry:expiryMeta(item.validUntil,todayKey)});
+    }
+    for(const location of Array.isArray(item.planningLocations)?item.planningLocations:[]){
+      if(Number.isFinite(location.lat)&&Number.isFinite(location.lng)){
+        const store={...location,address:location.label};
+        rows.push({item,store,approximate:true,expiry:expiryMeta(item.validUntil,todayKey)});
+      }
     }
   }
   if(!rows.length){
     container.hidden=true;
-    status.textContent="当前还没有取得可公开展示的门店坐标；待套餐详情核验后，门店会自动出现在这里。";
+    const candidateCount=items.reduce((count,item)=>count+(Array.isArray(item.candidateStores)?item.candidateStores.length:0),0);
+    status.textContent=`已整理 ${candidateCount} 条公开门店线索，但尚未同时确认套餐适用性与 WGS84 坐标；可先从套餐卡片进入门店资料或地图导航。`;
     return;
   }
   if(!window.L){
@@ -283,15 +353,18 @@ function initPurchaseMap(items,todayKey){
     const bounds=[];
     for(const group of grouped.values()){
       const first=group.rows[0];
+      const approximate=group.rows.every(row=>row.approximate);
       const popupItems=group.rows.map(row=>`<li>${esc(row.item.title)} · ${esc(row.expiry.label)} · ${esc((WEEKEND_META[row.item.weekendPolicy]||WEEKEND_META.unknown).label)}</li>`).join("");
-      const popup=`<strong>${esc(group.store.shop)}${group.store.branch?`（${esc(group.store.branch)}）`:""}</strong><span>${esc(group.store.address||group.store.area||"")}</span><ul>${popupItems}</ul>`;
-      window.L.circleMarker([group.store.lat,group.store.lng],{radius:9,color:first.expiry.color,weight:3,fillColor:first.expiry.color,fillOpacity:.75}).addTo(map).bindPopup(popup);
+      const accuracyNote=approximate?`<span>${esc(group.store.note||"公开近似位置，非门店中心点")}</span>`:"";
+      const popup=`<strong>${esc(group.store.shop)}${group.store.branch?`（${esc(group.store.branch)}）`:""}</strong><span>${esc(group.store.address||group.store.area||"")}</span>${accuracyNote}<ul>${popupItems}</ul>`;
+      window.L.circleMarker([group.store.lat,group.store.lng],{radius:9,color:first.expiry.color,weight:3,dashArray:approximate?"4 3":null,fillColor:first.expiry.color,fillOpacity:approximate ? 0.3 : 0.75}).addTo(map).bindPopup(popup);
       bounds.push([group.store.lat,group.store.lng]);
     }
     if(bounds.length===1)map.setView(bounds[0],14);
     else map.fitBounds(bounds,{padding:[24,24],maxZoom:14});
-    const mappedItems=new Set(rows.map(row=>row.item.sourceId)).size;
-    status.textContent=`地图显示 ${grouped.size} 个已核验门店位置，覆盖 ${mappedItems} 个套餐；颜色与卡片到期提醒一致。`;
+    const exactItems=new Set(rows.filter(row=>!row.approximate).map(row=>row.item.sourceId)).size;
+    const approximateItems=new Set(rows.filter(row=>row.approximate).map(row=>row.item.sourceId)).size;
+    status.textContent=`地图显示 ${exactItems} 个精确定位套餐、${approximateItems} 个路口近似定位套餐；虚线点不是门店中心，颜色与卡片到期提醒一致。`;
   }catch{
     container.hidden=true;
     status.classList.add("error");
