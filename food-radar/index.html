@@ -149,12 +149,11 @@ footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:c
 <section class="hero">
 <p class="eyebrow">生活 · 武汉</p>
 <h1>美食优惠雷达</h1>
-<p class="lede">每天 10:01 起筛选 PASS 可兑换免费试，并汇总大众点评 App 已确认可使用的已购美食套餐。以融侨城周边为公开距离参考，不包含家庭坐标、订单号、券码或账号数据。</p>
+<p class="lede">汇总大众点评 App 已确认可使用的已购美食套餐，按位置、菜系、到期日和周末可用性辅助安排。以融侨城周边为公开距离参考，不包含家庭坐标、订单号、券码或账号数据。</p>
 </section>
 <nav class="quick-nav" aria-label="页面快速跳转">
 <a class="primary" href="#purchase-planner">本周安排 <span id="quick-purchase-count"></span></a>
 <a href="#purchased-deals">套餐详情</a>
-<a href="#pass-trials">PASS <span id="quick-pass-count"></span></a>
 </nav>
 <section id="purchase-planner" class="planner" hidden></section>
 <div id="summary" class="summary" hidden></div>
@@ -165,7 +164,7 @@ footer{margin-top:24px;color:#8c8177;font-size:11px;line-height:1.6;text-align:c
 <h3>阅读提示</h3>
 <ul></ul>
 </section>
-<footer id="footer">PASS 来自公开活动页；已购套餐来自 App“可使用”列表并仅展示脱敏信息。最终使用条件以平台和门店说明为准。</footer>
+<footer id="footer">已购套餐来自 App“可使用”列表并仅展示脱敏信息。最终使用条件以平台和门店说明为准。</footer>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -218,8 +217,7 @@ const notes=document.querySelector("#notes");
 const planner=document.querySelector("#purchase-planner");
 
 const GROUPS=[
-  {id:"purchased-deals",kind:"purchased_deal",source:"purchasedDeals",dataset:"purchases",title:"我的已购套餐",target:"按到期日排序",desc:"先看位置、菜系和到期时间；感兴趣再展开门店详情。"},
-  {id:"pass-trials",kind:"pass_free_trial",source:"passFreeTrial",dataset:"radar",title:"PASS 可兑换免费试",target:"约 5 个",desc:"必须支持 PASS 且剩余名额大于 0；近场和高价值优先。"}
+  {id:"purchased-deals",kind:"purchased_deal",source:"purchasedDeals",dataset:"purchases",title:"我的已购套餐",target:"按到期日排序",desc:"先看位置、菜系和到期时间；感兴趣再展开门店详情。"}
 ];
 
 const safeUrl=value=>{
@@ -440,20 +438,17 @@ function initPurchaseMap(items,todayKey){
 const loadJson=file=>fetch(`${file}?v=${Date.now()}`,{cache:"no-store"})
   .then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json()});
 
-Promise.all([loadJson("./latest.json"),loadJson("./purchases.json")])
-  .then(([radar,purchases])=>{
+loadJson("./purchases.json")
+  .then(purchases=>{
     const todayKey=shanghaiDateKey();
-    const radarItems=(Array.isArray(radar.items)?radar.items:[])
-      .filter(item=>item.kind==="pass_free_trial"&&item.availability==="available"&&radar.sources?.passFreeTrial?.status==="ok")
-      .sort((a,b)=>(a.priorityRank??999)-(b.priorityRank??999));
     const purchasedItems=(Array.isArray(purchases.items)?purchases.items:[])
       .filter(item=>item.kind==="purchased_deal"&&item.availability==="usable_coupon"&&item.validUntil>=todayKey&&["ok","partial"].includes(purchases.sources?.purchasedDeals?.status))
       .sort((a,b)=>a.validUntil.localeCompare(b.validUntil)||(a.priorityRank??999)-(b.priorityRank??999));
-    const datasets={radar:{data:radar,items:radarItems},purchases:{data:purchases,items:purchasedItems}};
+    const datasets={purchases:{data:purchases,items:purchasedItems}};
     const purchaseHeadline=["ok","partial"].includes(purchases.sources?.purchasedDeals?.status)?`可用已购券 ${fmt(purchasedItems.length)} 张`:"已购套餐待同步";
-    const updatedAt=[radar.generatedAt,purchases.updatedAt].filter(Boolean).sort().at(-1);
+    const updatedAt=purchases.updatedAt;
     summary.hidden=false;
-    summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(radar.summary?.headline||`今日 PASS ${radarItems.length} 条`)}；${esc(purchaseHeadline)}</strong><span>PASS ${fmt(radarItems.length)} 条 · ${esc(purchaseHeadline)} · 更新于 ${esc(new Date(updatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
+    summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(purchaseHeadline)}</strong><span>按到期日自动隐藏过期券 · 更新于 ${esc(new Date(updatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
     sections.innerHTML=GROUPS.map(group=>{
       const dataset=datasets[group.dataset];
       return renderSection(group,dataset.items.filter(item=>(item.kind||item.dealType)===group.kind),dataset.data.sources?.[group.source],todayKey);
@@ -465,10 +460,9 @@ Promise.all([loadJson("./latest.json"),loadJson("./purchases.json")])
       planner.hidden=true;
       planner.innerHTML="";
     }
-    document.querySelector("#quick-pass-count").textContent=`（${fmt(radarItems.length)}）`;
     document.querySelector("#quick-purchase-count").textContent=`（${fmt(purchasedItems.length)}）`;
     initPurchaseMap(purchasedItems,todayKey);
-    const tips=[...(Array.isArray(radar.notes)?radar.notes:[]),...(Array.isArray(purchases.notes)?purchases.notes:[])];
+    const tips=Array.isArray(purchases.notes)?purchases.notes:[];
     if(tips.length){notes.hidden=false;notes.querySelector("ul").innerHTML=tips.map(tip=>`<li>${esc(tip)}</li>`).join("")}
   })
   .catch(()=>{sections.innerHTML='<div class="status">今日结果暂时加载失败，请稍后刷新。</div>'});

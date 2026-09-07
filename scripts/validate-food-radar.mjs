@@ -18,7 +18,7 @@ const SUMMARY_BY_KIND = {
 };
 const LIMIT_BY_KIND = { pass_free_trial: 5 };
 const SOURCE_KEYS = ["passFreeTrial"];
-const SOURCE_STATUSES = new Set(["ok", "login_required", "app_required", "no_match", "error"]);
+const SOURCE_STATUSES = new Set(["ok", "login_required", "app_required", "no_match", "error", "disabled"]);
 const PURCHASE_SOURCE_STATUSES = new Set(["pending_sync", "ok", "partial", "no_match"]);
 const PUBLIC_STORE_SOURCE_STATUSES = new Set(["ok", "partial", "error"]);
 const PURCHASE_DEAL_TYPES = new Set(["package", "voucher", "drink", "single_dish", "buffet", "checkin_gift"]);
@@ -154,8 +154,11 @@ assert(data.schemaVersion === 3, "schemaVersion must be 3");
 assert(data.city === "武汉", "city must be 武汉");
 assert(data.referenceRadiusKm === 3, "referenceRadiusKm must be 3");
 const generatedAtMs = parseDate(data.generatedAt, "generatedAt");
-assert(Date.now() - generatedAtMs <= MAX_SCAN_AGE_MS, "generatedAt is older than 6 hours");
-assert(generatedAtMs - Date.now() <= 5 * 60 * 1000, "generatedAt is unexpectedly in the future");
+const passDisabled = data.sources?.passFreeTrial?.status === "disabled";
+if (!passDisabled) {
+  assert(Date.now() - generatedAtMs <= MAX_SCAN_AGE_MS, "generatedAt is older than 6 hours");
+  assert(generatedAtMs - Date.now() <= 5 * 60 * 1000, "generatedAt is unexpectedly in the future");
+}
 assert(Array.isArray(data.items), "items must be an array");
 assert(data.items.length <= 5, "items exceed the PASS publication limit");
 
@@ -163,6 +166,11 @@ const actualSourceKeys = Object.keys(data.sources || {}).sort();
 assert(JSON.stringify(actualSourceKeys) === JSON.stringify(SOURCE_KEYS), "sources must contain exactly the PASS radar source");
 for (const [sourceKey, source] of Object.entries(data.sources)) {
   assert(SOURCE_STATUSES.has(source.status), `unknown source status: ${source.status}`);
+  if (source.status === "disabled") {
+    assert(source.checkedAt === null && source.verifiedAt === null, `${sourceKey} disabled source must not claim verification`);
+    assert(data.items.length === 0, `${sourceKey} disabled source must not publish items`);
+    continue;
+  }
   const sourceCheckedAtMs = parseDate(source.checkedAt, `${sourceKey}.checkedAt`);
   assert(Math.abs(sourceCheckedAtMs - generatedAtMs) <= MAX_VERIFICATION_SKEW_MS, `${sourceKey} check is stale`);
   if (source.status === "ok" || source.status === "no_match") {
