@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-17",
+  "trips": [
+    {
+      "id": "2026-maldives-bangkok",
+      "number": "Trip 001",
+      "title": "Maldives × Bangkok",
+      "subtitle": "中秋国庆蜜月旅行",
+      "status": "planning",
+      "statusLabel": "Planning",
+      "dateDisplay": "2026.09.30 — 10.07",
+      "routeDisplay": "武汉 → 马累 → 曼谷 → 武汉",
+      "durationLabel": "8 天",
+      "path": "./trips/2026-maldives-bangkok/"
+    }
+  ]
+}
