@@ -4,6 +4,9 @@
   const source = body.dataset.tripSource || './trip.json';
   let trip;
   let state;
+  let cloud;
+  let defaultBudgets;
+  let legacyPatch;
 
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
@@ -38,8 +41,11 @@
     }
   }
 
-  function saveState() {
-    localStorage.setItem(STORE, JSON.stringify(state));
+  function saveState(group, key) {
+    if (group) cloud?.edit(group, key, state[group][key]);
+    else {
+      try { localStorage.setItem('jtqx-global-trips-mode', state.mode); } catch { /* View mode is optional. */ }
+    }
   }
 
   function statusClass(status) {
@@ -123,11 +129,11 @@
   }
 
   function renderBudgetAndMemories() {
-    $('#budgetList').innerHTML = trip.budget.items.map(item => `<div class="budget-row"><span>${escapeHtml(item.label)}</span><input type="number" inputmode="numeric" class="budget-input" data-budget="${escapeHtml(item.key)}" ${item.key === 'bkkhotel' ? 'id="bkkHotelBudget"' : ''} placeholder="${item.defaultCny === null ? '待录入' : ''}"></div>`).join('');
+    $('#budgetList').innerHTML = trip.budget.items.map(item => `<div class="budget-row"><label for="budget-${escapeHtml(item.key)}">${escapeHtml(item.label)}</label><input id="budget-${escapeHtml(item.key)}" type="number" inputmode="decimal" min="0" max="10000000" step="0.01" class="budget-input" data-budget="${escapeHtml(item.key)}" placeholder="${item.defaultCny === null ? '待录入' : ''}"></div>`).join('');
     $('#budgetNote').textContent = trip.hotels.bangkok.status === 'confirmed'
-      ? `${trip.budget.note}曼谷酒店已订，实际房费请手动录入；旧候选自动估价不会当作实付。`
+      ? '已知金额与实际支出汇总；空白项目尚未计入。曼谷酒店已订 2 晚，实付待录入。'
       : `${trip.budget.note}选定曼谷酒店草稿后会按 ${trip.hotels.bangkok.nights} 晚自动计入。`;
-    $('#memoryGrid').innerHTML = trip.memoryPrompts.map(item => `<div class="memory-card"><h4>${escapeHtml(item.title)}</h4><textarea data-note="${escapeHtml(item.key)}" placeholder="${escapeHtml(item.placeholder)}"></textarea></div>`).join('');
+    $('#memoryGrid').innerHTML = trip.memoryPrompts.map(item => `<div class="memory-card"><h4><label for="note-${escapeHtml(item.key)}">${escapeHtml(item.title)}</label></h4><textarea id="note-${escapeHtml(item.key)}" maxlength="5000" data-note="${escapeHtml(item.key)}" placeholder="${escapeHtml(item.placeholder)}"></textarea></div>`).join('');
   }
 
   function bindState() {
@@ -139,7 +145,7 @@
       select.addEventListener('change', () => {
         state.packingStates[select.dataset.packingStatus] = select.value;
         select.dataset.state = select.value || 'unset';
-        saveState();
+        saveState('packingStates', select.dataset.packingStatus);
         updateProgress();
       });
     });
@@ -147,7 +153,7 @@
       input.checked = Boolean(state.checks[input.dataset.key]);
       input.addEventListener('change', () => {
         state.checks[input.dataset.key] = input.checked;
-        saveState();
+        saveState('checks', input.dataset.key);
         updateProgress();
       });
     });
@@ -155,7 +161,7 @@
       textarea.value = state.notes[textarea.dataset.note] || '';
       textarea.addEventListener('input', () => {
         state.notes[textarea.dataset.note] = textarea.value;
-        saveState();
+        saveState('notes', textarea.dataset.note);
       });
     });
     $$('.hotel-card').forEach(card => card.querySelector('.select-hotel').addEventListener('click', () => {
@@ -163,7 +169,7 @@
       state.hotelPrice = Number(card.dataset.price);
       state.budgets.bkkhotel = state.hotelPrice * trip.hotels.bangkok.nights;
       saveState();
-      $('#bkkHotelBudget').value = state.budgets.bkkhotel;
+      $('#budget-bkkhotel').value = state.budgets.bkkhotel;
       renderHotelState();
       renderBudgetTotal();
       updateProgress();
@@ -172,8 +178,9 @@
       const key = input.dataset.budget;
       input.value = state.budgets[key] ?? '';
       input.addEventListener('input', () => {
+        if (!input.validity.valid) { input.reportValidity(); return; }
         state.budgets[key] = input.value === '' ? '' : Number(input.value);
-        saveState();
+        saveState('budgets', key);
         renderBudgetTotal();
       });
     });
@@ -285,12 +292,93 @@
       } else activatePanel(button.dataset.panel, true);
     }));
     $('#printBtn').addEventListener('click', () => window.print());
-    $('#resetBtn').addEventListener('click', () => {
-      if (confirm('清空这个浏览器里的采购状态、打包勾选、预算草稿和旅行笔记？')) {
-        localStorage.removeItem(STORE);
-        location.reload();
+    $('#resetBtn').addEventListener('click', () => cloud?.logout());
+  }
+
+  function applyCloudState(remote) {
+    state.checks = { ...remote.checks };
+    state.packingStates = { ...remote.packingStates };
+    state.notes = { ...remote.notes };
+    state.budgets = { ...defaultBudgets, ...remote.budgets };
+    $$('input[type=checkbox][data-key]').forEach(input => { input.checked = state.checks[input.dataset.key] === true; });
+    $$('select[data-packing-status]').forEach(select => {
+      const item = trip.packing.flatMap(group => group.items).find(item => item.key === select.dataset.packingStatus);
+      const value = state.packingStates[item.key] ?? item.status ?? '';
+      select.value = packingLabels[value] ? value : '';
+      select.dataset.state = select.value || 'unset';
+    });
+    $$('textarea[data-note]').forEach(input => {
+      const value = state.notes[input.dataset.note] || '';
+      if (input.value !== value) input.value = value;
+    });
+    $$('.budget-input').forEach(input => {
+      const value = String(state.budgets[input.dataset.budget] ?? '');
+      if (input.value !== value) input.value = value;
+    });
+    renderBudgetTotal();
+    updateProgress();
+  }
+
+  function editable(enabled) {
+    $$('input[data-key],select[data-packing-status],textarea[data-note],.budget-input,.select-hotel,#resetBtn').forEach(input => { input.disabled = !enabled; });
+  }
+
+  function getLegacyPatch(legacy) {
+    const patch = { checks: {}, packingStates: {}, notes: {}, budgets: {} };
+    const keys = new Set([...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => item.key)));
+    for (const [key, value] of Object.entries(legacy.checks)) if (keys.has(key) && value === true) patch.checks[key] = true;
+    for (const item of trip.packing.flatMap(group => group.items)) {
+      const value = legacy.packingStates[item.key];
+      if (item.kind !== 'task' && (value === '' || packingLabels[value]) && value !== (item.status || '')) patch.packingStates[item.key] = value;
+    }
+    for (const item of trip.memoryPrompts) if (typeof legacy.notes[item.key] === 'string' && legacy.notes[item.key]) patch.notes[item.key] = legacy.notes[item.key];
+    for (const item of trip.budget.items) {
+      const value = legacy.budgets[item.key];
+      if (value !== defaultBudgets[item.key] && (value === '' || typeof value === 'number' && Number.isFinite(value) && value >= 0)) patch.budgets[item.key] = value;
+    }
+    return patch;
+  }
+
+  async function setupCloud() {
+    const { TripCloudSync } = await import('./cloud-sync.mjs');
+    const configResponse = await fetch(new URL('./cloud-config.json', new URL('../../app.js', location.href)), { cache: 'no-store' });
+    if (!configResponse.ok) throw new Error('云端配置读取失败');
+    const config = await configResponse.json();
+    const legacyCount = Object.values(legacyPatch).reduce((sum, values) => sum + Object.keys(values).length, 0);
+    const labels = Object.fromEntries([
+      ...trip.packing.flatMap(group => group.items), ...trip.todos.flatMap(group => group.items),
+      ...trip.budget.items, ...trip.memoryPrompts.map(item => ({ key: item.key, label: item.title }))
+    ].map(item => [item.key, item.label]));
+    cloud = new TripCloudSync({
+      apiBase: config.apiBase, tripId: trip.id, onChange: applyCloudState, onEditable: editable,
+      onStatus: info => {
+        $('#cloudStatus').textContent = info.message;
+        $('#cloudBar').dataset.status = info.kind;
+        $('#cloudLoginPanel').hidden = info.loggedIn || info.kind === 'disabled';
+        $('#cloudActions').hidden = !info.loggedIn;
+        $('#cloudImport').hidden = !legacyCount || info.imported;
+        $('#cloudConflict').hidden = !info.conflicts.length;
+        $('#cloudConflictNames').textContent = info.conflicts.map(item => labels[item.key] || item.key).join('、');
+        $('#cloudLogin').disabled = info.kind === 'loading' || info.kind === 'saving';
       }
     });
+    $('#cloudLoginForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      if (await cloud.login($('#cloudKey').value, $('#cloudRemember').checked)) $('#cloudKey').value = '';
+    });
+    $('#cloudRefresh').addEventListener('click', () => cloud.sync());
+    $('#cloudLogout').addEventListener('click', () => cloud.logout());
+    $('#cloudUseRemote').addEventListener('click', () => cloud.resolveConflicts(true));
+    $('#cloudUseLocal').addEventListener('click', () => cloud.resolveConflicts(false));
+    $('#cloudImport').addEventListener('click', () => {
+      const conflicts = [];
+      for (const [group, values] of Object.entries(legacyPatch)) for (const [key, value] of Object.entries(values)) {
+        if (Object.hasOwn(cloud.current[group], key) && cloud.current[group][key] !== value) conflicts.push(labels[key] || key);
+      }
+      const message = `将导入本浏览器的 ${legacyCount} 项旧记录。${conflicts.length ? `以下项目会以旧记录替换云端内容：${conflicts.join('、')}。` : ''}是否导入？`;
+      if (confirm(message)) cloud.importLegacy(legacyPatch);
+    });
+    await cloud.start();
   }
 
   async function init() {
@@ -298,8 +386,11 @@
     if (!response.ok) throw new Error(`Trip Data 读取失败：${response.status}`);
     trip = await response.json();
     if (!trip.id || !trip.dates || !trip.hotels) throw new Error('Trip Data 结构不完整');
-    const defaultBudgets = Object.fromEntries(trip.budget.items.map(item => [item.key, item.defaultCny ?? '']));
-    state = readState(defaultBudgets);
+    defaultBudgets = Object.fromEntries(trip.budget.items.map(item => [item.key, item.defaultCny ?? '']));
+    const legacy = readState(defaultBudgets);
+    legacyPatch = getLegacyPatch(legacy);
+    state = { mode: 'plan', hotel: '', hotelPrice: 0, checks: {}, packingStates: {}, notes: {}, budgets: { ...defaultBudgets } };
+    try { state.mode = localStorage.getItem('jtqx-global-trips-mode') || legacy.mode || 'plan'; } catch { /* Default view. */ }
     renderHeader();
     renderStatus();
     renderTimeline();
@@ -313,7 +404,12 @@
     renderBudgetTotal();
     updateProgress();
     setMode(state.mode || 'plan');
+    editable(false);
     document.documentElement.dataset.ready = 'true';
+    try { await setupCloud(); } catch {
+      $('#cloudStatus').textContent = '暂时无法连接云端，请刷新重试；原有本机记录仍保留';
+      $('#cloudBar').dataset.status = 'error';
+    }
   }
 
   init().catch(error => {

@@ -23,8 +23,14 @@
       <button class="mode-btn" data-mode="live">Live 旅途中</button>
       <button class="mode-btn" data-mode="memory">Memory 纪念册</button>
     </div>
-    <div class="top-actions"><button class="icon-btn" id="printBtn">打印 / 存 PDF</button><button class="icon-btn" id="resetBtn">重置本机草稿</button></div>
+    <div class="top-actions"><button class="icon-btn" id="printBtn">打印 / 存 PDF</button><button class="icon-btn" id="resetBtn" disabled>退出云端登录</button></div>
   </nav>
+
+  <section class="cloud-bar" id="cloudBar" data-status="loading" aria-label="云端同步">
+    <div class="cloud-line"><span id="cloudStatus" role="status" aria-live="polite">正在连接云端…</span><div id="cloudActions" class="cloud-actions" hidden><button id="cloudRefresh">刷新 / 重试</button><button id="cloudImport" hidden>导入本机旧记录</button><button id="cloudLogout">退出</button></div></div>
+    <details id="cloudLoginPanel"><summary>登录以编辑</summary><form id="cloudLoginForm"><input type="hidden" name="username" autocomplete="username" value="JT"><label for="cloudKey">旅行登录码</label><div class="cloud-login-row"><input id="cloudKey" name="password" type="password" autocomplete="current-password" placeholder="输入专用旅行登录码" required><button id="cloudLogin" type="submit">连接</button></div><label class="cloud-remember"><input id="cloudRemember" type="checkbox" checked>记住这台设备</label><small>使用同一个登录码，可在手机和电脑继续编辑。</small></form></details>
+    <div id="cloudConflict" class="cloud-conflict" hidden><p>这些项目在其他设备也有修改：<span id="cloudConflictNames"></span></p><button id="cloudUseRemote">采用云端内容</button><button id="cloudUseLocal">保留我的修改</button></div>
+  </section>
 
   <section class="mobile-summary card" id="overview">
     <div class="mobile-kicker"><span id="mobileNumber">Trip</span><span id="mobileCountdown">—</span></div>
@@ -51,18 +57,18 @@
   <section class="timeline-card card" id="timelineSection"><div class="section-head"><div><h3>行程时间线 <small>Timeline</small></h3><small>大节点保持清楚，不让攻略淹没旅行</small></div><span class="pill">Trip 001</span></div><div class="timeline" id="timeline"></div></section>
 
   <section class="planner card" id="planner">
-    <div class="section-head"><div><h3>旅行规划中心 <small>Plan Together, Go Further</small></h3><small>确认事实来自 Trip Data；页面操作是本机草稿。</small></div><span class="pill">JT × QX</span></div>
+    <div class="section-head"><div><h3>旅行规划中心 <small>Plan Together, Go Further</small></h3><small>登录后，清单、预算与笔记自动保存到云端。</small></div><span class="pill">JT × QX</span></div>
     <div class="planner-tabs" role="tablist"><button class="plan-tab active" data-panel="itinerary">行程</button><button class="plan-tab" data-panel="hotels">酒店</button><button class="plan-tab" data-panel="packing">打包清单</button><button class="plan-tab" data-panel="budget">预算</button><button class="plan-tab" data-panel="todos">待办</button><button class="plan-tab" data-panel="memories">旅行回忆</button></div>
     <div class="panel active" id="panel-itinerary"><div class="itinerary-grid"><div class="day-list" id="dayList"></div><div class="aside-note" id="principles"></div></div></div>
     <div class="panel" id="panel-hotels"><div class="known-booking" id="maldivesBooking"></div><div class="section-head" style="margin-top:12px"><div><h3 style="font-size:17px">Bangkok · 已订酒店</h3><small id="bangkokPriceNote"></small></div></div><div class="hotel-grid" id="hotelGrid"></div><div class="challenge" id="decisionNote"></div></div>
-    <div class="panel" id="panel-packing"><p class="packing-help">物品可标记“已有 / 已买 / 待买 / 可选 / 不需要”；“已打包”与准备事项单独勾选。可选未带和不需要的物品不计入打包进度。修改仅保存在当前浏览器。</p><div class="check-grid" id="packingGroups"></div></div>
+    <div class="panel" id="panel-packing"><p class="packing-help">采购状态和“已打包”分别记录；可选未带和不需要的物品不计入进度。登录后自动保存。</p><div class="check-grid" id="packingGroups"></div></div>
     <div class="panel" id="panel-budget"><div class="budget-grid"><div class="budget-list" id="budgetList"></div><div class="total-box"><div class="eyebrow">Trip Budget</div><div class="big" id="budgetTotal">—</div><p id="budgetNote"></p></div></div></div>
     <div class="panel" id="panel-todos"><div class="todo-grid" id="todoGroups"></div></div>
     <div class="panel" id="panel-memories"><div class="memory-grid" id="memoryGrid"></div></div>
   </section>
 
   <div class="load-error" id="appError" hidden></div>
-  <footer class="footer">JT & QX’s Global Trips · Trip 001 · 确认事实来自 trip.json；采购状态、勾选、预算草稿和笔记仅保存在本浏览器</footer>
+  <footer class="footer">JT & QX’s Global Trips · Trip 001 · 登录后，采购状态、勾选、预算和笔记可跨设备同步。</footer>
 </div>
 
 <nav class="mobile-nav" aria-label="手机工作区导航"><button class="active" data-action="overview">首页</button><button data-panel="itinerary">行程</button><button data-panel="hotels">酒店</button><button data-panel="packing">清单</button><button data-panel="memories">回忆</button></nav>

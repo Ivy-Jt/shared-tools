@@ -1,0 +1,16 @@
+{
+  "name": "jt-global-trips-sync",
+  "main": "src/worker.mjs",
+  "compatibility_date": "2026-09-22",
+  "workers_dev": true,
+  "vars": { "ALLOWED_ORIGINS": "https://ivy-jt.github.io" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "jt-global-trips",
+      "database_id": "7464675d-f9f7-4004-8f85-e9a423a09e68",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": { "enabled": false }
+}
