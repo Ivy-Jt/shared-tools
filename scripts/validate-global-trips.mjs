@@ -34,6 +34,18 @@ for (const entry of manifest.trips) {
   assert(Array.isArray(trip.route) && trip.route.length >= 2, `${entry.id}: route is required`);
   assert(Array.isArray(trip.itinerary) && trip.itinerary.length > 0, `${entry.id}: itinerary is required`);
   assert(Array.isArray(trip.packing) && trip.packing.length > 0, `${entry.id}: packing is required`);
+  const packingStatuses = new Set(['owned', 'bought', 'to_buy', 'optional', 'not_needed']);
+  for (const item of trip.packing.flatMap(group => group.items)) {
+    assert(typeof item.key === 'string' && typeof item.label === 'string' && typeof item.owner === 'string', `${entry.id}: invalid packing item`);
+    assert(item.kind === undefined || item.kind === 'task', `${entry.id}: invalid packing kind for ${item.key}`);
+    assert(item.status === undefined || packingStatuses.has(item.status), `${entry.id}: invalid packing status for ${item.key}`);
+    assert(item.kind !== 'task' || item.status === undefined, `${entry.id}: task cannot have purchase status for ${item.key}`);
+    assert(item.note === undefined || typeof item.note === 'string', `${entry.id}: invalid packing note for ${item.key}`);
+  }
+  if (trip.hotels.bangkok.status === 'confirmed') {
+    assert(typeof trip.hotels.bangkok.name === 'string' && trip.hotels.bangkok.nights > 0, `${entry.id}: confirmed Bangkok hotel needs name and nights`);
+    assert(trip.statusItems.find(item => item.key === 'bangkokHotel')?.status === 'confirmed', `${entry.id}: Bangkok hotel status mismatch`);
+  }
   assert(Array.isArray(trip.todos), `${entry.id}: todos must be an array`);
   assert(Array.isArray(trip.budget?.items), `${entry.id}: budget items are required`);
   assert(Array.isArray(trip.memoryPrompts), `${entry.id}: memory prompts are required`);

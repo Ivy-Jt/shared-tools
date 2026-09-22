@@ -5,7 +5,7 @@
   "title": "Maldives × Bangkok",
   "subtitle": "Mid-Autumn × National Day Honeymoon",
   "status": "planning",
-  "updatedAt": "2026-09-17",
+  "updatedAt": "2026-09-22",
   "dates": {
     "start": "2026-09-30",
     "end": "2026-10-07",
@@ -21,23 +21,23 @@
   "statusItems": [
     { "key": "flights", "icon": "✈", "label": "机票", "summary": "9/30 WUH→MLE · 10/4 MLE→DMK · 10/7 BKK→WUH", "status": "confirmed", "statusLabel": "已确认" },
     { "key": "ozen", "icon": "▰", "label": "OZEN", "summary": "OZEN LIFE MAADHOO · 4晚 · AI", "status": "confirmed", "statusLabel": "已确认" },
-    { "key": "bangkokHotel", "icon": "⌂", "label": "曼谷酒店", "summary": "待选择", "status": "deciding", "statusLabel": "待定" },
+    { "key": "bangkokHotel", "icon": "⌂", "label": "曼谷酒店", "summary": "Four Points by Sheraton Bangkok, Sukhumvit 22 · 10/4–10/6 · 2晚", "status": "confirmed", "statusLabel": "已订" },
     { "key": "packing", "icon": "✓", "label": "打包", "summary": "按清单推进", "status": "progress", "statusLabel": "0%" }
   ],
   "timeline": [
     { "date": "09.30", "title": "WUH → MLE", "detail": "00:05 出发 · 09:50 抵达" },
     { "date": "09.30–10.04", "title": "OZEN", "detail": "Earth Villa → 两种水屋" },
     { "date": "10.04", "title": "MLE → BKK", "detail": "12:30 出发 · 19:05 抵达 DMK" },
-    { "date": "10.04–10.07", "title": "Bangkok", "detail": "吃 · 走 · 按摩 · 轨交优先" }
+    { "date": "10.04–10.06", "title": "Bangkok · Four Points", "detail": "已订 2 晚 · 10/5 吃喝按摩 · 10/6 二选一" }
   ],
   "itinerary": [
     { "date": "09.30", "weekday": "Wed", "title": "武汉 → 马累 → OZEN", "detail": "00:05 WUH 出发，经吉隆坡转机；09:50 抵达 MLE。酒店快艇上岛，入住 Earth Villa。当天不排任务。", "liveTitle": "武汉 → 马累 → OZEN", "liveDetail": "抵达日不排任务；快艇上岛、入住 Earth Villa。" },
     { "date": "10.01", "weekday": "Thu", "title": "OZEN · 慢下来", "detail": "睡到自然醒、熟悉岛上餐厅与活动。浮潜或水上活动看海况，不追行程完成率。", "liveTitle": "OZEN · 慢下来", "liveDetail": "睡到自然醒；海况合适再浮潜。" },
     { "date": "10.02", "weekday": "Fri", "title": "换房 · 滑梯 Jacuzzi 水屋", "detail": "把换房本身当作体验；适合安排拍照、水上活动或酒店赠送项目。", "liveTitle": "换滑梯 Jacuzzi 水屋", "liveDetail": "换房，加上拍照、水上活动或酒店项目。" },
     { "date": "10.03", "weekday": "Sat", "title": "换房 · 泳池水屋", "detail": "最后一个完整海岛日。蜜月礼遇、SPA、浮潜或日落，根据酒店最终安排调整。", "liveTitle": "换泳池水屋", "liveDetail": "最后完整海岛日；SPA、浮潜或蜜月礼遇。" },
-    { "date": "10.04", "weekday": "Sun", "title": "马累 → 曼谷", "detail": "12:30 MLE 起飞，19:05 抵达 DMK。晚上只安排入住、洗澡、附近简单吃饭。", "liveTitle": "马累 → 曼谷", "liveDetail": "12:30 MLE → 19:05 DMK；晚上只入住和简单吃饭。" },
-    { "date": "10.05", "weekday": "Mon", "title": "Bang Rak · Charoen Krung · 按摩", "detail": "老店吃饭 → 城市闲逛 → Perception Blind Massage。轨道交通为主，不为网红项目排队。", "liveTitle": "Bang Rak + 按摩", "liveDetail": "老店 → Charoen Krung → Perception Blind Massage；轨交优先。" },
-    { "date": "10.06", "weekday": "Tue", "title": "Lumpini · 好吃的 · 最后一晚", "detail": "公园慢走 → Polo Fried Chicken → 下午回酒店休息 → 晚餐。22:30 左右前往 BKK。", "liveTitle": "Lumpini + 好吃的", "liveDetail": "公园 → Polo Fried Chicken → 酒店休息 → 晚餐 → 22:30 左右去 BKK。" },
+    { "date": "10.04", "weekday": "Sun", "title": "马累 → 曼谷", "detail": "12:30 MLE 起飞，19:05 抵达 DMK。入住已订的 Four Points by Sheraton Bangkok, Sukhumvit 22；晚上只安排简单吃饭。", "liveTitle": "马累 → 曼谷", "liveDetail": "12:30 MLE → 19:05 DMK；入住 Four Points，简单吃饭。" },
+    { "date": "10.05", "weekday": "Mon", "title": "曼谷吃喝 · Perception · Banthat Thong", "detail": "睡够后以城市吃喝为主；Perception 按摩；晚上逛 Banthat Thong，边走边吃，不锁定排队名店。Factory Coffee 仅作顺路候选。", "liveTitle": "吃喝 + 按摩 + Banthat Thong", "liveDetail": "城市吃喝 → Perception 按摩 → Banthat Thong 夜间逛吃。" },
+    { "date": "10.06", "weekday": "Tue", "title": "河岸日落 / DD Mall 二选一", "detail": "A 河岸版：下午往河西，视状态顺路看水门寺，傍晚坐船看郑王庙与湄南河日落。B 购物版：DD Mall 逛约 2–3 小时，下午休息。两案不叠加；晚饭后取行李前往 BKK。格兰岛不纳入本次行程。", "liveTitle": "河岸日落 / DD Mall 二选一", "liveDetail": "按当天状态选河岸日落或 DD Mall；晚饭后取行李去 BKK。" },
     { "date": "10.07", "weekday": "Wed", "title": "曼谷 → 武汉", "detail": "02:45 BKK 起飞，07:20 抵达 WUH。旅行结束，页面进入 Memory 模式继续补照片与回忆。", "liveTitle": "曼谷 → 武汉", "liveDetail": "02:45 BKK → 07:20 WUH。" }
   ],
   "principles": [
@@ -62,61 +62,58 @@
       ]
     },
     "bangkok": {
-      "status": "deciding",
-      "nights": 3,
-      "priceNote": "价格是用户当时采集的飞猪参考价 / 晚，不是实时官方价格，最终以实际下单页为准。",
-      "candidates": [
-        { "name": "Le Méridien Bangkok", "displayName": "Le Méridien Bangkok", "priceCny": 930, "tier": "Premium", "note": "Silom / Surawong。BTS + MRT 都比较顺，当前交通匹配度最高。" },
-        { "name": "W Bangkok", "displayName": "W Bangkok", "priceCny": 1104, "tier": "Luxury", "note": "Chong Nonsi BTS 很近。酒店气质更强，位置也匹配这次路线。" },
-        { "name": "JW Marriott Bangkok", "displayName": "JW Marriott Bangkok", "priceCny": 1038, "tier": "Luxury", "note": "价格很漂亮，但基地在 Sukhumvit，会增加跨城移动。" },
-        { "name": "Banyan Tree Bangkok", "displayName": "Banyan Tree Bangkok", "priceCny": 1079, "tier": "Luxury", "note": "SPA / 服务强；轨交便利度略弱于艾美和 W。" },
-        { "name": "Bangkok Marriott Hotel The Surawongse", "displayName": "Marriott Surawongse", "priceCny": 1221, "tier": "Premium", "note": "Bang Rak / Talat Noi 吃东西很顺；酒店更新，但轨交不是它的最强项。" },
-        { "name": "The Ritz-Carlton, Bangkok", "displayName": "The Ritz-Carlton Bangkok", "priceCny": 2322, "tier": "Luxury", "note": "这次预算与使用方式下已基本 pass，仅留作价格参照。" }
-      ],
-      "decisionNote": "若决定正式进行 Marriott Platinum Challenge，应先确认官网合格房价和挑战注册状态，再决定是否选择万豪系酒店；这里不把活动规则写死。"
+      "name": "Four Points by Sheraton Bangkok, Sukhumvit 22",
+      "status": "confirmed",
+      "statusLabel": "已订",
+      "dateDisplay": "10.04–10.06",
+      "nights": 2,
+      "priceCny": null,
+      "summary": "已预订 2 晚；实际房费尚未录入。"
     }
   },
   "packing": [
     { "group": "海岛重点", "items": [
-      { "key": "sun1", "label": "SPF50+ 防晒（单瓶≤100ml）", "owner": "JT+QX" },
-      { "key": "rash", "label": "UPF 防晒衣 / Rash Guard", "owner": "JT+QX" },
-      { "key": "swim", "label": "泳衣 / 泳裤轮换", "owner": "QX" },
-      { "key": "dress", "label": "度假裙 / 晚餐衣服", "owner": "QX" },
+      { "key": "sun1", "label": "SPF50+ 防晒（单瓶≤100ml）", "owner": "JT+QX", "status": "to_buy" },
+      { "key": "rash", "label": "QX 长袖水母衣 / Rash Guard", "owner": "QX", "status": "to_buy" },
+      { "key": "rash-jt", "label": "JT 水母衣 / 长袖防晒泳衣", "owner": "JT", "status": "optional" },
+      { "key": "swim", "label": "泳衣", "owner": "JT", "status": "bought", "note": "已买部分；是否还需补充待确认。" },
+      { "key": "swim-qx", "label": "QX 泳裤", "owner": "QX" },
+      { "key": "dress", "label": "度假裙 / 晚餐衣服", "owner": "JT", "status": "bought", "note": "已买部分；是否还需补充待确认。" },
+      { "key": "dive-socks", "label": "薄潜水袜", "owner": "JT+QX", "status": "optional" },
       { "key": "shoes", "label": "凉鞋 / 拖鞋", "owner": "JT+QX" },
-      { "key": "hat", "label": "帽子 + 太阳镜", "owner": "JT+QX" }
+      { "key": "hat", "label": "帽子 + 太阳镜", "owner": "JT+QX" },
+      { "key": "repellent", "label": "小瓶驱蚊液", "owner": "JT+QX", "status": "to_buy" }
     ] },
     { "group": "设备与证件", "items": [
-      { "key": "action4", "label": "决定是否带 Action 4（已有标准版）", "owner": "JT" },
-      { "key": "float", "label": "若带 Action 4：漂浮手柄 / 腕带", "owner": "JT" },
-      { "key": "passport", "label": "新护照 + 飞猪更新护照号", "owner": "JT+QX" },
-      { "key": "flightinfo", "label": "航班信息同步 OZEN 接送", "owner": "JT" },
-      { "key": "insurance", "label": "收到赠送保险保单 / 决定是否补充购买", "owner": "JT" },
-      { "key": "marriage", "label": "蜜月礼遇所需结婚证明", "owner": "JT+QX" }
+      { "key": "action4", "label": "Action 4（是否携带另决定）", "owner": "JT", "status": "owned" },
+      { "key": "float", "label": "若带 Action 4：漂浮手柄 / 腕带", "owner": "JT", "status": "optional" },
+      { "key": "waterproof-pouch", "label": "防水手机袋", "owner": "JT+QX", "status": "to_buy" },
+      { "key": "marriage", "label": "蜜月礼遇所需结婚证明", "owner": "JT+QX", "kind": "task" }
     ] },
     { "group": "城市段", "items": [
-      { "key": "esim", "label": "泰国 eSIM / 流量", "owner": "QX" },
-      { "key": "grab", "label": "Grab / 地图 / 翻译 App", "owner": "JT+QX" },
-      { "key": "cash", "label": "少量泰铢现金", "owner": "JT" },
+      { "key": "grab", "label": "Grab / 地图 / 翻译 App", "owner": "JT+QX", "kind": "task" },
+      { "key": "cash", "label": "准备少量泰铢现金", "owner": "JT", "kind": "task" },
       { "key": "shoes2", "label": "曼谷好走的鞋", "owner": "JT+QX" }
     ] },
     { "group": "常用物品", "items": [
       { "key": "med", "label": "常用药 / 肠胃药 / 创可贴", "owner": "JT" },
       { "key": "charge", "label": "手机 / 充电器 / 充电宝", "owner": "JT+QX" },
-      { "key": "liquid", "label": "两人液体袋按登机规则分装", "owner": "JT+QX" },
-      { "key": "docs", "label": "确认单 / 保单 / 航班资料电子备份", "owner": "JT" }
+      { "key": "liquid", "label": "两人液体袋按登机规则分装", "owner": "JT+QX", "kind": "task" },
+      { "key": "docs", "label": "确认单 / 保单 / 航班资料电子备份", "owner": "JT", "kind": "task" }
     ] }
   ],
   "todos": [
     { "owner": "JT", "items": [
       { "key": "todo-jt-pass", "label": "拿到新护照后更新机票 / 酒店资料" },
       { "key": "todo-jt-ins", "label": "收到旅行社保险保单并检查保障" },
-      { "key": "todo-jt-hotel", "label": "最终选定曼谷酒店" },
-      { "key": "todo-jt-buy", "label": "防晒 / 泳衣 / 度假裙等采购" }
+      { "key": "todo-jt-flightinfo", "label": "新护照到手后，把航班与护照信息同步 OZEN / 旅行社接送" },
+      { "key": "todo-jt-tdac", "label": "10/4 入境泰国前按官方开放时间提交 TDAC" },
+      { "key": "todo-jt-buy", "label": "确认已买部分是否还要补充；采购防晒、驱蚊与防水手机袋" }
     ] },
     { "owner": "QX", "items": [
       { "key": "todo-qx-marriott", "label": "研究 Marriott Platinum Challenge 是否值得做" },
       { "key": "todo-qx-action", "label": "一起决定 Action 4 是否携带" },
-      { "key": "todo-qx-esim", "label": "泰国 / 马代网络方案" },
+      { "key": "todo-qx-esim", "label": "确认泰国网络方案（实体卡 / 漫游，尚未决定）" },
       { "key": "todo-qx-food", "label": "把想吃的曼谷餐厅加入候选" }
     ] }
   ],
@@ -125,7 +122,7 @@
     "items": [
       { "key": "ozen", "label": "马尔代夫酒店（已知）", "defaultCny": 37800 },
       { "key": "flights", "label": "机票总额", "defaultCny": null },
-      { "key": "bkkhotel", "label": "曼谷酒店（按3晚自动）", "defaultCny": 0 },
+      { "key": "bkkhotel", "label": "曼谷酒店（已订2晚，实付待录入）", "defaultCny": null },
       { "key": "bkkspend", "label": "曼谷餐饮 / 按摩 / 市内交通", "defaultCny": 2000 },
       { "key": "shopping", "label": "行前采购", "defaultCny": 0 },
       { "key": "other", "label": "其他", "defaultCny": 0 }

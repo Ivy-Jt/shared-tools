@@ -54,15 +54,15 @@
     <div class="section-head"><div><h3>旅行规划中心 <small>Plan Together, Go Further</small></h3><small>确认事实来自 Trip Data；页面操作是本机草稿。</small></div><span class="pill">JT × QX</span></div>
     <div class="planner-tabs" role="tablist"><button class="plan-tab active" data-panel="itinerary">行程</button><button class="plan-tab" data-panel="hotels">酒店</button><button class="plan-tab" data-panel="packing">打包清单</button><button class="plan-tab" data-panel="budget">预算</button><button class="plan-tab" data-panel="todos">待办</button><button class="plan-tab" data-panel="memories">旅行回忆</button></div>
     <div class="panel active" id="panel-itinerary"><div class="itinerary-grid"><div class="day-list" id="dayList"></div><div class="aside-note" id="principles"></div></div></div>
-    <div class="panel" id="panel-hotels"><div class="known-booking" id="maldivesBooking"></div><div class="section-head" style="margin-top:12px"><div><h3 style="font-size:17px">Bangkok · 候选酒店</h3><small id="bangkokPriceNote"></small></div></div><div class="hotel-grid" id="hotelGrid"></div><div class="challenge" id="decisionNote"></div></div>
-    <div class="panel" id="panel-packing"><div class="check-grid" id="packingGroups"></div></div>
+    <div class="panel" id="panel-hotels"><div class="known-booking" id="maldivesBooking"></div><div class="section-head" style="margin-top:12px"><div><h3 style="font-size:17px">Bangkok · 已订酒店</h3><small id="bangkokPriceNote"></small></div></div><div class="hotel-grid" id="hotelGrid"></div><div class="challenge" id="decisionNote"></div></div>
+    <div class="panel" id="panel-packing"><p class="packing-help">物品可标记“已有 / 已买 / 待买 / 可选 / 不需要”；“已打包”与准备事项单独勾选。可选未带和不需要的物品不计入打包进度。修改仅保存在当前浏览器。</p><div class="check-grid" id="packingGroups"></div></div>
     <div class="panel" id="panel-budget"><div class="budget-grid"><div class="budget-list" id="budgetList"></div><div class="total-box"><div class="eyebrow">Trip Budget</div><div class="big" id="budgetTotal">—</div><p id="budgetNote"></p></div></div></div>
     <div class="panel" id="panel-todos"><div class="todo-grid" id="todoGroups"></div></div>
     <div class="panel" id="panel-memories"><div class="memory-grid" id="memoryGrid"></div></div>
   </section>
 
   <div class="load-error" id="appError" hidden></div>
-  <footer class="footer">JT & QX’s Global Trips · Trip 001 · 确认事实来自 trip.json；试选、勾选、预算草稿和笔记仅保存在本浏览器</footer>
+  <footer class="footer">JT & QX’s Global Trips · Trip 001 · 确认事实来自 trip.json；采购状态、勾选、预算草稿和笔记仅保存在本浏览器</footer>
 </div>
 
 <nav class="mobile-nav" aria-label="手机工作区导航"><button class="active" data-action="overview">首页</button><button data-panel="itinerary">行程</button><button data-panel="hotels">酒店</button><button data-panel="packing">清单</button><button data-panel="memories">回忆</button></nav>

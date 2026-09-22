@@ -14,20 +14,27 @@
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
   const money = value => `¥${Number(value || 0).toLocaleString('zh-CN')}`;
+  const packingLabels = { owned: '已有', bought: '已买', to_buy: '待买', optional: '可选', not_needed: '不需要' };
 
   function readState(defaultBudgets) {
     try {
       const saved = JSON.parse(localStorage.getItem(STORE) || '{}');
+      const budgets = { ...defaultBudgets, ...(saved.budgets || {}) };
+      const oldHotelAutoPrice = Number(saved.hotelPrice || 0) * 3;
+      const wasAutoHotelDraft = trip.hotels.bangkok.status === 'confirmed' && saved.hotel && oldHotelAutoPrice > 0 && Number(budgets.bkkhotel) === oldHotelAutoPrice;
+      if (wasAutoHotelDraft) budgets.bkkhotel = '';
       return {
         mode: saved.mode || 'plan',
         hotel: saved.hotel || '',
         hotelPrice: Number(saved.hotelPrice || 0),
         checks: saved.checks || {},
+        packingStates: saved.packingStates || {},
         notes: saved.notes || {},
-        budgets: { ...defaultBudgets, ...(saved.budgets || {}) }
+        budgets,
+        legacyHotelDraft: saved.legacyHotelDraft || (wasAutoHotelDraft ? { name: saved.hotel, estimatedCny: oldHotelAutoPrice } : null)
       };
     } catch {
-      return { mode: 'plan', hotel: '', hotelPrice: 0, checks: {}, notes: {}, budgets: { ...defaultBudgets } };
+      return { mode: 'plan', hotel: '', hotelPrice: 0, checks: {}, packingStates: {}, notes: {}, budgets: { ...defaultBudgets }, legacyHotelDraft: null };
     }
   }
 
@@ -53,7 +60,7 @@
     const confirmed = trip.statusItems.filter(item => item.status === 'confirmed');
     $('#heroMeta').innerHTML = [
       ...confirmed.map(item => `<span class="pill ok">✓ ${escapeHtml(item.label)}已确认</span>`),
-      '<span class="pill warn" id="bangkokHotelPill">○ 曼谷酒店待定</span>',
+      ...(trip.hotels.bangkok.status === 'confirmed' ? [] : ['<span class="pill warn" id="bangkokHotelPill">○ 曼谷酒店待定</span>']),
       '<span class="pill warn">○ 新护照信息待更新</span>'
     ].join('');
 
@@ -91,9 +98,19 @@
   function renderHotels() {
     const maldives = trip.hotels.maldives;
     $('#maldivesBooking').innerHTML = `<h4>✓ Maldives · ${escapeHtml(maldives.name)} <span class="pill ok" style="float:right">${escapeHtml(maldives.statusLabel)}</span></h4><div>${escapeHtml(maldives.dateDisplay)} · ${escapeHtml(maldives.summary)} · 合同价 ${money(maldives.priceCny)}</div><div class="room-seq">${maldives.rooms.map(room => `<div class="room"><b>${escapeHtml(room.dates)}</b><br>${escapeHtml(room.name)}</div>`).join('')}</div>`;
-    $('#bangkokPriceNote').textContent = trip.hotels.bangkok.priceNote;
-    $('#hotelGrid').innerHTML = trip.hotels.bangkok.candidates.map(hotel => `<div class="hotel-card" data-hotel="${escapeHtml(hotel.name)}" data-price="${hotel.priceCny}"><div><h4>${escapeHtml(hotel.displayName)}</h4><div class="rate">${money(hotel.priceCny)} / 晚</div></div><span class="pill">${escapeHtml(hotel.tier)}</span><p>${escapeHtml(hotel.note)}</p><button class="select-hotel">本机试选</button></div>`).join('');
-    $('#decisionNote').innerHTML = `<b>Marriott Platinum Challenge · 决策项</b><br>${escapeHtml(trip.hotels.bangkok.decisionNote)}`;
+    const bangkok = trip.hotels.bangkok;
+    $('#bangkokPriceNote').textContent = bangkok.status === 'confirmed' ? '已确认预订；房费未提供，不用旧候选估价代替。' : bangkok.priceNote;
+    $('#hotelGrid').innerHTML = bangkok.status === 'confirmed'
+      ? `<div class="known-booking hotel-confirmed"><h4>✓ ${escapeHtml(bangkok.name)} <span class="pill ok">${escapeHtml(bangkok.statusLabel)}</span></h4><p>${escapeHtml(bangkok.dateDisplay)} · ${bangkok.nights} 晚</p><p>${escapeHtml(bangkok.summary)}</p></div>`
+      : bangkok.candidates.map(hotel => `<div class="hotel-card" data-hotel="${escapeHtml(hotel.name)}" data-price="${hotel.priceCny}"><div><h4>${escapeHtml(hotel.displayName)}</h4><div class="rate">${money(hotel.priceCny)} / 晚</div></div><span class="pill">${escapeHtml(hotel.tier)}</span><p>${escapeHtml(hotel.note)}</p><button class="select-hotel">本机试选</button></div>`).join('');
+    $('#decisionNote').hidden = bangkok.status === 'confirmed';
+    if (bangkok.status !== 'confirmed') $('#decisionNote').innerHTML = `<b>Marriott Platinum Challenge · 决策项</b><br>${escapeHtml(bangkok.decisionNote)}`;
+  }
+
+  function packingItem(item) {
+    if (item.kind === 'task') return checkItem(item);
+    const options = Object.entries(packingLabels).map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
+    return `<div class="packing-item"><div class="packing-main"><span class="packing-name">${escapeHtml(item.label)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}</span><span class="owner">${escapeHtml(item.owner)}</span></div><div class="packing-controls"><select data-packing-status="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}的采购状态"><option value="">待标记</option>${options}</select><label class="packed-toggle"><input type="checkbox" data-key="${escapeHtml(item.key)}">已打包</label></div></div>`;
   }
 
   function checkItem(item, owner) {
@@ -101,17 +118,31 @@
   }
 
   function renderPackingAndTodos() {
-    $('#packingGroups').innerHTML = trip.packing.map(group => `<div class="check-group"><h4>${escapeHtml(group.group)}</h4>${group.items.map(item => checkItem(item)).join('')}</div>`).join('');
+    $('#packingGroups').innerHTML = trip.packing.map(group => `<div class="check-group"><h4>${escapeHtml(group.group)}</h4>${group.items.map(item => packingItem(item)).join('')}</div>`).join('');
     $('#todoGroups').innerHTML = trip.todos.map(group => `<div class="check-group"><h4>${escapeHtml(group.owner)}</h4>${group.items.map(item => checkItem(item, group.owner)).join('')}</div>`).join('');
   }
 
   function renderBudgetAndMemories() {
     $('#budgetList').innerHTML = trip.budget.items.map(item => `<div class="budget-row"><span>${escapeHtml(item.label)}</span><input type="number" inputmode="numeric" class="budget-input" data-budget="${escapeHtml(item.key)}" ${item.key === 'bkkhotel' ? 'id="bkkHotelBudget"' : ''} placeholder="${item.defaultCny === null ? '待录入' : ''}"></div>`).join('');
-    $('#budgetNote').textContent = `${trip.budget.note}选定曼谷酒店草稿后会按 ${trip.hotels.bangkok.nights} 晚自动计入。`;
+    $('#budgetNote').textContent = trip.hotels.bangkok.status === 'confirmed'
+      ? `${trip.budget.note}曼谷酒店已订，实际房费请手动录入；旧候选自动估价不会当作实付。`
+      : `${trip.budget.note}选定曼谷酒店草稿后会按 ${trip.hotels.bangkok.nights} 晚自动计入。`;
     $('#memoryGrid').innerHTML = trip.memoryPrompts.map(item => `<div class="memory-card"><h4>${escapeHtml(item.title)}</h4><textarea data-note="${escapeHtml(item.key)}" placeholder="${escapeHtml(item.placeholder)}"></textarea></div>`).join('');
   }
 
   function bindState() {
+    $$('select[data-packing-status]').forEach(select => {
+      const item = trip.packing.flatMap(group => group.items).find(entry => entry.key === select.dataset.packingStatus);
+      const selected = state.packingStates[select.dataset.packingStatus] ?? item?.status ?? '';
+      select.value = packingLabels[selected] ? selected : '';
+      select.dataset.state = select.value || 'unset';
+      select.addEventListener('change', () => {
+        state.packingStates[select.dataset.packingStatus] = select.value;
+        select.dataset.state = select.value || 'unset';
+        saveState();
+        updateProgress();
+      });
+    });
     $$('input[type=checkbox][data-key]').forEach(input => {
       input.checked = Boolean(state.checks[input.dataset.key]);
       input.addEventListener('change', () => {
@@ -149,6 +180,7 @@
   }
 
   function renderHotelState() {
+    if (trip.hotels.bangkok.status === 'confirmed') return;
     $$('.hotel-card').forEach(card => {
       const selected = card.dataset.hotel === state.hotel;
       card.classList.toggle('selected', selected);
@@ -179,14 +211,17 @@
   }
 
   function updateProgress() {
-    const packing = $$('#packingGroups input[type=checkbox]');
+    const packing = $$('#packingGroups input[type=checkbox]').filter(input => {
+      const status = input.closest('.packing-item')?.querySelector('select[data-packing-status]')?.value;
+      return status !== 'not_needed' && (status !== 'optional' || input.checked);
+    });
     const done = packing.filter(input => input.checked).length;
     const percent = packing.length ? Math.round(done / packing.length * 100) : 0;
     const row = $('[data-status-key="packing"]');
     row.querySelector('.status-summary').textContent = `已完成 ${done} / ${packing.length}`;
     row.querySelector('.badge').textContent = `${percent}%`;
     $('[data-mobile-status-key="packing"] span').textContent = `${percent}%`;
-    const majorDone = 2 + (state.hotel ? 1 : 0);
+    const majorDone = 2 + (trip.hotels.bangkok.status === 'confirmed' || state.hotel ? 1 : 0);
     const overall = Math.round(((majorDone / 3) * .55 + (percent / 100) * .45) * 100);
     $('#overallPct').textContent = `整体约 ${overall}%`;
   }
@@ -251,7 +286,7 @@
     }));
     $('#printBtn').addEventListener('click', () => window.print());
     $('#resetBtn').addEventListener('click', () => {
-      if (confirm('清空这个浏览器里的酒店试选、勾选、预算草稿和旅行笔记？')) {
+      if (confirm('清空这个浏览器里的采购状态、打包勾选、预算草稿和旅行笔记？')) {
         localStorage.removeItem(STORE);
         location.reload();
       }
