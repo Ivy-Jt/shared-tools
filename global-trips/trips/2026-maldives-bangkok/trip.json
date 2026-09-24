@@ -5,7 +5,7 @@
   "title": "Maldives × Bangkok",
   "subtitle": "Mid-Autumn × National Day Honeymoon",
   "status": "planning",
-  "updatedAt": "2026-09-22",
+  "updatedAt": "2026-09-24",
   "dates": {
     "start": "2026-09-30",
     "end": "2026-10-07",
@@ -24,6 +24,33 @@
     { "key": "bangkokHotel", "icon": "⌂", "label": "曼谷酒店", "summary": "Four Points by Sheraton Bangkok, Sukhumvit 22 · 10/4–10/6 · 2晚", "status": "confirmed", "statusLabel": "已订" },
     { "key": "packing", "icon": "✓", "label": "打包", "summary": "按清单推进", "status": "progress", "statusLabel": "0%" }
   ],
+  "preparation": {
+    "checkedAt": "2026-09-24",
+    "timeline": [
+      { "date": "现在–09.27", "title": "资料与接送", "detail": "核对新护照与机票姓名；酒店确认信、各段行程单、保单离线保存并打印。把最终航班与证件资料私下发给 OZEN / 代理，确认接机举牌、柜台与联系办法。" },
+      { "date": "09.28–09.29", "title": "IMUGA + 吉隆坡转机条件", "detail": "计划这两天完成免费 IMUGA 并保存二维码，避开 96 小时窗口边界；填报以官方页面接受的航班时间为准。向航司确认吉隆坡是否全程空侧、行李直挂；若需入境取行李、换航站楼或重新值机，按入境条件办理 MDAC，在抵达前 3 天内提交。不能仅凭“转机”就认定豁免。" },
+      { "date": "09.29 晚", "title": "出发前最后检查", "detail": "9/30 00:05 武汉起飞，提前 3 小时对应 9/29 21:05，别误记成 9/30 晚到机场。核对实际值机截止时间、证件、离线材料、现金、漫游和行李额度。" },
+      { "date": "09.30 上岛", "title": "领取装备与安全确认", "detail": "按 OZEN 接机安排上快艇。询问免费浮潜装备的具体品类、尺码、近视面镜和卫生安排；确认救生衣合身，先由潜水中心说明海况、区域与活动条件。" },
+      { "date": "10.02–10.03", "title": "TDAC + 离岛确认", "detail": "10/4 入境泰国，安排 10/2–10/3 在官方开放窗口完成 TDAC，保存回执；填写实际 DMK 航班和 Four Points 地址。10/3 向管家确认次日快艇、集合地点、退房和机场送达时间，并问清马累时间 / 岛上时间。" },
+      { "date": "10.04 离岛", "title": "保护航班衔接", "detail": "现有行程为 12:30 MLE 起飞；与酒店确认足够的值机余量，不自行套用通用水飞时刻。马代官方已取消离境 Traveller Declaration；泰国入境仍须 TDAC。" }
+    ],
+    "notes": [
+      { "title": "IMUGA｜官方口径与安排", "detail": "免费，当前入口写入境航班时间前 96 小时内；2024 年公告写抵达前 96 小时。这里用 9/28–9/29 的稳妥填报安排，不把某个精确开窗时刻写死；航班变化后重新核对。健康及海关问题按实际回答，不照抄模板 No。" },
+      { "title": "MDAC｜条件提醒，不自动判豁免", "detail": "马来西亚官方要求入境旅客按适用条件在抵达前 3 天内提交。当前缺少联程、直挂和航站楼证据；先让航司确认是否需要过马来西亚边检。纯空侧转机与入境转机分开判断，实际要求按官方及航司确认。" },
+      { "title": "现金｜预算而非强制", "detail": "代理建议约 200 美元，可先按此安排预算并准备部分 1–5 美元完整纸币；不是必花金额。银行提前预约，小面额库存与酒店换零另确认。泰铢另备；小费自愿，按已含服务费和个人意愿决定。" },
+      { "title": "OZEN｜快艇与免费装备", "detail": "本次既有订单基线含往返快艇；酒店官网套餐页也列免费往返快艇及浮潜装备使用。具体船班、品类、尺码、近视面镜、押金与库存仍向酒店确认，不由通用宣传推定全部免费可借；暂不重复购买整套浮潜装备。" },
+      { "title": "QX｜浮潜前安全确认", "detail": "不推定 QX 的游泳能力或既往经验。入水前向潜水中心说明真实经验并接受评估；穿合身救生衣、有人陪同，先熟悉面镜与呼吸管，不单独下水，不离开指定区域。海况差、紧张或不适就停止，不以完成活动为目标。" },
+      { "title": "打包｜先核对再买", "detail": "新增项目保持待标记或可选，不冒充已买。转换头按实际房间确认；食品配料、药品和充电宝按实际航司及入境规则核对。舞蹈袜不替代浮潜防护；防水袋先测试密封。" }
+    ],
+    "sources": [
+      { "label": "IMUGA 官方免费申报入口", "url": "https://imuga.immigration.gov.mv/traveller" },
+      { "label": "马代官方：取消离境申报", "url": "https://www.immigration.gov.mv/news/7356" },
+      { "label": "TDAC 官方指南与入口", "url": "https://tdac.immigration.go.th/manual/en/" },
+      { "label": "马来西亚官方：入境前 3 天内 MDAC", "url": "https://www.kln.gov.my/web/aus_perth/post/updated-entry-requirements-for-foreigners-traveling-to-malaysia" },
+      { "label": "MDAC 官方入口", "url": "https://imigresen-online.imi.gov.my/mdac/main" },
+      { "label": "OZEN 官方套餐所列快艇与浮潜装备（非本次订单凭证）", "url": "https://theozencollection.com/maadhoo/en/offers/kids-stay-free-offer" }
+    ]
+  },
   "timeline": [
     { "date": "09.30", "title": "WUH → MLE", "detail": "00:05 出发 · 09:50 抵达" },
     { "date": "09.30–10.04", "title": "OZEN", "detail": "Earth Villa → 两种水屋" },
@@ -94,6 +121,20 @@
       { "key": "grab", "label": "Grab / 地图 / 翻译 App", "owner": "JT+QX", "kind": "task" },
       { "key": "cash", "label": "准备少量泰铢现金", "owner": "JT", "kind": "task" },
       { "key": "shoes2", "label": "曼谷好走的鞋", "owner": "JT+QX" }
+    ] },
+    { "group": "行前补充 · 先核对已有", "items": [
+      { "key": "prep-usd-small", "label": "预约美元并备 1–5 美元小面额", "owner": "JT", "kind": "task" },
+      { "key": "prep-print-docs", "label": "打印酒店确认信与各段行程单", "owner": "JT", "kind": "task" },
+      { "key": "prep-imuga", "label": "9/28–9/29：完成两人 IMUGA，保存二维码", "owner": "JT+QX", "kind": "task" },
+      { "key": "prep-mdac-check", "label": "确认 KUL 空侧 / 直挂；如需入境，按窗口填写 MDAC", "owner": "JT", "kind": "task" },
+      { "key": "prep-ozen-departure", "label": "10/3 确认离岛快艇与 10/4 12:30 航班衔接", "owner": "JT+QX", "kind": "task" },
+      { "key": "prep-snorkel-safety", "label": "QX 与潜水中心确认经验、救生衣和海况", "owner": "QX", "kind": "task" },
+      { "key": "prep-adapter", "label": "转换插头（先问酒店）", "owner": "JT+QX", "status": "optional" },
+      { "key": "prep-toiletries", "label": "牙刷牙膏 / 个人洗护 / 护发用品", "owner": "JT+QX" },
+      { "key": "prep-towel", "label": "速干毛巾", "owner": "JT+QX", "status": "optional" },
+      { "key": "prep-aftersun", "label": "晒后护理 / 润唇用品", "owner": "JT+QX", "status": "optional" },
+      { "key": "prep-mask", "label": "近视面镜 / 自用咬嘴（核对需求和兼容性）", "owner": "JT+QX", "status": "optional" },
+      { "key": "prep-bags", "label": "湿巾 / 分装袋 / 湿衣收纳袋", "owner": "JT+QX" }
     ] },
     { "group": "常用物品", "items": [
       { "key": "med", "label": "常用药 / 肠胃药 / 创可贴", "owner": "JT" },

@@ -62,7 +62,13 @@ try {
   const { page: phone } = await pageIn({ width: 390, height: 844 });
   assert.equal(await phone.locator('select[data-packing-status="sun1"]').isDisabled(), true);
   await login(phone);
+  assert.equal(await phone.locator('#prepTimeline .prep-row').count(), 6);
+  assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await phone.screenshot({ path: path.join(results, 'preparation-mobile.png') });
   await panel(phone, 'packing');
+  await phone.locator('select[data-packing-status="prep-adapter"]').selectOption('not_needed');
+  await phone.locator('input[data-key="prep-imuga"]').check();
+  await waitSaved(phone);
   await phone.locator('select[data-packing-status="sun1"]').selectOption('bought');
   await phone.locator('#packingGroups input[data-key="sun1"]').check();
   await waitSaved(phone);
@@ -76,6 +82,9 @@ try {
 
   const { page: desktop } = await pageIn({ width: 1280, height: 900 });
   await login(desktop);
+  assert.equal(await desktop.locator('select[data-packing-status="prep-adapter"]').inputValue(), 'not_needed');
+  assert.equal(await desktop.locator('input[data-key="prep-imuga"]').isChecked(), true);
+  checks.push('new preparation keys sync to second device without replacing existing state');
   assert.equal(await desktop.locator('select[data-packing-status="sun1"]').inputValue(), 'bought');
   assert.equal(await desktop.locator('[data-budget="flights"]').inputValue(), '1234.56');
   assert.equal(await desktop.locator('[data-note="food"]').inputValue(), '本地测试：手机记录');

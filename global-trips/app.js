@@ -101,6 +101,14 @@
     $('#principles').innerHTML = `<h4>这次旅行的原则</h4><ul>${trip.principles.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
   }
 
+  function renderPreparation() {
+    const prep = trip.preparation;
+    if (!prep || !$('#preparation')) return;
+    $('#prepTimeline').innerHTML = prep.timeline.map(item => `<div class="prep-row"><b>${escapeHtml(item.date)}</b><div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.detail)}</p></div></div>`).join('');
+    $('#prepNotes').innerHTML = prep.notes.map(item => `<h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.detail)}</p>`).join('');
+    $('#prepSources').innerHTML = `<small>官方来源核对：${escapeHtml(prep.checkedAt)}；代理建议和本次订单待确认项已分开标注。</small>` + prep.sources.filter(item => { try { return new URL(item.url).protocol === 'https:'; } catch { return false; } }).map(item => `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.label)}</a>`).join('');
+  }
+
   function renderHotels() {
     const maldives = trip.hotels.maldives;
     $('#maldivesBooking').innerHTML = `<h4>✓ Maldives · ${escapeHtml(maldives.name)} <span class="pill ok" style="float:right">${escapeHtml(maldives.statusLabel)}</span></h4><div>${escapeHtml(maldives.dateDisplay)} · ${escapeHtml(maldives.summary)} · 合同价 ${money(maldives.priceCny)}</div><div class="room-seq">${maldives.rooms.map(room => `<div class="room"><b>${escapeHtml(room.dates)}</b><br>${escapeHtml(room.name)}</div>`).join('')}</div>`;
@@ -394,6 +402,7 @@
     renderHeader();
     renderStatus();
     renderTimeline();
+    renderPreparation();
     renderItinerary();
     renderHotels();
     renderPackingAndTodos();
