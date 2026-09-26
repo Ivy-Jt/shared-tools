@@ -381,6 +381,7 @@ function renderSection(group,items,source,todayKey){
   return `<section id="${esc(group.id)}" class="section"><div class="section-head"><div><h2>${group.title}</h2><p>${group.desc}</p></div><span class="target">${group.target}</span></div>${body}</section>`;
 }
 
+let purchaseMap=null;
 function initPurchaseMap(items,todayKey){
   const container=document.querySelector("#purchase-map");
   const status=document.querySelector("#purchase-map-status");
@@ -412,6 +413,7 @@ function initPurchaseMap(items,todayKey){
       grouped.get(key).rows.push(row);
     }
     const map=window.L.map(container,{scrollWheelZoom:false,attributionControl:true});
+    purchaseMap=map;
     window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap"}).addTo(map);
     const bounds=[];
     for(const group of grouped.values()){
@@ -440,30 +442,49 @@ const loadJson=file=>fetch(`${file}?v=${Date.now()}`,{cache:"no-store"})
 
 loadJson("./purchases.json")
   .then(purchases=>{
-    const todayKey=shanghaiDateKey();
-    const purchasedItems=(Array.isArray(purchases.items)?purchases.items:[])
-      .filter(item=>item.kind==="purchased_deal"&&item.availability==="usable_coupon"&&item.validUntil>=todayKey&&["ok","partial"].includes(purchases.sources?.purchasedDeals?.status))
-      .sort((a,b)=>a.validUntil.localeCompare(b.validUntil)||(a.priorityRank??999)-(b.priorityRank??999));
-    const datasets={purchases:{data:purchases,items:purchasedItems}};
-    const purchaseHeadline=["ok","partial"].includes(purchases.sources?.purchasedDeals?.status)?`可用已购券 ${fmt(purchasedItems.length)} 张`:"已购套餐待同步";
-    const updatedAt=purchases.updatedAt;
-    summary.hidden=false;
-    summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(purchaseHeadline)}</strong><span>按到期日自动隐藏过期券 · 更新于 ${esc(new Date(updatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
-    sections.innerHTML=GROUPS.map(group=>{
-      const dataset=datasets[group.dataset];
-      return renderSection(group,dataset.items.filter(item=>(item.kind||item.dealType)===group.kind),dataset.data.sources?.[group.source],todayKey);
-    }).join("");
-    if(["ok","partial"].includes(purchases.sources?.purchasedDeals?.status)&&purchasedItems.length){
-      planner.hidden=false;
-      planner.innerHTML=renderPurchasePlanner(purchasedItems,todayKey);
-    }else{
-      planner.hidden=true;
-      planner.innerHTML="";
+    let renderedDate="";
+    let expiryTimer;
+    const refreshForToday=()=>{
+      clearTimeout(expiryTimer);
+      const currentDate=shanghaiDateKey();
+      if(currentDate!==renderedDate){
+        renderPurchases(currentDate);
+        renderedDate=currentDate;
+      }
+      // Date-only validity includes the full expiry day in China Standard Time.
+      const nextMidnight=(dateKeyToDayNumber(currentDate)+1)*86400000-8*3600000;
+      expiryTimer=setTimeout(refreshForToday,Math.max(1000,nextMidnight-Date.now()));
+    };
+    function renderPurchases(todayKey){
+      if(purchaseMap){purchaseMap.remove();purchaseMap=null}
+      const purchasedItems=(Array.isArray(purchases.items)?purchases.items:[])
+        .filter(item=>item.kind==="purchased_deal"&&item.availability==="usable_coupon"&&item.validUntil>=todayKey&&["ok","partial"].includes(purchases.sources?.purchasedDeals?.status))
+        .sort((a,b)=>a.validUntil.localeCompare(b.validUntil)||(a.priorityRank??999)-(b.priorityRank??999));
+      const datasets={purchases:{data:purchases,items:purchasedItems}};
+      const purchaseHeadline=["ok","partial"].includes(purchases.sources?.purchasedDeals?.status)?`可用已购券 ${fmt(purchasedItems.length)} 张`:"已购套餐待同步";
+      const updatedAt=purchases.updatedAt;
+      summary.hidden=false;
+      summary.innerHTML=`<span class="summary-dot"></span><div><strong>${esc(purchaseHeadline)}</strong><span>到期次日自动清退（北京时间）· 退款以大众点评为准 · 数据更新于 ${esc(new Date(updatedAt).toLocaleString("zh-CN",{hour12:false}))}</span></div>`;
+      sections.innerHTML=GROUPS.map(group=>{
+        const dataset=datasets[group.dataset];
+        return renderSection(group,dataset.items.filter(item=>(item.kind||item.dealType)===group.kind),dataset.data.sources?.[group.source],todayKey);
+      }).join("");
+      if(["ok","partial"].includes(purchases.sources?.purchasedDeals?.status)&&purchasedItems.length){
+        planner.hidden=false;
+        planner.innerHTML=renderPurchasePlanner(purchasedItems,todayKey);
+      }else{
+        planner.hidden=true;
+        planner.innerHTML="";
+      }
+      document.querySelector("#quick-purchase-count").textContent=`（${fmt(purchasedItems.length)}）`;
+      initPurchaseMap(purchasedItems,todayKey);
+      const tips=Array.isArray(purchases.notes)?purchases.notes:[];
+      if(tips.length){notes.hidden=false;notes.querySelector("ul").innerHTML=tips.map(tip=>`<li>${esc(tip)}</li>`).join("")}
     }
-    document.querySelector("#quick-purchase-count").textContent=`（${fmt(purchasedItems.length)}）`;
-    initPurchaseMap(purchasedItems,todayKey);
-    const tips=Array.isArray(purchases.notes)?purchases.notes:[];
-    if(tips.length){notes.hidden=false;notes.querySelector("ul").innerHTML=tips.map(tip=>`<li>${esc(tip)}</li>`).join("")}
+    refreshForToday();
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshForToday()});
+    window.addEventListener("focus",refreshForToday);
+    window.addEventListener("pageshow",refreshForToday);
   })
   .catch(()=>{sections.innerHTML='<div class="status">今日结果暂时加载失败，请稍后刷新。</div>'});
 </script>
