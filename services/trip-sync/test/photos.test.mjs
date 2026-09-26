@@ -1,0 +1,26 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {randomUUID} from 'node:crypto';
+import worker,{sha256,validateState} from '../src/worker.mjs';
+import {testDatabase} from './database.mjs';
+import {emptyState} from '../../../global-trips/sync-core.mjs';
+const key='jt_'+'a'.repeat(43), hash=await sha256(key);
+test('private album auth, upload, binary read, retry, soft removal and state isolation',async()=>{
+ const DB=testDatabase(); DB.sqlite.exec(fs.readFileSync(new URL('../migrations/0003_photos.sql',import.meta.url),'utf8'));
+ const before=JSON.stringify(DB.sqlite.prepare('SELECT * FROM trip_states').all());
+ const env={DB,OWNER_KEY_HASH:hash,ALLOWED_ORIGINS:'https://ivy-jt.github.io'};
+ const request=(path='',method='GET',body,auth=key)=>worker.fetch(new Request('https://example.test/v1/trips/2026-maldives-bangkok/photos'+path,{method,headers:{Authorization:auth?'Bearer '+auth:'','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})}),env);
+ const id=randomUUID(),image=Buffer.from([255,216,255,1,255,217]).toString('base64');
+ for(const [path,method]of[['','GET'],['/'+id,'GET'],['/'+id,'PUT'],['/'+id,'DELETE']]) assert.equal((await request(path,method,undefined,'')).status,401);
+ assert.equal((await request('/'+id,'PUT',{image,caption:'海边',day:'cover'})).status,200);
+ assert.equal((await request('/'+id,'PUT',{image,caption:'海边',day:'cover'})).status,200);
+ const list=await (await request()).json();assert.equal(list.photos.length,1);assert.equal('image' in list.photos[0],false);
+ const read=await request('/'+id);assert.equal(read.headers.get('Content-Type'),'image/jpeg');assert.equal(read.headers.get('Cache-Control'),'no-store');assert.equal((await read.arrayBuffer()).byteLength,6);
+ assert.equal((await request('/'+randomUUID(),'PUT',{image:'abc',caption:'',day:''})).status,400);
+ await request('/'+id,'DELETE');assert.equal((await request('/'+id)).status,404);assert.equal((await (await request()).json()).photos.length,0);
+ assert.ok(DB.sqlite.prepare('SELECT deleted_at FROM trip_photos').get().deleted_at);
+ assert.equal(JSON.stringify(DB.sqlite.prepare('SELECT * FROM trip_states').all()),before);
+ const state=emptyState();state.notes['prep:sun1']='已买，待收货';assert.equal(validateState(state),true);state.notes['prep:unknown']='x';assert.equal(validateState(state),false);
+ DB.sqlite.close();
+});

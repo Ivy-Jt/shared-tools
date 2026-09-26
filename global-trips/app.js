@@ -121,14 +121,18 @@
     if (bangkok.status !== 'confirmed') $('#decisionNote').innerHTML = `<b>Marriott Platinum Challenge · 决策项</b><br>${escapeHtml(bangkok.decisionNote)}`;
   }
 
+  function preparationNote(item) {
+    return `<details class="preparation-note" hidden><summary>备注 · 准备情况</summary><textarea maxlength="2000" data-note="prep:${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}的准备备注" placeholder="例如：已买，周三到货，还没试穿"></textarea><small data-prep-hint="${escapeHtml(item.key)}"></small></details>`;
+  }
+
   function packingItem(item) {
     if (item.kind === 'task') return checkItem(item);
     const options = Object.entries(packingLabels).map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
-    return `<div class="packing-item"><div class="packing-main"><span class="packing-name">${escapeHtml(item.label)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}</span><span class="owner">${escapeHtml(item.owner)}</span></div><div class="packing-controls"><select data-packing-status="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}的采购状态"><option value="">待标记</option>${options}</select><label class="packed-toggle"><input type="checkbox" data-key="${escapeHtml(item.key)}">已打包</label></div></div>`;
+    return `<div class="packing-item"><div class="packing-main"><span class="packing-name">${escapeHtml(item.label)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}</span><span class="owner">${escapeHtml(item.owner)}</span></div><div class="packing-controls"><select data-packing-status="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}的采购状态"><option value="">待标记</option>${options}</select><label class="packed-toggle"><input type="checkbox" data-key="${escapeHtml(item.key)}">已打包</label></div>${preparationNote(item)}</div>`;
   }
 
   function checkItem(item, owner) {
-    return `<label class="check-item"><input type="checkbox" data-key="${escapeHtml(item.key)}"><span>${escapeHtml(item.label)}</span><span class="owner">${escapeHtml(item.owner || owner)}</span></label>`;
+    return `<div class="task-with-note"><label class="check-item"><input type="checkbox" data-key="${escapeHtml(item.key)}"><span>${escapeHtml(item.label)}</span><span class="owner">${escapeHtml(item.owner || owner)}</span></label>${preparationNote(item)}</div>`;
   }
 
   function renderPackingAndTodos() {
@@ -170,6 +174,7 @@
       textarea.addEventListener('input', () => {
         state.notes[textarea.dataset.note] = textarea.value;
         saveState('notes', textarea.dataset.note);
+        updateProgress();
       });
     });
     $$('.hotel-card').forEach(card => card.querySelector('.select-hotel').addEventListener('click', () => {
@@ -230,7 +235,12 @@
       const status = input.closest('.packing-item')?.querySelector('select[data-packing-status]')?.value;
       return status !== 'not_needed' && (status !== 'optional' || input.checked);
     });
-    const done = packing.filter(input => input.checked).length;
+    const blocked = key => /未到货|待收货|未收到|没收到|未确认|待确认|未完成|还没|尚未|待填写|待办理/.test(state.notes[`prep:${key}`] || '');
+    $$('[data-prep-hint]').forEach(node => { node.textContent = blocked(node.dataset.prepHint) ? '备注提示仍有待办，请确认后再算准备完成。' : ''; });
+    const done = packing.filter(input => input.checked && !blocked(input.dataset.key)).length;
+    const tasks = $$('#todoGroups input[data-key]');
+    const tasksDone = tasks.filter(input => input.checked && !blocked(input.dataset.key)).length;
+    $('#readinessNote').textContent = cloud?.key ? `打包就绪 ${done}/${packing.length} · 待办完成 ${tasksDone}/${tasks.length}。备注中的待收货、未确认等措辞会提示复核；只是规则提示，不会自动修改勾选。` : '登录后可填写每项备注，并结合待办提示检查准备情况。';
     const percent = packing.length ? Math.round(done / packing.length * 100) : 0;
     const row = $('[data-status-key="packing"]');
     row.querySelector('.status-summary').textContent = `已完成 ${done} / ${packing.length}`;
@@ -328,6 +338,7 @@
   }
 
   function editable(enabled) {
+    $$('.preparation-note').forEach(node => { node.hidden = !enabled; });
     $$('input[data-key],select[data-packing-status],textarea[data-note],.budget-input,.select-hotel,#resetBtn').forEach(input => { input.disabled = !enabled; });
   }
 
@@ -355,11 +366,15 @@
     const legacyCount = Object.values(legacyPatch).reduce((sum, values) => sum + Object.keys(values).length, 0);
     const labels = Object.fromEntries([
       ...trip.packing.flatMap(group => group.items), ...trip.todos.flatMap(group => group.items),
+      ...[...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => ({ key: `prep:${item.key}`, label: `${item.label}备注` }))),
       ...trip.budget.items, ...trip.memoryPrompts.map(item => ({ key: item.key, label: item.title }))
     ].map(item => [item.key, item.label]));
+    const { createAlbum } = await import('./photo-album.mjs');
+    const album = createAlbum({ root: $('#photoAlbum'), apiBase: config.apiBase, trip, getKey: () => cloud?.key || '' });
     cloud = new TripCloudSync({
       apiBase: config.apiBase, tripId: trip.id, onChange: applyCloudState, onEditable: editable,
       onStatus: info => {
+        album.setAuth(info.loggedIn);
         $('#cloudStatus').textContent = info.message;
         $('#cloudBar').dataset.status = info.kind;
         $('#cloudLoginPanel').hidden = info.loggedIn || info.kind === 'disabled';

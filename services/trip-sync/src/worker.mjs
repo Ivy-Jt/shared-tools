@@ -1,9 +1,10 @@
+import { photos } from './photos.mjs';
 import trip from '../../../global-trips/trips/2026-maldives-bangkok/trip.json' with { type: 'json' };
 
 const fieldKeys = {
   checks: new Set([...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => item.key))),
   packingStates: new Set(trip.packing.flatMap(group => group.items.filter(item => item.kind !== 'task').map(item => item.key))),
-  notes: new Set(trip.memoryPrompts.map(item => item.key)),
+  notes: new Set([...trip.memoryPrompts.map(item => item.key), ...[...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => `prep:${item.key}`))]),
   budgets: new Set(trip.budget.items.map(item => item.key))
 };
 const statuses = new Set(['', 'owned', 'bought', 'to_buy', 'optional', 'not_needed']);
@@ -62,7 +63,7 @@ export default {
     const respond = (data, status = 200) => new Response(JSON.stringify(data), { status, headers });
     if (origin && !allowed.has(origin)) return respond({ error: 'origin_not_allowed' }, 403);
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Max-Age': '600' } });
+      return new Response(null, { status: 204, headers: { ...headers, 'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Max-Age': '600' } });
     }
     const path = new URL(request.url).pathname;
     if (path === '/health' && request.method === 'GET') return respond({ service: 'jt-global-trips-sync', ready: Boolean(env.DB && /^[a-f0-9]{64}$/.test(env.OWNER_KEY_HASH || '')) });
@@ -73,6 +74,10 @@ export default {
     let mismatch = 0;
     for (let i = 0; i < 64; i++) mismatch |= hash.charCodeAt(i) ^ env.OWNER_KEY_HASH.charCodeAt(i);
     if (mismatch !== 0) return respond({ error: 'unauthorized' }, 401);
+    try {
+      const photoResponse = await photos(request, env, trip.id, headers, respond);
+      if (photoResponse) return photoResponse;
+    } catch { return respond({ error: 'storage_unavailable' }, 503); }
     if (path !== `/v1/trips/${trip.id}`) return respond({ error: 'not_found' }, 404);
     try {
       if (request.method === 'GET') {

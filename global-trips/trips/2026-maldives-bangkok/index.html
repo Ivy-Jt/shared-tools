@@ -6,7 +6,7 @@
 <meta name="description" content="JT &amp; QX 的 2026 马尔代夫与曼谷旅行计划、旅途中工作台和旅行回忆。">
 <meta name="theme-color" content="#f5f2eb">
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="../../app.css?v=20260925">
+<link rel="stylesheet" href="../../app.css?v=20260926-photos">
 <title>JT &amp; QX's Global Trips · Maldives × Bangkok</title>
 </head>
 <body data-trip-source="./trip.json">
@@ -43,6 +43,7 @@
 
   <section class="card prep-card" id="preparation" aria-label="行前时间轴"><h3>行前时间轴</h3><div id="prepTimeline"></div><details><summary>申报条件、现金、OZEN 与浮潜安全</summary><div id="prepNotes"></div><div id="prepSources"></div></details></section>
 
+  <img id="privateCover" class="private-cover" alt="我们的旅行封面" hidden>
   <section class="hero card desktop-only">
     <div class="hero-copy"><div class="eyebrow" id="tripEyebrow">Trip</div><h2 id="tripTitle">Loading…</h2><p id="tripDescription"></p><div class="hero-meta" id="heroMeta"></div></div>
     <div class="hero-art" aria-hidden="true"><div class="postcard maldives"><div class="fake-photo sea"></div></div><div class="postcard bangkok"><div class="fake-photo city"></div></div><div class="hero-route"></div></div>
@@ -63,10 +64,10 @@
     <div class="planner-tabs" role="tablist"><button class="plan-tab active" data-panel="itinerary">行程</button><button class="plan-tab" data-panel="hotels">酒店</button><button class="plan-tab" data-panel="packing">打包清单</button><button class="plan-tab" data-panel="budget">预算</button><button class="plan-tab" data-panel="todos">待办</button><button class="plan-tab" data-panel="memories">旅行回忆</button></div>
     <div class="panel active" id="panel-itinerary"><div class="itinerary-grid"><div class="day-list" id="dayList"></div><div class="aside-note" id="principles"></div></div></div>
     <div class="panel" id="panel-hotels"><div class="known-booking" id="maldivesBooking"></div><div class="section-head" style="margin-top:12px"><div><h3 style="font-size:17px">Bangkok · 已订酒店</h3><small id="bangkokPriceNote"></small></div></div><div class="hotel-grid" id="hotelGrid"></div><div class="challenge" id="decisionNote"></div></div>
-    <div class="panel" id="panel-packing"><p class="packing-help">采购状态和“已打包”分别记录；可选未带和不需要的物品不计入进度。登录后自动保存。</p><div class="check-grid" id="packingGroups"></div></div>
+    <div class="panel" id="panel-packing"><p class="packing-help">采购状态和“已打包”分别记录；可选未带和不需要的物品不计入进度。登录后自动保存。</p><p id="readinessNote" class="packing-help"></p><div class="check-grid" id="packingGroups"></div></div>
     <div class="panel" id="panel-budget"><div class="budget-grid"><div class="budget-list" id="budgetList"></div><div class="total-box"><div class="eyebrow">Trip Budget</div><div class="big" id="budgetTotal">—</div><p id="budgetNote"></p></div></div></div>
     <div class="panel" id="panel-todos"><div class="todo-grid" id="todoGroups"></div></div>
-    <div class="panel" id="panel-memories"><div class="memory-grid" id="memoryGrid"></div></div>
+    <div class="panel" id="panel-memories"><section id="photoAlbum" class="photo-album"><h3>我们的旅行相册</h3><p data-photo-status role="status">登录后可查看和上传私人照片</p><form hidden><label>照片<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" required></label><label>放在哪里<select aria-label="照片日期"><option value="cover">旅行封面</option></select></label><label>一句描述<input type="text" maxlength="300" placeholder="这一刻，想记住什么"></label><button type="submit">上传照片</button><small>自动压缩，最多 24 张；最新封面会显示在页面顶部。</small></form><button type="button" data-photo-refresh hidden>刷新相册</button><div data-photo-gallery class="photo-gallery"></div></section><div class="memory-grid" id="memoryGrid"></div></div>
   </section>
 
   <div class="load-error" id="appError" hidden></div>
@@ -74,6 +75,6 @@
 </div>
 
 <nav class="mobile-nav" aria-label="手机工作区导航"><button class="active" data-action="overview">首页</button><button data-panel="itinerary">行程</button><button data-panel="hotels">酒店</button><button data-panel="packing">清单</button><button data-panel="memories">回忆</button></nav>
-<script src="../../app.js?v=20260925" defer></script>
+<script src="../../app.js?v=20260926-photos" defer></script>
 </body>
 </html>
