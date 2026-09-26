@@ -28,7 +28,7 @@
 
   <section class="cloud-bar" id="cloudBar" data-status="loading" aria-label="云端同步">
     <div class="cloud-line"><span id="cloudStatus" role="status" aria-live="polite">正在连接云端…</span><div id="cloudActions" class="cloud-actions" hidden><button id="cloudRefresh">刷新 / 重试</button><button id="cloudImport" hidden>导入本机旧记录</button><button id="cloudLogout">退出</button></div></div>
-    <details id="cloudLoginPanel"><summary>登录以编辑</summary><form id="cloudLoginForm"><input type="hidden" name="username" autocomplete="username" value="JT"><label for="cloudKey">旅行登录码</label><div class="cloud-login-row"><input id="cloudKey" name="password" type="password" autocomplete="current-password" placeholder="输入专用旅行登录码" required><button id="cloudLogin" type="submit">连接</button></div><label class="cloud-remember"><input id="cloudRemember" type="checkbox" checked>记住这台设备</label><small>使用同一个登录码，可在手机和电脑继续编辑。</small></form></details>
+    <details id="cloudLoginPanel"><summary>登录以编辑</summary><form id="cloudLoginForm"><input type="hidden" name="username" autocomplete="username" value="JT"><label for="cloudKey">旅行登录码</label><div class="cloud-login-row"><input id="cloudKey" name="password" type="password" autocomplete="current-password" placeholder="输入专用旅行登录码" required><button id="cloudLogin" type="submit" disabled>连接</button></div><label class="cloud-remember"><input id="cloudRemember" type="checkbox" checked>记住这台设备</label><small>使用同一个登录码，可在手机和电脑继续编辑。</small></form></details>
     <div id="cloudConflict" class="cloud-conflict" hidden><p>这些项目在其他设备也有修改：<span id="cloudConflictNames"></span></p><button id="cloudUseRemote">采用云端内容</button><button id="cloudUseLocal">保留我的修改</button></div>
   </section>
 
