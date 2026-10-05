@@ -4,8 +4,8 @@
   "number": "Trip 001",
   "title": "Maldives × Bangkok",
   "subtitle": "Mid-Autumn × National Day Honeymoon",
-  "status": "planning",
-  "updatedAt": "2026-09-24",
+  "status": "live",
+  "updatedAt": "2026-10-05",
   "dates": {
     "start": "2026-09-30",
     "end": "2026-10-07",
@@ -21,7 +21,7 @@
   "statusItems": [
     { "key": "flights", "icon": "✈", "label": "机票", "summary": "9/30 WUH→MLE · 10/4 MLE→DMK · 10/7 BKK→WUH", "status": "confirmed", "statusLabel": "已确认" },
     { "key": "ozen", "icon": "▰", "label": "OZEN", "summary": "OZEN LIFE MAADHOO · 4晚 · AI", "status": "confirmed", "statusLabel": "已确认" },
-    { "key": "bangkokHotel", "icon": "⌂", "label": "曼谷酒店", "summary": "Four Points by Sheraton Bangkok, Sukhumvit 22 · 10/4–10/6 · 2晚", "status": "confirmed", "statusLabel": "已订" },
+    { "key": "bangkokHotel", "icon": "⌂", "label": "曼谷酒店", "summary": "Four Points by Sheraton Bangkok, Sukhumvit 22 · 10/04 已入住 · 2晚", "status": "confirmed", "statusLabel": "已入住" },
     { "key": "packing", "icon": "✓", "label": "打包", "summary": "按清单推进", "status": "progress", "statusLabel": "0%" }
   ],
   "preparation": {
@@ -55,17 +55,17 @@
     { "date": "09.30", "title": "WUH → MLE", "detail": "00:05 出发 · 09:50 抵达" },
     { "date": "09.30–10.04", "title": "OZEN", "detail": "Earth Villa → 两种水屋" },
     { "date": "10.04", "title": "MLE → BKK", "detail": "12:30 出发 · 19:05 抵达 DMK" },
-    { "date": "10.04–10.06", "title": "Bangkok · Four Points", "detail": "已订 2 晚 · 10/5 吃喝按摩 · 10/6 二选一" }
+    { "date": "10.04–10.06", "title": "Bangkok · Four Points", "detail": "10/04 已入住 · 10/05 实况更新 · 10/06 候选二选一" }
   ],
   "itinerary": [
     { "date": "09.30", "weekday": "Wed", "title": "武汉 → 马累 → OZEN", "detail": "00:05 WUH 出发，经吉隆坡转机；09:50 抵达 MLE。酒店快艇上岛，入住 Earth Villa。当天不排任务。", "liveTitle": "武汉 → 马累 → OZEN", "liveDetail": "抵达日不排任务；快艇上岛、入住 Earth Villa。" },
     { "date": "10.01", "weekday": "Thu", "title": "OZEN · 慢下来", "detail": "睡到自然醒、熟悉岛上餐厅与活动。浮潜或水上活动看海况，不追行程完成率。", "liveTitle": "OZEN · 慢下来", "liveDetail": "睡到自然醒；海况合适再浮潜。" },
     { "date": "10.02", "weekday": "Fri", "title": "换房 · 滑梯 Jacuzzi 水屋", "detail": "把换房本身当作体验；适合安排拍照、水上活动或酒店赠送项目。", "liveTitle": "换滑梯 Jacuzzi 水屋", "liveDetail": "换房，加上拍照、水上活动或酒店项目。" },
     { "date": "10.03", "weekday": "Sat", "title": "换房 · 泳池水屋", "detail": "最后一个完整海岛日。蜜月礼遇、SPA、浮潜或日落，根据酒店最终安排调整。", "liveTitle": "换泳池水屋", "liveDetail": "最后完整海岛日；SPA、浮潜或蜜月礼遇。" },
-    { "date": "10.04", "weekday": "Sun", "title": "马累 → 曼谷", "detail": "12:30 MLE 起飞，19:05 抵达 DMK。入住已订的 Four Points by Sheraton Bangkok, Sukhumvit 22；晚上只安排简单吃饭。", "liveTitle": "马累 → 曼谷", "liveDetail": "12:30 MLE → 19:05 DMK；入住 Four Points，简单吃饭。" },
-    { "date": "10.05", "weekday": "Mon", "title": "曼谷吃喝 · Perception · Banthat Thong", "detail": "睡够后以城市吃喝为主；Perception 按摩；晚上逛 Banthat Thong，边走边吃，不锁定排队名店。Factory Coffee 仅作顺路候选。", "liveTitle": "吃喝 + 按摩 + Banthat Thong", "liveDetail": "城市吃喝 → Perception 按摩 → Banthat Thong 夜间逛吃。" },
-    { "date": "10.06", "weekday": "Tue", "title": "河岸日落 / DD Mall 二选一", "detail": "A 河岸版：下午往河西，视状态顺路看水门寺，傍晚坐船看郑王庙与湄南河日落。B 购物版：DD Mall 逛约 2–3 小时，下午休息。两案不叠加；晚饭后取行李前往 BKK。格兰岛不纳入本次行程。", "liveTitle": "河岸日落 / DD Mall 二选一", "liveDetail": "按当天状态选河岸日落或 DD Mall；晚饭后取行李去 BKK。" },
-    { "date": "10.07", "weekday": "Wed", "title": "曼谷 → 武汉", "detail": "02:45 BKK 起飞，07:20 抵达 WUH。旅行结束，页面进入 Memory 模式继续补照片与回忆。", "liveTitle": "曼谷 → 武汉", "liveDetail": "02:45 BKK → 07:20 WUH。" }
+    { "date": "10.04", "weekday": "Sun", "title": "已入住曼谷 · P Kitchen 晚餐", "detail": "10/04 已入住 Four Points by Sheraton Bangkok, Sukhumvit 22。晚餐在 P Kitchen，含 7% VAT 约 800 多泰铢。", "liveTitle": "已入住曼谷 · P Kitchen 晚餐", "liveDetail": "10/04 已入住 Four Points；P Kitchen 晚餐含 7% VAT 约 800 多泰铢。" },
+    { "date": "10.05", "weekday": "Mon", "title": "41号咖啡已买 · 正在前往大皇宫", "detail": "实况截至曼谷时间 12:08：41号咖啡两杯已买，正在前往大皇宫，尚未报告参观完成。后续餐厅、Perception 按摩及 Banthat Thong 逛吃均为候选，未确认预约或完成；Factory Coffee 仍仅为顺路候选。", "liveTitle": "41号咖啡已买 · 正在前往大皇宫", "liveDetail": "截至曼谷时间 12:08：41号咖啡两杯已买，正在前往大皇宫；尚未报告参观完成。后续餐厅和按摩仍为候选，未确认预约或完成。" },
+    { "date": "10.06", "weekday": "Tue", "title": "候选：河岸日落 / DD Mall 二选一", "detail": "候选 A 河岸版：下午往河西，视状态顺路看水门寺，傍晚坐船看郑王庙与湄南河日落。候选 B 购物版：DD Mall 逛约 2–3 小时，下午休息。两案不叠加，均未确认预约或完成。晚饭后取行李前往 BKK，衔接已确认的 10/07 凌晨 02:45 MU2564。格兰岛不纳入本次行程。", "liveTitle": "候选二选一 · 晚间取行李赴 BKK", "liveDetail": "河岸日落或 DD Mall 仍为候选，按当天状态选择；晚饭后取行李赴 BKK，衔接 10/07 凌晨 02:45 MU2564。" },
+    { "date": "10.07", "weekday": "Wed", "title": "曼谷 → 武汉 · MU2564", "detail": "用户已确认 MU2564 于 10/07 凌晨 02:45 从 BKK 起飞；原行程预计 07:20 抵达 WUH。10/06 晚取行李赴机场，尚未报告返程完成。", "liveTitle": "MU2564 · 凌晨 02:45 返程", "liveDetail": "已确认：MU2564，10/07 凌晨 02:45 BKK 起飞；原行程预计 07:20 抵达 WUH。" }
   ],
   "principles": [
     "马代：酒店本身就是目的地，不把活动排满。",
@@ -91,11 +91,11 @@
     "bangkok": {
       "name": "Four Points by Sheraton Bangkok, Sukhumvit 22",
       "status": "confirmed",
-      "statusLabel": "已订",
+      "statusLabel": "已入住",
       "dateDisplay": "10.04–10.06",
       "nights": 2,
       "priceCny": null,
-      "summary": "已预订 2 晚；实际房费尚未录入。"
+      "summary": "10/04 已入住，预订 2 晚；实际房费尚未录入。"
     }
   },
   "packing": [

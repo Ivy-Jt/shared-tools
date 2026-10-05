@@ -27,7 +27,7 @@
       const wasAutoHotelDraft = trip.hotels.bangkok.status === 'confirmed' && saved.hotel && oldHotelAutoPrice > 0 && Number(budgets.bkkhotel) === oldHotelAutoPrice;
       if (wasAutoHotelDraft) budgets.bkkhotel = '';
       return {
-        mode: saved.mode || 'plan',
+        mode: saved.mode || null,
         hotel: saved.hotel || '',
         hotelPrice: Number(saved.hotelPrice || 0),
         checks: saved.checks || {},
@@ -37,7 +37,7 @@
         legacyHotelDraft: saved.legacyHotelDraft || (wasAutoHotelDraft ? { name: saved.hotel, estimatedCny: oldHotelAutoPrice } : null)
       };
     } catch {
-      return { mode: 'plan', hotel: '', hotelPrice: 0, checks: {}, packingStates: {}, notes: {}, budgets: { ...defaultBudgets }, legacyHotelDraft: null };
+      return { mode: null, hotel: '', hotelPrice: 0, checks: {}, packingStates: {}, notes: {}, budgets: { ...defaultBudgets }, legacyHotelDraft: null };
     }
   }
 
@@ -255,9 +255,9 @@
     return mode === 'live' ? '当前：旅途中' : mode === 'memory' ? '当前：纪念册' : '当前：准备期';
   }
 
-  function setMode(mode) {
+  function setMode(mode, persist = true) {
     state.mode = mode;
-    saveState();
+    if (persist) saveState();
     $$('.mode-btn').forEach(button => button.classList.toggle('active', button.dataset.mode === mode));
     $('#memoryHero').classList.toggle('active', mode === 'memory');
     $('#liveCard').classList.toggle('active', mode === 'live');
@@ -412,8 +412,9 @@
     defaultBudgets = Object.fromEntries(trip.budget.items.map(item => [item.key, item.defaultCny ?? '']));
     const legacy = readState(defaultBudgets);
     legacyPatch = getLegacyPatch(legacy);
-    state = { mode: 'plan', hotel: '', hotelPrice: 0, checks: {}, packingStates: {}, notes: {}, budgets: { ...defaultBudgets } };
-    try { state.mode = localStorage.getItem('jtqx-global-trips-mode') || legacy.mode || 'plan'; } catch { /* Default view. */ }
+    const defaultMode = trip.status === 'live' ? 'live' : trip.status === 'memory' ? 'memory' : 'plan';
+    state = { mode: defaultMode, hotel: '', hotelPrice: 0, checks: {}, packingStates: {}, notes: {}, budgets: { ...defaultBudgets } };
+    try { state.mode = [localStorage.getItem('jtqx-global-trips-mode'), legacy.mode, defaultMode].find(mode => ['plan', 'live', 'memory'].includes(mode)); } catch { /* Use the trip stage when browser storage is unavailable. */ }
     renderHeader();
     renderStatus();
     renderTimeline();
@@ -427,7 +428,7 @@
     renderHotelState();
     renderBudgetTotal();
     updateProgress();
-    setMode(state.mode || 'plan');
+    setMode(state.mode, false);
     editable(false);
     document.documentElement.dataset.ready = 'true';
     try { await setupCloud(); } catch {
