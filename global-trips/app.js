@@ -261,6 +261,7 @@
     $$('.mode-btn').forEach(button => button.classList.toggle('active', button.dataset.mode === mode));
     $('#memoryHero').classList.toggle('active', mode === 'memory');
     $('#liveCard').classList.toggle('active', mode === 'live');
+    if ($('#preparation')) $('#preparation').hidden = mode !== 'plan';
     $('#mobileStage').textContent = stageLabel(mode);
     if (mode === 'live') renderLive();
   }
