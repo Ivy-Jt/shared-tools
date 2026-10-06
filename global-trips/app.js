@@ -83,7 +83,7 @@
     let text;
     if (now < start) text = `距出发 ${Math.max(1, Math.ceil((start - now) / 86400000))} 天`;
     else if (now <= end) text = '旅途中';
-    else text = '已完成';
+    else text = trip.status === 'live' ? '返程待确认' : '已完成';
     $('#mobileCountdown').textContent = text;
   }
 
@@ -282,6 +282,11 @@
       return;
     }
     if (now > end) {
+      if (trip.status === 'live') {
+        $('#countdownPill').textContent = 'Live · 返程待确认';
+        $('#liveContent').innerHTML = '<div class="live-now"><b>返程情况待确认。</b><br>旅程仍保持 Live；收到实际返程记录后再收尾。</div>';
+        return;
+      }
       $('#countdownPill').textContent = '旅行已结束';
       $('#liveContent').innerHTML = `<div class="live-now"><b>${escapeHtml(trip.number)} 已完成。</b><br>切到 Memory，把照片、花费和两个人的评价补进去。</div>`;
       return;
