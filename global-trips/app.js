@@ -97,8 +97,15 @@
   }
 
   function renderItinerary() {
-    $('#dayList').innerHTML = trip.itinerary.map(item => `<div class="day"><div class="date">${escapeHtml(item.date)}<small>${escapeHtml(item.weekday)}</small></div><div><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.detail)}</p></div></div>`).join('');
-    $('#principles').innerHTML = `<h4>这次旅行的原则</h4><ul>${trip.principles.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+    $('#dayList').innerHTML = trip.itinerary.map(item => {
+      const detail = item.detail.split('\n').filter(Boolean).map(line => {
+        const divider = line.indexOf('｜');
+        const text = divider < 0 ? escapeHtml(line) : `<b>${escapeHtml(line.slice(0, divider))}</b><br>${escapeHtml(line.slice(divider + 1))}`;
+        return `<p style="margin-top:8px">${text}</p>`;
+      }).join('');
+      return `<div class="day"><div class="date">${escapeHtml(item.date)}<small>${escapeHtml(item.weekday)}</small></div><div><h4>${escapeHtml(item.title)}</h4>${detail}</div></div>`;
+    }).join('');
+    $('#principles').innerHTML = `<h4>想记住的小事</h4><ul>${trip.principles.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
   }
 
   function renderPreparation() {
@@ -285,7 +292,7 @@
     if (now > end) {
       if (trip.status === 'live') {
         $('#countdownPill').textContent = 'Live · 返程待确认';
-        $('#liveContent').innerHTML = '<div class="live-now"><b>返程情况待确认。</b><br>旅程仍保持 Live；收到实际返程记录后再收尾。</div>';
+        $('#liveContent').innerHTML = '<div class="live-now"><b>返程待确认</b><br>等返程后，再补上最后一段。</div>';
         return;
       }
       $('#countdownPill').textContent = '旅行已结束';

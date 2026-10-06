@@ -17,12 +17,12 @@
     { "city": "马累", "code": "MLE" },
     { "city": "曼谷", "code": "BKK", "note": "DMK / BKK" }
   ],
-  "summary": "四晚 OZEN，把时间交给海、水屋和泳池；再到曼谷边走边改，大皇宫、孔剧、河边偶遇的水上训练、逛公园、购物和按摩，都成了现场留下的记忆。返程尚待确认，旅行继续保持 Live。",
+  "summary": "四晚海岛，换水屋、看海豚、泡泳池。再到曼谷逛逛吃吃，走累了就去按摩。",
   "statusItems": [
-    {"key": "flights", "icon": "✈", "label": "机票", "summary": "去程与马代→曼谷已完成 · 10/07 MU2564 02:45 BKK→WUH 待返程确认", "status": "confirmed", "statusLabel": "已确认"},
-    {"key": "ozen", "icon": "▰", "label": "OZEN", "summary": "OZEN LIFE MAADHOO · 已住 4 晚 · Earth → 滑梯水屋 → 泳池水屋", "status": "confirmed", "statusLabel": "已入住体验"},
+    {"key": "flights", "icon": "✈", "label": "机票", "summary": "MU2564 · 10/07 02:45 BKK → WUH · 返程待确认", "status": "confirmed", "statusLabel": "已确认"},
+    {"key": "ozen", "icon": "▰", "label": "OZEN", "summary": "4 晚 · Earth Villa → 滑梯水屋 → 泳池水屋", "status": "confirmed", "statusLabel": "住了 4 晚"},
     {"key": "bangkokHotel", "icon": "⌂", "label": "曼谷酒店", "summary": "Four Points Sukhumvit 22 · 10/04 入住 · 10/06 已退房", "status": "confirmed", "statusLabel": "已退房"},
-    {"key": "packing", "icon": "✓", "label": "打包", "summary": "按清单推进", "status": "progress", "statusLabel": "0%"}
+    {"key": "packing", "icon": "✓", "label": "打包", "summary": "行李清单", "status": "progress", "statusLabel": "0%"}
   ],
   "preparation": {
     "checkedAt": "2026-09-24",
@@ -52,38 +52,37 @@
     ]
   },
   "timeline": [
-    {"date": "09.30", "title": "武汉 → 吉隆坡 → 马累", "detail": "已抵达 · 酒店快艇上岛，入住 OZEN"},
-    {"date": "09.30–10.04", "title": "OZEN · 四晚海岛", "detail": "三种房型 · 海豚、海钓与多次遇见鳐鱼"},
+    {"date": "09.30", "title": "武汉 → 吉隆坡 → 马累", "detail": "吉隆坡转机 · 快艇上岛"},
+    {"date": "09.30–10.04", "title": "OZEN · 四晚海岛", "detail": "换水屋 · 看海豚 · 海钓"},
     {"date": "10.04", "title": "马累 → 曼谷 DMK", "detail": "FD176 · Four Points 入住 · P Kitchen 晚餐"},
     {"date": "10.05", "title": "大皇宫 · 孔剧 · 湄南河", "detail": "郑王庙对岸看塔 · 偶遇水上训练，公共船停航"},
     {"date": "10.06", "title": "伦披尼 → CentralWorld", "detail": "水巨蜥与猫 · 购物 · Let’s Relax 按摩"},
-    {"date": "10.07", "title": "待返程 · MU2564", "detail": "计划 02:45 BKK → WUH · 起飞、抵达尚待确认"}
+    {"date": "10.07", "title": "返程 · MU2564", "detail": "计划 02:45 BKK → WUH · 返程待确认"}
   ],
   "itinerary": [
-    {"date": "09.30", "weekday": "Wed", "title": "武汉 → 马累 → OZEN", "detail": "从武汉经吉隆坡转机抵达马累，再坐酒店快艇前往 OZEN LIFE MAADHOO，入住 Earth Villa。原计划 00:05 从 WUH 出发、09:50 抵达 MLE；实际航班时刻未另记。第一天就是抵达、上岛、入住和放空，旅行慢慢开始。", "liveTitle": "已抵达 OZEN · 放空的第一天", "liveDetail": "武汉经吉隆坡转机到马累，快艇上岛，入住 Earth Villa。"},
-    {"date": "10.01", "weekday": "Thu", "title": "OZEN · 岛本身就是目的地", "detail": "在岛上慢下来，餐厅、海边、水屋和泳池本身就是活动。海岛这几天追到了海豚，而且有很多漂亮的海豚；也出海海钓了，结果零收获、全体空军。还多次看到了鳐鱼，回想起来不止两三次。这些活动的具体日期暂未逐一记录。", "liveTitle": "海岛时光 · 海豚、海钓与鳐鱼", "liveDetail": "这几天追到了很多漂亮的海豚，海钓全体空军，还多次遇见鳐鱼；具体活动日期待补。"},
-    {"date": "10.02", "weekday": "Fri", "title": "换房 · Jacuzzi + Slide 水屋", "detail": "住完两晚 Earth Villa，换到带 Jacuzzi 和 Slide 的 Wind Villa，一次换房就是一种新的海岛体验。这段海岛时光里，最喜欢酒吧的 Negroni 00 零酒精版本：先喝 00，很喜欢；后来晚上试过含酒精版，也好喝但更容易醉，最后又回到 00。", "liveTitle": "换到滑梯 Jacuzzi 水屋", "liveDetail": "从 Earth Villa 换到带 Jacuzzi 和 Slide 的水屋。海岛饮品记忆：最喜欢的还是 Negroni 00。"},
-    {"date": "10.03", "weekday": "Sat", "title": "换房 · 私人泳池水屋", "detail": "最后一晚换到带私人泳池的 Wind Villa。在马代水屋拍了好几套泳池照片，觉得拍得很好看，很开心。海岛期间还参加过一次酒店主题活动，名字记得像“印度洋之夜”，准确名称未记清；获赠了一条深蓝与白色条纹、带当地特色的布巾。主题活动的具体日期也暂未确定。", "liveTitle": "泳池水屋 · 拍了喜欢的照片", "liveDetail": "换到带私人泳池的 Wind Villa。马代水屋拍了好几套喜欢的泳池照片，很开心。"},
-    {"date": "10.04", "weekday": "Sun", "title": "OZEN → 曼谷 · P Kitchen 晚餐", "detail": "离开 OZEN，坐快艇返回马累，搭 FD176 飞往曼谷 DMK（计划时刻 12:30–19:05），随后入住 Four Points by Sheraton Bangkok, Sukhumvit 22。晚上没有赶景点，在酒店附近 P Kitchen 吃了两人泰餐，含 7% VAT 约 800 多泰铢：普通、舒服的一餐，也成了认识曼谷日常餐饮价格的参照。曼谷有一晚还在酒店楼下附近做了足疗，很舒服；是 10/04 或 10/05 晚，具体日期和店名待补。", "liveTitle": "已到曼谷 · 酒店附近吃泰餐", "liveDetail": "Four Points 已入住；P Kitchen 两人晚餐含 7% VAT 约 800 多泰铢。附近还做过一次舒服的足疗，具体是哪晚待补。"},
-    {"date": "10.05", "weekday": "Mon", "title": "大皇宫 → 孔剧 → 湄南河边的意外", "detail": "上午在口述为“41号咖啡”的店买了冰拿铁和冰卡布奇诺，用券后两杯合计人民币 11 元多，觉得很划算。打车去大皇宫时下雨，抵达后迅速放晴，实际参观了大皇宫与玉佛寺。门票含孔剧，14:30 场满座，改看 16:00 场；等待时逛了 The Old Siam Plaza，喝泰奶、尝当地甜点，买的椰丝卷点 mix 5 个 60 THB，吃一个就觉得太甜腻。16:00 看完 Khon 孔剧，去了郑王庙对岸的经典机位看完整塔景，没有进庙。原想坐湄南河公共船，却遇到多艘长舟、统一着装的划手同步划桨；现场有 Royal Barge Procession 2026 告示，码头标明中午 12 点起停航。没坐成公共船，却意外看到皇家御舟相关训练／水上活动，具体活动级别不确定。之后回酒店休息、游泳。Four Points 的房间没有浴缸，却有漂亮的城景无边泳池；那晚去时几乎包场，游得特别开心，感觉自己基本学会了游泳。此前看到社交平台上吉隆坡热门泳池人很多，回想起来很庆幸这次选择了曼谷。Better Day 询问后因需等一个多小时、只收现金且现金不够而未做；也没有再去造船厂咖啡。", "liveTitle": "大皇宫、孔剧与河边偶遇", "liveDetail": "大皇宫与玉佛寺已参观，16:00 看了孔剧；在郑王庙对岸看塔，偶遇皇家御舟相关水上训练／活动。公共船停航，没坐成船；后来回酒店，在城景无边泳池几乎包场，游得很开心，感觉基本学会了游泳。"},
-    {"date": "10.06", "weekday": "Tue", "title": "伦披尼 → CentralWorld · 购物与按摩", "detail": "上午去了伦披尼公园，沿湖走走，看到了大约十只水巨蜥，还有很多猫。中午回 Four Points 收拾、退房，下午和晚上集中在 CentralWorld，减少折返。买到了 Puff 鞋／凉拖；看过一个泰国本地品牌包，最终没买，也没有买手机。给朋友买了一对小西柚／葡萄柚造型香皂，约 95 THB 一个；给自己买了喜欢的香茅草香皂和护手霜。最后买下 4 个小鼻通的组合套装，共 450 THB，没有买 300 THB 的 Duo Set。傍晚在 7F 美食区吃饭休息。20:30–21:30 两人在 Let’s Relax Spa – CentralWorld 做了 1 小时按摩，体验很好，去机场前还洗了澡；具体按摩项目未另记。获赠两支 LRL Start Fresh Aroma Spray 5ml，是随身草本香氛喷雾，不是鼻喷剂；店员确认与 LookPrakob Herbal Inhaler 套装中的喷剂相同，可用于给草本鼻通补香。两人已在线值机，无托运行李，CentralWorld 的行李已处理好；按摩后安排直接前往 BKK，机场抵达与后续航班情况待补。", "liveTitle": "伦披尼、CentralWorld 与最后一场按摩", "liveDetail": "伦披尼看到约十只水巨蜥和很多猫；CentralWorld 买到 Puff、香皂、护手霜及 450 THB 鼻通组合。20:30–21:30 完成 Let’s Relax 按摩，还洗了澡；已在线值机、无托运行李，准备赴 BKK。"},
-    {"date": "10.07", "weekday": "Wed", "title": "即将返程 · MU2564 待完成", "detail": "返程计划为 10/07 MU2564，凌晨 02:45 从 BKK 飞往 WUH。两人已完成在线值机，没有托运行李。当前尚未确认实际起飞或抵达武汉；不按时间经过推定返程完成。", "liveTitle": "即将返程 · MU2564 02:45", "liveDetail": "计划 10/07 凌晨 02:45 BKK → WUH。已在线值机、无托运行李；实际起飞与抵达待确认，旅程保持 Live。"}
+    {"date": "09.30", "weekday": "Wed", "title": "快艇上岛，开始放空", "detail": "出发｜武汉出发，经吉隆坡转机到马累。\n上岛｜快艇到 OZEN，入住 Earth Villa。第一天，放空就好。", "liveTitle": "抵达 OZEN", "liveDetail": "武汉 → 吉隆坡 → 马累。快艇上岛，入住 Earth Villa。"},
+    {"date": "10.01", "weekday": "Thu", "title": "OZEN · 慢慢过一天", "detail": "在岛上｜海边走走，吃饭，泡泳池。没有要赶的景点，待在岛上就很好。", "liveTitle": "OZEN · 慢下来", "liveDetail": "海边走走，吃饭，泡泳池。"},
+    {"date": "10.02", "weekday": "Fri", "title": "换到滑梯水屋", "detail": "换房｜住了两晚 Earth Villa，换到带 Jacuzzi 和滑梯的 Wind Villa。换个房间，又多一种玩法。", "liveTitle": "滑梯水屋", "liveDetail": "今天换房：Wind Villa，带 Jacuzzi 和滑梯。"},
+    {"date": "10.03", "weekday": "Sat", "title": "私人泳池水屋", "detail": "换房｜最后一晚，住进带私人泳池的 Wind Villa。\n照片｜住水屋这几天拍了好几套泳池照片，喜欢，开心。", "liveTitle": "泳池水屋", "liveDetail": "换到私人泳池水屋。这几天拍了不少喜欢的照片。"},
+    {"date": "10.04", "weekday": "Sun", "title": "到曼谷，先吃一顿泰餐", "detail": "离岛｜快艇回马累，搭 FD176 到曼谷 DMK。\n入住｜Sukhumvit 22 的 Four Points。\n晚饭｜附近的 P Kitchen。两人 800 多泰铢，含 7% VAT。吃得舒服，也不贵。", "liveTitle": "曼谷第一晚", "liveDetail": "入住 Four Points。P Kitchen 两人晚餐，含税 800 多泰铢。"},
+    {"date": "10.05", "weekday": "Mon", "title": "大皇宫、孔剧，河边看长舟", "detail": "上午｜冰拿铁和冰卡布奇诺，用券后两杯才人民币 11 元多。路上下雨，到大皇宫就放晴了。逛大皇宫和玉佛寺。\n下午｜14:30 的孔剧满座，改看 16:00 场。等候时逛 Old Siam、喝泰奶。椰丝卷点 5 个 60 泰铢，吃一个就甜腻了。\n16:00｜看 Khon 孔剧。\n傍晚｜到郑王庙对岸看塔。公共船停航，却碰上皇家御舟相关的水上活动。一排排长舟，划手齐齐划桨。\n晚上｜回酒店游泳。城景无边泳池几乎包场，感觉自己基本学会了游泳。还在酒店附近做了足疗，很舒服。", "liveTitle": "大皇宫、孔剧，河边的意外", "liveDetail": "逛大皇宫，看 16:00 孔剧，到郑王庙对岸看塔。公共船没坐成，意外看到了长舟。晚上在酒店泳池几乎包场。"},
+    {"date": "10.06", "weekday": "Tue", "title": "公园、购物，按摩后准备去机场", "detail": "上午｜逛伦披尼公园，看到大约十只水巨蜥，还有很多猫。\n中午｜回酒店收拾、退房。之后就待在 CentralWorld。\n下午｜买到 Puff 凉拖。给朋友挑了一对葡萄柚香皂，约 95 泰铢一个；自己买了香茅草香皂和护手霜。4 个小鼻通套装，450 泰铢。包和手机都没买。\n晚饭｜CentralWorld 7F 美食区。\n20:30–21:30｜Let’s Relax 按摩。很舒服，去机场前还洗了澡。店里送了两支 5ml 香氛喷雾，也能给草本鼻通补香。\n去机场前｜已在线值机，没有托运行李。准备直接去 BKK。", "liveTitle": "伦披尼 → CentralWorld → Let’s Relax", "liveDetail": "看水巨蜥和猫，买凉拖和伴手礼。20:30 做了一小时按摩，还洗了澡。已在线值机，准备去机场。"},
+    {"date": "10.07", "weekday": "Wed", "title": "返程 · MU2564", "detail": "02:45｜计划搭 MU2564，BKK → WUH。\n返程待确认｜已在线值机，没有托运行李。", "liveTitle": "MU2564 · 02:45 返程", "liveDetail": "计划凌晨 02:45，BKK → WUH。返程待确认。"}
   ],
   "principles": [
-    "马代：酒店本身就是目的地，慢下来，换房也是旅行的一部分。",
-    "曼谷：边走边改，真正留下来的往往是现场的意外。",
-    "天气彩蛋：这几天天气异常地好，大皇宫路上下雨、抵达就放晴，感觉冥冥之中有“龙王护体”。",
-    "泰式高甜甜点尝鲜可以，但太甜腻的不太喜欢。",
-    "旧计划留在过去：Perception、Banthat Thong、Chinatown、Talat Noi、造船厂咖啡、Health Land Asoke、DD Mall 都没有去；Better Day 只询问过，未做按摩。",
-    "Green Mile / Benjakitti、二手店、浮潜、海岛 SPA 与蜜月礼遇暂未确认完成；不计入已发生的经历。"
+    "海岛这几天追到了好多漂亮的海豚，也不止两三次遇见鳐鱼。海钓则是零收获，全体空军。",
+    "最喜欢 Negroni 00。含酒精版也好喝，但容易醉，后来还是喝回零酒精的。",
+    "酒店主题夜送了一条深蓝、白色条纹的布巾。活动名字记不清了，礼物留下了。",
+    "曼谷房间没有浴缸，但有漂亮的城景无边泳池。那晚几乎包场，太开心了。看到网上吉隆坡热门泳池挤满人的照片，更庆幸这次选了曼谷。",
+    "这几天天气好得像有“龙王护体”。连去大皇宫路上的雨，都在抵达时停了。"
   ],
   "hotels": {
     "maldives": {
       "name": "OZEN LIFE MAADHOO",
       "status": "confirmed",
-      "statusLabel": "已入住体验",
+      "statusLabel": "住了 4 晚",
       "dateDisplay": "09.30–10.04",
-      "summary": "2人 · AI 一价全包 · 往返快艇 · 税金",
+      "summary": "2 人 · 一价全包 · 含往返快艇和税费",
       "priceCny": 37800,
       "rooms": [
         { "dates": "09.30–10.02", "name": "Earth Villa × 2晚" },
@@ -98,7 +97,7 @@
       "dateDisplay": "10.04–10.06",
       "nights": 2,
       "priceCny": null,
-      "summary": "10/04 入住，10/06 已退房，共 2 晚。房间没有浴缸；城景无边泳池漂亮，那晚几乎包场。实际房费尚未录入。"
+      "summary": "住了 2 晚。没有浴缸，城景无边泳池很漂亮。那晚几乎包场。"
     }
   },
   "packing": [
