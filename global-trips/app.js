@@ -57,6 +57,14 @@
     $('#tripEyebrow').textContent = `${trip.number} · ${trip.subtitle}`;
     $('#tripTitle').textContent = trip.title;
     $('#tripDescription').textContent = `${trip.dates.display} · ${trip.route.map(item => item.city).join(' → ')}。${trip.summary}`;
+    if ($('.trip-cover')) {
+      $('#tripEyebrow').textContent = trip.number;
+      $('#tripTitle').innerHTML = trip.title.split(' × ').map(escapeHtml).map(part => `<span>${part}</span>`).join('<em>×</em>');
+      $('#tripDescription').textContent = trip.summary;
+      $('#coverDates').textContent = trip.dates.display;
+      $('#coverStage').textContent = trip.status === 'live' ? 'Live · 旅途中' : trip.status === 'memory' ? 'Memory · 纪念册' : 'Plan · 准备期';
+      $('#coverRoute').innerHTML = trip.route.map(item => `<span>${escapeHtml(item.city)}</span>`).join('<i aria-hidden="true">↗</i>');
+    }
     $('#mobileNumber').textContent = trip.number;
     $('#mobileTitle').textContent = trip.title;
     $('#mobileDates').textContent = trip.dates.display;

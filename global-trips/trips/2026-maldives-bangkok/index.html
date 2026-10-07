@@ -7,15 +7,33 @@
 <meta name="theme-color" content="#f5f2eb">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="../../app.css?v=20260926-photos">
+<link rel="stylesheet" href="./cover.css?v=20261007-cover">
 <title>JT &amp; QX's Global Trips · Maldives × Bangkok</title>
 </head>
-<body data-trip-source="./trip.json">
+<body class="trip-journal" data-trip-source="./trip.json">
 <div class="shell">
   <a class="back-link" href="../../">← 返回 Global Trips</a>
-  <header class="brand">
-    <div><h1>JT &amp; QX’s Global Trips</h1><div class="cn">和你，一起看更大的世界</div><div class="micro">Same people · more places · a brighter us</div></div>
-    <div class="brand-note">Good trips, better together.<br>从计划，到旅途，再到我们的回忆。</div>
+  <header class="brand journal-brand">
+    <div class="journal-signature"><span class="journal-monogram" aria-hidden="true">J<span>&</span>Q</span><div><h1>JT &amp; QX’s Global Trips</h1><p>和你，一起看更大的世界</p></div></div>
+    <span class="journal-edition">OUR TRAVEL JOURNAL <span>VOL. 001 / 2026</span></span>
   </header>
+
+  <section class="trip-cover" aria-labelledby="tripTitle">
+    <div class="cover-copy">
+      <div class="cover-kicker"><span id="tripEyebrow">Trip 001</span><span id="coverStage" class="cover-stage">Live · 旅途中</span></div>
+      <h2 id="tripTitle">Maldives × Bangkok</h2>
+      <div class="cover-subtitle">马尔代夫 × 曼谷</div>
+      <p id="tripDescription"></p>
+      <div class="cover-date"><span class="cover-date-line"></span><span id="coverDates">2026.09.30 — 10.07</span></div>
+      <div id="heroMeta" hidden></div>
+    </div>
+    <figure class="cover-visual">
+      <img src="./assets/cover-illustration.jpg" width="1536" height="1024" fetchpriority="high" alt="海岛水屋与曼谷河畔交融的旅行插画">
+      <figcaption><span>INDIAN OCEAN → CHAO PHRAYA</span><span>旅行插画</span></figcaption>
+      <div class="cover-stamp" aria-hidden="true"><span>JT &amp; QX</span><b>01</b><span>TOGETHER</span></div>
+    </figure>
+    <div class="cover-footer"><span class="cover-footer-note">从海岛的慢，到城市的热闹。</span><div class="cover-route" id="coverRoute">武汉 <i>↗</i> 马累 <i>↗</i> 曼谷</div></div>
+  </section>
 
   <nav class="topbar" aria-label="旅行阶段">
     <div class="modes">
@@ -44,10 +62,6 @@
   <section class="card prep-card" id="preparation" aria-label="行前时间轴"><h3>行前时间轴</h3><div id="prepTimeline"></div><details><summary>申报条件、现金、OZEN 与浮潜安全</summary><div id="prepNotes"></div><div id="prepSources"></div></details></section>
 
   <img id="privateCover" class="private-cover" alt="我们的旅行封面" hidden>
-  <section class="hero card desktop-only">
-    <div class="hero-copy"><div class="eyebrow" id="tripEyebrow">Trip</div><h2 id="tripTitle">Loading…</h2><p id="tripDescription"></p><div class="hero-meta" id="heroMeta"></div></div>
-    <div class="hero-art" aria-hidden="true"><div class="postcard maldives"><div class="fake-photo sea"></div></div><div class="postcard bangkok"><div class="fake-photo city"></div></div><div class="hero-route"></div></div>
-  </section>
 
   <section class="memory-hero card" id="memoryHero"><div class="eyebrow">Trip 001 · Memory Mode</div><h3>把计划过成回忆。</h3><div style="color:var(--ink2)">旅行结束后，不删计划，而是在原来的行程上叠加照片、花费、两个人的评价和临时发生的小事。</div><div class="stats"><div class="stat"><b>8 天</b><br><small>旅行跨度</small></div><div class="stat"><b>2 个目的地</b><br><small>Maldives · Bangkok</small></div><div class="stat"><b>4 晚海岛</b><br><small>OZEN LIFE MAADHOO</small></div><div class="stat"><b>Trip 001</b><br><small>JT & QX’s Global Trips</small></div></div></section>
   <section class="live-card card" id="liveCard"><div class="section-head"><div><h3>今天</h3><small id="liveDate">旅途中快速查看模式</small></div><span class="pill" id="countdownPill"></span></div><div id="liveContent"></div></section>
@@ -75,6 +89,6 @@
 </div>
 
 <nav class="mobile-nav" aria-label="手机工作区导航"><button class="active" data-action="overview">首页</button><button data-panel="itinerary">行程</button><button data-panel="hotels">酒店</button><button data-panel="packing">清单</button><button data-panel="memories">回忆</button></nav>
-<script src="../../app.js?v=20260926-photos" defer></script>
+<script src="../../app.js?v=20261007-cover" defer></script>
 </body>
 </html>

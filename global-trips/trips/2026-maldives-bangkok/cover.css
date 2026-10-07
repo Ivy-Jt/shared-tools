@@ -1,0 +1,53 @@
+/* Trip 001 cover. Shared itinerary and private-photo styles stay unchanged. */
+.trip-journal .shell{max-width:1280px;padding-top:20px}
+.trip-journal .back-link{font-size:11px;margin-bottom:18px}
+.journal-brand{align-items:center;margin-bottom:24px}
+.journal-signature{display:flex;align-items:center;gap:13px}
+.journal-monogram{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border:1px solid #92aaa0;border-radius:50%;font:24px Georgia,serif;letter-spacing:-2px}
+.journal-monogram span{font-size:12px;margin:0 3px;font-style:italic}
+.journal-brand h1{font:500 24px/1.15 Georgia,serif;letter-spacing:-.5px}
+.journal-brand p{font-size:11px;letter-spacing:.15em;color:var(--muted);margin:7px 0 0}
+.journal-edition{font-size:9px;letter-spacing:.18em;text-align:right;line-height:1.8;color:var(--ink2)}
+.journal-edition span{display:block;color:var(--muted)}
+.trip-cover{display:grid;grid-template-columns:43% 57%;background:#fffcf4;border:1px solid #d6dace;border-radius:4px 28px 4px 28px;overflow:hidden;margin-bottom:22px;box-shadow:0 18px 50px #244b4012}
+.cover-copy{padding:38px 34px 34px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.cover-kicker{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#657a70}
+.cover-stage{font-size:10px;letter-spacing:0;background:#edf2e7;border:1px solid #d6decc;border-radius:20px;padding:5px 10px;white-space:nowrap}
+.trip-cover h2{font:500 clamp(42px,5.3vw,70px)/.99 Georgia,'Times New Roman',serif;letter-spacing:-2px;margin:0;color:#153d34}
+.trip-cover h2 span{display:block}
+.trip-cover h2 em{font:italic 30px/1.3 Georgia,serif;color:#ad8254;display:block;margin:3px 0}
+.cover-subtitle{font-size:14px;letter-spacing:.3em;margin-top:19px;color:#49675b}
+.cover-copy p{font-size:13px;line-height:1.85;max-width:320px;color:#65736a;margin:20px 0 28px}
+.cover-date{display:flex;align-items:center;gap:12px;font:12px Georgia,serif;letter-spacing:.07em;color:#6c7469}
+.cover-date-line{width:30px;height:1px;background:#bd9b65}
+.cover-visual{margin:0;position:relative;min-height:440px;overflow:hidden;background:#5ab4b6}
+.cover-visual>img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:57% 50%}
+.cover-visual:after{content:'';position:absolute;inset:60% 0 0;background:linear-gradient(transparent,#062f3c80);pointer-events:none}
+.cover-visual figcaption{position:absolute;bottom:19px;left:22px;right:22px;z-index:1;display:flex;justify-content:space-between;gap:12px;color:#fffdf5;font-size:9px;letter-spacing:.12em;text-shadow:0 1px 4px #173d45}
+.cover-stamp{position:absolute;top:24px;right:24px;width:77px;height:77px;border:1px solid #fff8ddc0;border-radius:50%;color:#fff9e7;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(12deg);background:#163b3229;outline:1px solid #fff8dd85;outline-offset:4px;box-shadow:0 0 0 6px #173a3020}
+.cover-stamp span{font-size:8px;letter-spacing:.12em}.cover-stamp b{font:28px Georgia,serif;line-height:1.2}
+.cover-footer{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid #d7ddce;padding:17px 30px;background:#f5f6eb}
+.cover-footer-note{font-size:12px;color:#6c7969;letter-spacing:.05em}
+.cover-route{display:flex;align-items:center;gap:18px;font-size:12px;white-space:nowrap}.cover-route i{font-style:normal;color:#ad8254}
+.trip-journal .topbar{box-shadow:none}
+.trip-journal .cloud-bar{background:transparent}
+@media(max-width:900px){.trip-cover{grid-template-columns:46% 54%}.cover-copy{padding:28px 24px}.trip-cover h2{font-size:49px}.cover-visual{min-height:410px}.cover-kicker{gap:6px;letter-spacing:.08em}.journal-brand h1{font-size:22px}}
+@media(max-width:600px){
+ .trip-journal .shell{padding-top:18px}.trip-journal .back-link{display:none}
+ .journal-brand{margin:0 3px 18px}.journal-signature{gap:10px}.journal-monogram{width:38px;height:38px;font-size:19px;letter-spacing:-1px}.journal-monogram span{font-size:10px;margin:0 2px}
+ .journal-brand h1{font-size:18px;letter-spacing:-.3px}.journal-brand p{font-size:9px;letter-spacing:.1em;margin-top:5px}.journal-edition{display:none}
+ .trip-cover{grid-template-columns:1fr;border-radius:3px 23px 3px 23px;margin-bottom:14px}
+ .cover-visual{grid-row:1;min-height:0;aspect-ratio:1.65}.cover-visual>img{object-position:center 40%}
+ .cover-stamp{top:18px;right:18px;width:56px;height:56px}.cover-stamp b{font-size:21px}.cover-stamp span{font-size:6px}
+ .cover-visual figcaption{left:16px;right:16px;bottom:12px;font-size:7px;letter-spacing:.08em}
+ .cover-copy{padding:22px 23px 24px}.cover-kicker{margin-bottom:17px;font-size:9px}.cover-stage{font-size:9px;padding:4px 9px}
+ .trip-cover h2{font-size:clamp(39px,11.2vw,60px);letter-spacing:-1.6px;display:flex;align-items:baseline;flex-wrap:wrap;column-gap:10px;row-gap:5px}
+ .trip-cover h2 em{font-size:25px;line-height:1;margin:0}.cover-subtitle{font-size:11px;letter-spacing:.25em;margin-top:12px}
+ .cover-copy p{font-size:12px;line-height:1.7;margin:13px 0 18px;max-width:100%}.cover-date{font-size:11px}
+ .cover-footer{padding:13px 20px;justify-content:center}.cover-footer-note{display:none}.cover-route{font-size:11px;gap:24px}
+ .trip-journal .mobile-summary{padding:0;border:0;box-shadow:none;background:transparent;margin:0 0 12px}
+ .mobile-summary .mobile-kicker,.mobile-summary h2,.mobile-summary .mobile-date,.mobile-summary .mobile-route{display:none}
+ .mobile-summary .mobile-status{margin-top:0}.mobile-summary .quick-actions{margin-top:8px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{.trip-cover{grid-template-columns:43% 57%;break-inside:avoid;box-shadow:none}.cover-visual{grid-row:auto;min-height:300px}.cover-copy{padding:25px}.trip-cover h2{font-size:45px}.cover-stage{display:none}}
