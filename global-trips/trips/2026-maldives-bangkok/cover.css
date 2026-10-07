@@ -31,6 +31,12 @@
 .cover-route{display:flex;align-items:center;gap:18px;font-size:12px;white-space:nowrap}.cover-route i{font-style:normal;color:#ad8254}
 .trip-journal .topbar{box-shadow:none}
 .trip-journal .cloud-bar{background:transparent}
+.room-journey{padding:14px 0 18px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.room-journey h4{margin:0 0 12px;font-size:13px}
+#roomJourney{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#roomJourney>div{border-left:2px solid #b6cbbd;padding-left:9px}
+#roomJourney small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+#roomJourney b{display:block;font-size:11px;line-height:1.5;font-weight:500;overflow-wrap:anywhere}
 @media(max-width:900px){.trip-cover{grid-template-columns:46% 54%}.cover-copy{padding:28px 24px}.trip-cover h2{font-size:49px}.cover-visual{min-height:410px}.cover-kicker{gap:6px;letter-spacing:.08em}.journal-brand h1{font-size:22px}}
 @media(max-width:600px){
  .trip-journal .shell{padding-top:18px}.trip-journal .back-link{display:none}

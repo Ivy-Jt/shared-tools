@@ -60,19 +60,19 @@
     {"date": "10.07", "title": "返程 · MU2564", "detail": "计划 02:45 BKK → WUH · 返程待确认"}
   ],
   "itinerary": [
-    {"date": "09.30", "weekday": "Wed", "title": "快艇上岛，开始放空", "detail": "出发｜武汉出发，经吉隆坡转机到马累。\n上岛｜快艇到 OZEN，入住 Earth Villa。第一天，放空就好。", "liveTitle": "抵达 OZEN", "liveDetail": "武汉 → 吉隆坡 → 马累。快艇上岛，入住 Earth Villa。"},
-    {"date": "10.01", "weekday": "Thu", "title": "OZEN · 慢慢过一天", "detail": "在岛上｜海边走走，吃饭，泡泳池。没有要赶的景点，待在岛上就很好。", "liveTitle": "OZEN · 慢下来", "liveDetail": "海边走走，吃饭，泡泳池。"},
-    {"date": "10.02", "weekday": "Fri", "title": "换到滑梯水屋", "detail": "换房｜住了两晚 Earth Villa，换到带 Jacuzzi 和滑梯的 Wind Villa。换个房间，又多一种玩法。", "liveTitle": "滑梯水屋", "liveDetail": "今天换房：Wind Villa，带 Jacuzzi 和滑梯。"},
-    {"date": "10.03", "weekday": "Sat", "title": "私人泳池水屋", "detail": "换房｜最后一晚，住进带私人泳池的 Wind Villa。\n照片｜住水屋这几天拍了好几套泳池照片，喜欢，开心。", "liveTitle": "泳池水屋", "liveDetail": "换到私人泳池水屋。这几天拍了不少喜欢的照片。"},
-    {"date": "10.04", "weekday": "Sun", "title": "到曼谷，先吃一顿泰餐", "detail": "离岛｜快艇回马累，搭 FD176 到曼谷 DMK。\n入住｜Sukhumvit 22 的 Four Points。\n晚饭｜附近的 P Kitchen。两人 800 多泰铢，含 7% VAT。吃得舒服，也不贵。", "liveTitle": "曼谷第一晚", "liveDetail": "入住 Four Points。P Kitchen 两人晚餐，含税 800 多泰铢。"},
+    {"date": "09.30", "weekday": "Wed", "title": "快艇上岛，蜜月第一晚", "detail": "抵达｜武汉经吉隆坡转机到马累。坐 OZEN 快艇上岛，开始四晚一价全包的海岛生活。\n入住｜Earth Villa，先住两晚。\n约 17:30 · 管家安排｜SPA。\n约 19:30 · 管家安排｜Palms 蜜月晚餐。", "liveTitle": "快艇上岛 · Earth Villa", "liveDetail": "前两晚住 Earth Villa。管家安排：约 17:30 SPA、约 19:30 Palms 蜜月晚餐。"},
+    {"date": "10.01", "weekday": "Thu", "title": "Earth Villa · 两顿餐之间慢慢过", "detail": "上午｜在岛上慢下来，不赶行程。\n13:45–15:00 · 管家安排｜LONU 午餐。\n20:30 · 管家安排｜Traditions IndoCeylon 晚餐。", "liveTitle": "Earth Villa · 第二天", "liveDetail": "管家安排：13:45 LONU 午餐，20:30 Traditions IndoCeylon 晚餐。"},
+    {"date": "10.02", "weekday": "Fri", "title": "滑梯水屋、海豚和主题夜", "detail": "下午 · 换房｜从 Earth Villa 换到 Wind Villa with Jacuzzi & Slide。水屋、滑梯和眼前的海，换房也是这天的乐趣。\n16:30 · 出海安排｜Sunset Cruise，16:15 码头集合。\n追海豚｜真的追到了，而且有好多漂亮的海豚。\n19:00–20:30 · 晚餐安排｜Palms Gala Dinner。\n晚上｜参加了 Palms 主题夜，记得叫“印度洋之夜”。拿到一条深蓝白条纹布巾，后来一路带到了曼谷。", "liveTitle": "滑梯水屋 · 追海豚", "liveDetail": "换到 Jacuzzi + Slide 水屋，出海追到了好多海豚。晚上参加 Palms 主题夜，带回一条深蓝白条纹布巾。"},
+    {"date": "10.03", "weekday": "Sat", "title": "泳池水屋，海钓全体空军", "detail": "换房｜最后一晚，住进 Wind Villa with Pool。自己的泳池，可以再慢一点。\n13:45 · 管家安排｜M6M 午餐。\n17:00 · 出海安排｜Sunset Fishing，16:45 码头集合。\n海钓｜钓过了，零收获，全体空军。\n20:30 · 管家安排｜Traditions Peking 晚餐。\n照片｜住水屋这几天拍了好几套泳池照片，喜欢，开心。", "liveTitle": "泳池水屋 · 日落海钓", "liveDetail": "换到私人泳池水屋，出海海钓，全体空军。管家安排：13:45 M6M、20:30 Traditions Peking。"},
+    {"date": "10.04", "weekday": "Sun", "title": "离开 OZEN，到曼谷吃泰餐", "detail": "清晨｜在 OZEN 过最后一个早晨，退掉泳池水屋。\n离岛｜酒店快艇回马累，结束四晚海岛生活。\n航班｜FD176，计划 12:30 MLE → 19:05 DMK。\n入住｜曼谷 Sukhumvit 22 的 Four Points。\n晚饭｜附近的 P Kitchen。两人 800 多泰铢，含 7% VAT。吃得舒服，也不贵。", "liveTitle": "OZEN → 曼谷", "liveDetail": "快艇离岛，搭 FD176 到曼谷。入住 Four Points，晚饭在 P Kitchen。"},
     {"date": "10.05", "weekday": "Mon", "title": "大皇宫、孔剧，河边看长舟", "detail": "上午｜冰拿铁和冰卡布奇诺，用券后两杯才人民币 11 元多。路上下雨，到大皇宫就放晴了。逛大皇宫和玉佛寺。\n下午｜14:30 的孔剧满座，改看 16:00 场。等候时逛 Old Siam、喝泰奶。椰丝卷点 5 个 60 泰铢，吃一个就甜腻了。\n16:00｜看 Khon 孔剧。\n傍晚｜到郑王庙对岸看塔。公共船停航，却碰上皇家御舟相关的水上活动。一排排长舟，划手齐齐划桨。\n晚上｜回酒店游泳。城景无边泳池几乎包场，感觉自己基本学会了游泳。还在酒店附近做了足疗，很舒服。", "liveTitle": "大皇宫、孔剧，河边的意外", "liveDetail": "逛大皇宫，看 16:00 孔剧，到郑王庙对岸看塔。公共船没坐成，意外看到了长舟。晚上在酒店泳池几乎包场。"},
     {"date": "10.06", "weekday": "Tue", "title": "公园、购物，按摩后准备去机场", "detail": "上午｜逛伦披尼公园，看到大约十只水巨蜥，还有很多猫。\n中午｜回酒店收拾、退房。之后就待在 CentralWorld。\n下午｜买到 Puff 凉拖。给朋友挑了一对葡萄柚香皂，约 95 泰铢一个；自己买了香茅草香皂和护手霜。4 个小鼻通套装，450 泰铢。包和手机都没买。\n晚饭｜CentralWorld 7F 美食区。\n20:30–21:30｜Let’s Relax 按摩。很舒服，去机场前还洗了澡。店里送了两支 5ml 香氛喷雾，也能给草本鼻通补香。\n去机场前｜已在线值机，没有托运行李。准备直接去 BKK。", "liveTitle": "伦披尼 → CentralWorld → Let’s Relax", "liveDetail": "看水巨蜥和猫，买凉拖和伴手礼。20:30 做了一小时按摩，还洗了澡。已在线值机，准备去机场。"},
     {"date": "10.07", "weekday": "Wed", "title": "返程 · MU2564", "detail": "02:45｜计划搭 MU2564，BKK → WUH。\n返程待确认｜已在线值机，没有托运行李。", "liveTitle": "MU2564 · 02:45 返程", "liveDetail": "计划凌晨 02:45，BKK → WUH。返程待确认。"}
   ],
   "principles": [
-    "海岛这几天追到了好多漂亮的海豚，也不止两三次遇见鳐鱼。海钓则是零收获，全体空军。",
+    "在岛上不止两三次遇见鳐鱼。起初觉得像魔鬼鱼，后来才知道是鳐。",
     "最喜欢 Negroni 00。含酒精版也好喝，但容易醉，后来还是喝回零酒精的。",
-    "酒店主题夜送了一条深蓝、白色条纹的布巾。活动名字记不清了，礼物留下了。",
+    "Palms 主题夜送的深蓝白条纹布巾，一路带到了曼谷，也成了穿搭的一部分。",
     "曼谷房间没有浴缸，但有漂亮的城景无边泳池。那晚几乎包场，太开心了。看到网上吉隆坡热门泳池挤满人的照片，更庆幸这次选了曼谷。",
     "这几天天气好得像有“龙王护体”。连去大皇宫路上的雨，都在抵达时停了。"
   ],

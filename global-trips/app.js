@@ -105,6 +105,9 @@
   }
 
   function renderItinerary() {
+    if ($('#roomJourney')) {
+      $('#roomJourney').innerHTML = trip.hotels.maldives.rooms.map(room => `<div><small>${escapeHtml(room.dates)}</small><b>${escapeHtml(room.name)}</b></div>`).join('');
+    }
     $('#dayList').innerHTML = trip.itinerary.map(item => {
       const detail = item.detail.split('\n').filter(Boolean).map(line => {
         const divider = line.indexOf('｜');
