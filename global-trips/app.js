@@ -282,6 +282,7 @@
     if ($('#preparation')) $('#preparation').hidden = mode !== 'plan';
     $('#mobileStage').textContent = stageLabel(mode);
     if (mode === 'live') renderLive();
+    if ($('#tripJournal') && mode === 'memory') activatePanel('memories');
   }
 
   function shanghaiDate(date) {
