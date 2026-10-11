@@ -5,7 +5,7 @@ async function load() {
   const ledger = document.querySelector('#tripLedger');
   if (!journal || !ledger) return;
   const read = async (url, json = false) => {
-    const response = await fetch(url);
+    const response = await fetch(url, { cache: 'no-cache' });
     if (!response.ok) throw new Error(`无法读取 ${url} (${response.status})`);
     return json ? response.json() : response.text();
   };
