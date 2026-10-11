@@ -1,4 +1,4 @@
-import { mountLedger } from './journal-ledger.mjs';
+import { mountLedger } from './journal-ledger.mjs?v=20261011-r3';
 
 async function load() {
   const journal = document.querySelector('#tripJournal');
@@ -35,6 +35,7 @@ async function load() {
       img.setAttribute('aria-label', `查看大图：${img.alt}`);
       const open = () => {
         image.src = img.src;
+        image.className = img.className;
         image.alt = img.alt;
         caption.textContent = img.closest('figure')?.querySelector('figcaption')?.textContent || img.alt;
         dialog.showModal();

@@ -6,17 +6,34 @@ export function toCnyCents(row, rate) {
 }
 
 
+// Upgrade known seed fields while preserving local edits and custom rows.
+export function migrateLedgerRows(rows, data) {
+  const removed = new Set(data.migration?.removedIds || []);
+  const current = new Map(data.rows.map(row => [row.id, row]));
+  return rows.filter(row => !removed.has(row.id)).map(row => {
+    const before = data.migration?.previous?.[row.id];
+    const next = current.get(row.id);
+    if (!before || !next) return {...row};
+    const result = {...row};
+    for (const key of Object.keys(next)) {
+      if (row[key] === before[key]) result[key] = next[key];
+    }
+    return result;
+  });
+}
+
+
 export function mountLedger(root, data){
   const seed=data.rows;
   const key='jtqx-trip001-memory-budget-20261011-v4';
-  const statuses={contract:'合同价',estimate:'用户估计',stated:'本人报金额',lower:'下界/约数',reference:'参考估算',unconfirmed:'未确认支付',missing:'待补',paid:'实际支付',likely:'待核归属',duplicate:'重复参考（不计入）'};
-  const order=['大项','交通','体验','餐饮','购物','行前采购','待核项目','待补'];
+  const statuses={contract:'合同价',estimate:'估算',stated:'本人报金额',lower:'下界/约数',reference:'参考估算',unconfirmed:'未确认支付',missing:'待补',paid:'实际支付',likely:'待核归属',duplicate:'重复参考（不计入）'};
+  const order=['大项','交通','住宿','体验','餐饮','购物','行前采购','其他','待核项目','待补'];
   let rows=seed.map(r=>({...r})); let rate=.20;
-  try {const old=JSON.parse(localStorage.getItem(key)||'null');if(old&&Array.isArray(old.rows)&&old.rows.every(r=>r&&typeof r.id==='string'&&typeof r.item==='string'&&['CNY','THB'].includes(r.currency)&&(r.amount===null||Number.isFinite(r.amount)&&r.amount>=0))){rows=old.rows;rate=Number(old.rate)>0&&Number(old.rate)<=1?Number(old.rate):.20}}catch(e){}
+  try {const old=JSON.parse(localStorage.getItem(key)||'null');if(old&&Array.isArray(old.rows)&&old.rows.every(r=>r&&typeof r.id==='string'&&typeof r.item==='string'&&['CNY','THB'].includes(r.currency)&&(r.amount===null||Number.isFinite(r.amount)&&r.amount>=0))){if(old.revision!==data.revision){localStorage.setItem(key+'-before-r3',JSON.stringify(old));rows=migrateLedgerRows(old.rows,data)}else rows=old.rows;rate=Number(old.rate)>0&&Number(old.rate)<=1?Number(old.rate):.20}}catch(e){}
   root.querySelector('#journal-'+'fxRate').value=rate.toFixed(3);
   const money=n=>'¥'+n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
   const convert=r=> { const cents=toCnyCents(r,rate);return cents===null?null:cents/100; };
-  const save=()=>{try{localStorage.setItem(key,JSON.stringify({rows,rate,lastEditedAt:new Date().toISOString()}))}catch(e){}};
+  const save=()=>{try{localStorage.setItem(key,JSON.stringify({rows,rate,revision:data.revision,lastEditedAt:new Date().toISOString()}))}catch(e){}};
   function render(){
     const body=root.querySelector('#journal-'+'ledgerBody'); body.textContent='';
     [...rows].sort((a,b)=>order.indexOf(a.category)-order.indexOf(b.category)).forEach(row=>{
@@ -38,7 +55,7 @@ export function mountLedger(root, data){
     root.querySelector('#journal-'+'grandTotal').textContent='≈ '+money(major+other);
     root.querySelector('#journal-'+'footerTotal').textContent=money(major+other);
     root.querySelector('#journal-'+'countNotice').textContent='已计入 '+considered.length+' 笔；尚有 '+rows.filter(r=>!r.included || convert(r)===null).length+' 笔待补或暂不计入';
-    const groups=[{name:'交通',color:'#457f9c',test:r=>r.category==='交通'||r.id==='air'},{name:'住宿',color:'#63aa9a',test:r=>r.id==='ozen'||r.id==='fourpoints'},{name:'餐饮',color:'#dba875',test:r=>r.category==='餐饮'},{name:'采购',color:'#b57f9d',test:r=>r.category==='购物'||r.category==='行前采购'},{name:'体验及其他',color:'#8d8b9f',test:r=>true}];
+    const groups=[{name:'交通',color:'#457f9c',test:r=>r.category==='交通'||r.id==='air'},{name:'住宿',color:'#63aa9a',test:r=>r.id==='ozen'||r.id==='fourpoints'||r.category==='住宿'},{name:'餐饮',color:'#dba875',test:r=>r.category==='餐饮'},{name:'采购',color:'#b57f9d',test:r=>r.category==='购物'||r.category==='行前采购'},{name:'体验及其他',color:'#8d8b9f',test:r=>true}];
     let cum=0;const stops=[];const legend=root.querySelector('#journal-'+'spendLegend');legend.replaceChildren();
     groups.forEach(g=>{const subset=considered.filter(r=>g.test(r)&&!groups.slice(0,groups.indexOf(g)).some(prev=>prev.test(r)));const val=subset.reduce((s,r)=>s+convert(r),0);if(!val)return;const pct=100*val/(major+other);stops.push(`${g.color} ${cum}% ${cum+pct}%`);cum+=pct;const line=document.createElement('div');line.className='legend-line';line.innerHTML=`<span class="legend-dot" style="background:${g.color}"></span><strong>${g.name}</strong><span>${money(val)}</span><em>${pct.toFixed(1)}%</em>`;legend.appendChild(line)});
     root.querySelector('#journal-'+'spendDonut').style.background=stops.length?'conic-gradient('+stops.join(',')+')':'#dbe8ea';root.querySelector('#journal-'+'donutTotal').textContent=money(major+other);
@@ -47,7 +64,19 @@ export function mountLedger(root, data){
   }
   function update(){render()}
   root.querySelector('#journal-'+'fxRate').onchange=e=>{const n=Number(e.target.value);if(n>0&&n<=1){rate=n;update()}else{e.target.value=rate}};
-  root.querySelector('#journal-'+'addRow').onclick=()=>{const n=String(rows.length+1);rows.push({id:'custom_'+Date.now(),category:'待补',item:'新增消费 '+n,amount:null,currency:'THB',status:'missing',included:false,note:'双击项目名称或备注可修改'});update()};
+  const form=root.querySelector('#journal-newExpense');
+  root.querySelector('#journal-addRow').onclick=()=>{form.hidden=false;form.querySelector('[name=item]').focus()};
+  root.querySelector('#journal-cancelExpense').onclick=()=>{form.hidden=true;form.reset()};
+  form.addEventListener('submit',event=>{
+    event.preventDefault();
+    if(!form.reportValidity())return;
+    const values=new FormData(form);const item=String(values.get('item')).trim();
+    const amount=Number(values.get('amount'));
+    if(!item||!Number.isFinite(amount)||amount<0)return;
+    rows.push({id:'custom_'+crypto.randomUUID(),category:String(values.get('category')),item,amount,currency:String(values.get('currency')),status:String(values.get('status')),included:true,note:String(values.get('note')).trim()});
+    update();form.reset();form.hidden=true;
+    root.querySelector('#journal-addStatus').textContent='已新增「'+item+'」，已计入合计并保存在当前浏览器。';
+  });
   function download(text,file,type){const blob=new Blob([text],{type});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=file;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
   root.querySelector('#journal-'+'exportJson').onclick=()=>download(JSON.stringify({tripId:'2026-maldives-bangkok',exportedAt:new Date().toISOString(),exchangeRateTHBtoCNY:rate,rows},null,2),'Trip001_预算账本.json','application/json');
   root.querySelector('#journal-'+'exportCsv').onclick=()=>{const h=['category','item','amount','currency','status','included','note'];const lines=[h.join(','),...rows.map(r=>h.map(k=>'"'+String(r[k]??'').replaceAll('"','""')+'"').join(','))];download('\ufeff'+lines.join('\n'),'Trip001_预算账本.csv','text/csv;charset=utf-8')};

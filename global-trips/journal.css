@@ -104,3 +104,32 @@
 #tripJournal .day-photos {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}
 #tripJournal .day-photos img {width:100%;height:185px;object-fit:cover;border-radius:10px}
 @media(max-width:720px){#tripJournal .day-photos{grid-template-columns:repeat(2,minmax(0,1fr))}#tripJournal .day-photos img{height:148px}}
+
+/* Keep navigation and journey facts compact above the long journal. */
+#planner {padding:18px}
+#planner > .section-head {margin-bottom:10px;gap:12px}
+#planner > .section-head h3 {font-size:18px;margin:0 0 3px}
+#planner > .section-head small {font-size:11px}
+#planner .planner-tabs {margin:10px 0 14px;gap:6px}
+#planner .plan-tab {padding:8px 14px;font-size:13px}
+#tripJournal .stats {gap:8px}
+#tripJournal .stat {padding:8px 12px;border-radius:8px;line-height:1.5}
+#tripJournal .stat strong {font-size:18px}
+#tripJournal .stat small {font-size:11px}
+#tripJournal .intro {font-size:15px;margin:18px 0;line-height:1.85}
+#photoAlbum {margin-bottom:14px}
+#photoAlbum h3 {font-size:16px;margin:0 0 6px}
+#photoAlbum p {font-size:12px;margin:5px 0}
+#tripLedger .new-expense {border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0;background:var(--paper)}
+#tripLedger .new-expense[hidden] {display:none}
+#tripLedger .new-expense h3 {font-size:17px;margin:0 0 12px}
+#tripLedger .expense-fields {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#tripLedger .expense-fields label {display:flex;flex-direction:column;gap:5px;font-size:13px;min-width:0}
+#tripLedger .expense-fields input,#tripLedger .expense-fields select {width:100%;box-sizing:border-box;min-width:0}
+#tripLedger .expense-actions {display:flex;gap:10px;margin-top:14px}
+#tripLedger #journal-addRow {background:var(--accent);color:white}
+@media(max-width:720px){#planner{padding:12px}#planner .plan-tab{padding:7px 10px}#tripLedger .expense-fields{grid-template-columns:1fr 1fr}#tripLedger .expense-fields label:first-child{grid-column:1/-1}}
+
+/* Display-only grading retains all original pixels and photographic detail. */
+.underwater-coral {filter:brightness(1.06) contrast(1.10) saturate(1.10)}
+.underwater-shark {filter:brightness(1.04) contrast(1.08) saturate(.92) hue-rotate(5deg)}
