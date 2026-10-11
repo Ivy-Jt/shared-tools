@@ -16,7 +16,8 @@ async function load() {
       read(config.content), read(config.ledgerView), read(config.ledger, true)
     ]);
     journal.innerHTML = story;
-    ledger.innerHTML = '<p class="ledger-local-note">旅行账本保存在当前浏览器；可导出 JSON 或 CSV 留存。下方行前预算保留原有同步记录，两个合计分别显示。</p>' + view;
+    document.dispatchEvent(new Event('trip-journal-ready'));
+    ledger.innerHTML = '<p class="ledger-local-note">无需登录即可查看和编辑这份旅行账本。初始记录随网站保存；你的修改仅保存在当前浏览器，不自动跨设备同步，可导出 JSON 或 CSV 留存。下方“行前预算与原有同步记录”保留云端数据，编辑需登录，两个合计分别显示。</p>' + view;
     mountLedger(ledger, data);
     const dialog = document.createElement('dialog');
     dialog.className = 'journal-lightbox';

@@ -394,7 +394,7 @@
       ...[...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => ({ key: `prep:${item.key}`, label: `${item.label}备注` }))),
       ...trip.budget.items, ...trip.memoryPrompts.map(item => ({ key: item.key, label: item.title }))
     ].map(item => [item.key, item.label]));
-    const { createAlbum } = await import('./photo-album.mjs');
+    const { createAlbum } = await import('./photo-album.mjs?v=20261011-r2');
     const album = createAlbum({ root: $('#photoAlbum'), apiBase: config.apiBase, trip, getKey: () => cloud?.key || '' });
     cloud = new TripCloudSync({
       apiBase: config.apiBase, tripId: trip.id, onChange: applyCloudState, onEditable: editable,

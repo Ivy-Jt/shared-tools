@@ -11,6 +11,24 @@ export function createAlbum({root, apiBase, trip, getKey}) {
     if(!response.ok){const messages={401:'登录已失效，请重新登录',409:'相册已满（24 张），请先移除不需要的照片',413:'图片太大，请换一张'};throw new Error(messages[response.status]||'照片暂时无法保存或读取，请重试');}
     return response;
   }
+  function placeDayPhotos(){
+    document.querySelectorAll('.day-photos').forEach(node=>node.remove());
+    if(!signedIn)return;
+    for(const figure of gallery.querySelectorAll('[data-photo-day]')){
+      const value=figure.dataset.photoDay;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(value))continue;
+      const index=Math.round((Date.parse(value+'T00:00:00Z')-Date.parse(trip.dates.start+'T00:00:00Z'))/86400000);
+      const journalDay=document.querySelector(`[data-journal-date="${value}"] .day-card`);
+      for(const target of [document.querySelectorAll('#dayList .day')[index],journalDay].filter(Boolean)){
+        let photos=target.querySelector('.day-photos');
+        if(!photos){photos=document.createElement('div');photos.className='day-photos';photos.setAttribute('aria-label','当天的私人照片');target.append(photos);}
+        const copy=document.createElement('figure');
+        copy.append(figure.querySelector('img').cloneNode(),figure.querySelector('figcaption').cloneNode(true));
+        photos.append(copy);
+      }
+    }
+  }
+  document.addEventListener('trip-journal-ready',placeDayPhotos);
   async function refresh(){
     const epoch=++generation;status.textContent='正在读取照片…';
     try {
@@ -32,10 +50,9 @@ export function createAlbum({root, apiBase, trip, getKey}) {
         remove.type='button';remove.textContent='移除';remove.className='photo-remove';remove.setAttribute('aria-label',`移除${photo.caption||'这张照片'}`);
         remove.addEventListener('click',async()=>{if(busy||!signedIn)return;if(!confirm('从相册移除这张照片？'))return;busy=true;try{await request('/'+photo.id,{method:'DELETE'});await refresh()}catch(e){status.textContent=e.message}finally{busy=false}});
         figure.append(img,caption,remove);gallery.append(figure);
-        const dayIndex=Math.round((Date.parse(photo.day+'T00:00:00Z')-Date.parse(trip.dates.start+'T00:00:00Z'))/86400000);
-        const dayCard=document.querySelectorAll('#dayList .day')[dayIndex];
-        if(dayCard){let photos=dayCard.querySelector('.day-photos');if(!photos){photos=document.createElement('div');photos.className='day-photos';dayCard.append(photos)}const copy=document.createElement('figure');copy.append(img.cloneNode(),caption.cloneNode(true));photos.append(copy);}
+        figure.dataset.photoDay=photo.day;
       }
+      placeDayPhotos();
       const hero=results.find(({photo})=>photo.day==='cover')||results[0];
       if(hero){const index=results.indexOf(hero);cover.src=urls[index];cover.hidden=false;}
       status.textContent=photos.length?`${photos.length} / 24 张 · 仅登录后可见`:'还没有照片，放一张喜欢的风景，开始这次旅行。';
