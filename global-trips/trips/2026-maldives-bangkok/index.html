@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#f5f2eb">
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="../../app.css?v=20260926-photos">
-<link rel="stylesheet" href="../../journal.css?v=20261011">
+<link rel="stylesheet" href="../../journal.css?v=20261011-r2">
 <link rel="stylesheet" href="./cover.css?v=20261007-cover-ozen">
 <title>JT &amp; QX's Global Trips · Maldives × Bangkok</title>
 </head>
@@ -28,9 +28,9 @@
       <div class="cover-date"><span class="cover-date-line"></span><span id="coverDates">2026.09.30 — 10.07</span></div>
       <div id="heroMeta" hidden></div>
     </div>
-    <figure class="cover-visual">
-      <img src="./assets/photos/embedded-e5cfa8f6be82.jpg" width="1536" height="1024" fetchpriority="high" alt="在 OZEN 水屋泳池看马尔代夫的海">
-      <figcaption><span>INDIAN OCEAN → CHAO PHRAYA</span><span>我们的旅行照片</span></figcaption>
+    <figure class="cover-visual snorkel-cover">
+      <img src="./assets/photos/photo_029.jpg" width="1536" height="1024" fetchpriority="high" alt="马尔代夫浮潜实拍：珊瑚与鱼群">
+      <figcaption><span>INDIAN OCEAN → CHAO PHRAYA</span><span>浮潜视频实拍截帧</span></figcaption>
       <div class="cover-stamp" aria-hidden="true"><span>JT &amp; QX</span><b>01</b><span>TOGETHER</span></div>
     </figure>
     <div class="cover-footer"><span class="cover-footer-note">从海岛的慢，到城市的热闹。</span><div class="cover-route" id="coverRoute">武汉 <i>↗</i> 马累 <i>↗</i> 曼谷</div></div>
@@ -82,15 +82,15 @@
     <div class="panel" id="panel-packing"><p class="packing-help">采购状态和“已打包”分别记录；可选未带和不需要的物品不计入进度。登录后自动保存。</p><p id="readinessNote" class="packing-help"></p><div class="check-grid" id="packingGroups"></div></div>
     <div class="panel" id="panel-budget"><section id="tripLedger" aria-label="旅行费用账本"><p role="status">正在载入费用账本…</p></section><details><summary>行前预算与原有同步记录</summary><div class="budget-grid"><div class="budget-list" id="budgetList"></div><div class="total-box"><div class="eyebrow">Trip Budget</div><div class="big" id="budgetTotal">—</div><p id="budgetNote"></p></div></div></details></div>
     <div class="panel" id="panel-todos"><div class="todo-grid" id="todoGroups"></div></div>
-    <div class="panel" id="panel-memories"><section id="tripJournal" aria-label="八天完整游记"><p role="status">正在载入完整游记…</p></section><section id="photoAlbum" class="photo-album"><h3>我们的旅行相册</h3><p data-photo-status role="status">登录后可查看和上传私人照片</p><form hidden><label>照片<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" required></label><label>放在哪里<select aria-label="照片日期"><option value="cover">旅行封面</option></select></label><label>一句描述<input type="text" maxlength="300" placeholder="这一刻，想记住什么"></label><button type="submit">上传照片</button><small>自动压缩，最多 24 张；最新封面会显示在页面顶部。</small></form><button type="button" data-photo-refresh hidden>刷新相册</button><div data-photo-gallery class="photo-gallery"></div></section><div class="memory-grid" id="memoryGrid"></div></div>
+    <div class="panel" id="panel-memories"><section id="photoAlbum" class="photo-album"><h3>添加我们的照片</h3><p>用旅行登录码登录后，可选择日期上传私人照片，照片会出现在当天游记和私人相册中。每次上传一张，最多 24 张；私人照片仅登录后可见。</p><p data-photo-status role="status">登录后可查看和上传私人照片</p><form hidden><label>照片<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" required></label><label>放在哪里<select aria-label="照片日期"><option value="cover">旅行封面</option></select></label><label>一句描述<input type="text" maxlength="300" placeholder="这一刻，想记住什么"></label><button type="submit">上传照片</button><small>自动压缩，最多 24 张；最新封面会显示在页面顶部。</small></form><button type="button" data-photo-refresh hidden>刷新相册</button><div data-photo-gallery class="photo-gallery"></div></section><div class="journal-shortcuts"><button type="button" data-jump-panel="budget">查看旅行账本 · 无需登录</button><a href="#photoAlbum">添加照片</a></div><section id="tripJournal" aria-label="八天完整游记"><p role="status">正在载入完整游记…</p></section><div class="memory-grid" id="memoryGrid"></div></div>
   </section>
 
   <div class="load-error" id="appError" hidden></div>
   <footer class="footer">JT & QX’s Global Trips · Trip 001 · 登录后，采购状态、勾选、预算和笔记可跨设备同步。</footer>
 </div>
 
-<nav class="mobile-nav" aria-label="手机工作区导航"><button class="active" data-action="overview">首页</button><button data-panel="itinerary">行程</button><button data-panel="hotels">酒店</button><button data-panel="packing">清单</button><button data-panel="memories">回忆</button></nav>
-<script type="module" src="../../journal.mjs?v=20261011"></script>
-<script src="../../app.js?v=20261007-cover-ozen" defer></script>
+<nav class="mobile-nav" aria-label="手机工作区导航"><button class="active" data-action="overview">首页</button><button data-panel="itinerary">行程</button><button data-panel="budget">预算</button><button data-panel="packing">清单</button><button data-panel="memories">回忆</button></nav>
+<script type="module" src="../../journal.mjs?v=20261011-r2"></script>
+<script src="../../app.js?v=20261011-r2" defer></script>
 </body>
 </html>
