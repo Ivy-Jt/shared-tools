@@ -7,11 +7,11 @@ const dir=new URL('../global-trips/trips/2026-maldives-bangkok/',import.meta.url
 const read=name=>fs.readFileSync(new URL(name,dir),'utf8');
 const ledger=JSON.parse(read('ledger.json'));
 const journal=read('journal.html');
-test('V11 retains eight dates and all 69 journal images with local resources',()=>{
+test('V11 retains eight dates and 74 selected journal images (one duplicate scene removed, six supplied photos added) with local resources',()=>{
  assert.equal((journal.match(/class="day"/g)||[]).length,8);
  for(const date of ['09.30','10.01','10.02','10.03','10.04','10.05','10.06','10.07']) assert.ok(journal.includes(date));
  const photos=[...journal.matchAll(/<img[^>]*src="([^"]+)"/g)].map(m=>m[1]);
- assert.equal(photos.length,69);assert.equal(new Set(photos).size,69);
+ assert.equal(photos.length,74);assert.equal(new Set(photos).size,74);
  for(const rel of photos){assert.ok(/^(\.\/)?assets\/photos\/[\w-]+\.jpg$/.test(rel));const buf=fs.readFileSync(new URL(rel,dir));assert.equal(buf.readUInt16BE(0),0xffd8);assert.equal(buf.readUInt16BE(buf.length-2),0xffd9);}
  assert.ok(!/data:image|<script|\son\w+=/.test(journal));
 });
