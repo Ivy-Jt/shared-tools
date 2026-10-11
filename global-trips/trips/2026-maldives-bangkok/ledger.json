@@ -67,51 +67,31 @@
       "id": "oldsiamtea",
       "category": "餐饮",
       "item": "10/05 Thai Tea with Milk",
-      "amount": null,
+      "amount": 50,
       "currency": "THB",
-      "status": "missing",
-      "included": false,
-      "note": "Old Siam 3F，金额未记录"
+      "status": "estimate",
+      "included": true,
+      "note": "暂估 50 THB；从五杯泰奶总估算中拆出，不重复计入"
     },
     {
       "id": "tha_tien",
       "category": "餐饮",
-      "item": "10/05 河边晚餐与其他餐饮",
-      "amount": null,
-      "currency": "THB",
-      "status": "missing",
-      "included": false,
-      "note": "有菜单照片，没有核实实际点单和支付总额"
-    },
-    {
-      "id": "grabfood",
-      "category": "待核项目",
-      "item": "10/05 GrabFood 结算截图",
-      "amount": null,
-      "currency": "THB",
-      "status": "unconfirmed",
-      "included": false,
-      "note": "已以凌晨GrabFood¥103.65实付单独入账；之前811THB为未下单截图，不能再加总；保留餐饮故事。"
+      "item": "10/05 河边晚餐",
+      "amount": 110,
+      "currency": "CNY",
+      "status": "estimate",
+      "included": true,
+      "note": "根据回忆100多元，暂估 ¥110"
     },
     {
       "id": "centralworld_food",
       "category": "餐饮",
       "item": "10/06 CentralWorld 7F 晚饭",
-      "amount": null,
-      "currency": "THB",
-      "status": "missing",
-      "included": false,
-      "note": "确有用餐，金额未知"
-    },
-    {
-      "id": "palace",
-      "category": "体验",
-      "item": "10/05 大皇宫门票（2人）",
-      "amount": null,
-      "currency": "THB",
-      "status": "duplicate",
-      "included": false,
-      "note": "标准参考价已由实际支付¥190.14替代；不参与合计"
+      "amount": 110,
+      "currency": "CNY",
+      "status": "estimate",
+      "included": true,
+      "note": "根据回忆100多元，暂估 ¥110；含猪脚饭与清汤火锅，合并记账"
     },
     {
       "id": "massage",
@@ -122,16 +102,6 @@
       "status": "estimate",
       "included": true,
       "note": "两人60分钟普通 Aroma Oil 按官网参考价1300 THB/人×2估算，非实付；按摩与鼻通纪念品分开"
-    },
-    {
-      "id": "grab",
-      "category": "交通",
-      "item": "曼谷 Grab / Taxi 及其他交通",
-      "amount": null,
-      "currency": "THB",
-      "status": "missing",
-      "included": false,
-      "note": "多笔支付宝Grab订单存在退款/重复预授权，未完成净额核验前不计总额"
     },
     {
       "id": "puff",
@@ -156,7 +126,7 @@
     {
       "id": "lemongrass",
       "category": "购物",
-      "item": "香茅皂（不含护手霜）",
+      "item": "香茅皂",
       "amount": 159,
       "currency": "THB",
       "status": "stated",
@@ -182,16 +152,6 @@
       "status": "likely",
       "included": true,
       "note": "10/07约凌晨1点 KPT ¥245.14；用户推测是机场冻干/泰茶等伴手礼，优先使用银行/微信实付记录，替代原回忆¥265；商户与物品仍待核。"
-    },
-    {
-      "id": "other",
-      "category": "待补",
-      "item": "其他零食、小费、未记录消费",
-      "amount": null,
-      "currency": "CNY",
-      "status": "missing",
-      "included": false,
-      "note": "无完整账单，避免将未知视为0"
     },
     {
       "id": "baggage",
@@ -254,26 +214,6 @@
       "note": "银行卡查询 Tungsmith Center：Central Park 船面消费¥125.27；可能包含饮品，泰奶勿重复加总。商户拼写按用户读账单记录，待截图校对。"
     },
     {
-      "id": "centralworld_pork",
-      "category": "餐饮",
-      "item": "10/06 CentralWorld 猪脚饭",
-      "amount": 99,
-      "currency": "THB",
-      "status": "stated",
-      "included": true,
-      "note": "本人回忆99泰铢"
-    },
-    {
-      "id": "centralworld_hotpot",
-      "category": "餐饮",
-      "item": "10/06 CentralWorld 泰式清汤火锅",
-      "amount": 250,
-      "currency": "THB",
-      "status": "estimate",
-      "included": true,
-      "note": "本人回忆约人民币¥40–60，暂按250THB估"
-    },
-    {
       "id": "handcream",
       "category": "购物",
       "item": "香茅护手霜",
@@ -299,19 +239,9 @@
       "item": "小象挂件×2",
       "amount": 70.98,
       "currency": "CNY",
-      "status": "likely",
+      "status": "stated",
       "included": true,
-      "note": "微信查到商户近似「顾子/古子」¥70.98，用户认为对应两只小象挂件，关联未完全核实。替代此前258THB中值估算。"
-    },
-    {
-      "id": "coffee_bag",
-      "category": "购物",
-      "item": "Coffee Connect 试喝后咖啡×1袋",
-      "amount": null,
-      "currency": "THB",
-      "status": "missing",
-      "included": false,
-      "note": "已购买，金额待核"
+      "note": "Good Goods · 两只小象挂件，微信支付 ¥70.98"
     },
     {
       "id": "pre_hat",
@@ -454,16 +384,6 @@
       "note": "10/04晚¥59.60＋¥7.66；单列实际支付，若后续核对与其他行程重复则剔除"
     },
     {
-      "id": "grab_candidates",
-      "category": "待核项目",
-      "item": "Grab支付宝记录：净额未核对",
-      "amount": null,
-      "currency": "CNY",
-      "status": "missing",
-      "included": false,
-      "note": "交通候选净额暂列¥85.45+¥44.58+¥29.62+¥37.22+¥27.71=¥224.58，已由各单笔入账；¥103.65明确外卖且单独列餐饮；10/04¥59.60+¥7.66及¥190.14仍待核，避免重复。"
-    },
-    {
       "id": "alipay190",
       "category": "体验",
       "item": "10/05 大皇宫门票（两人）",
@@ -476,12 +396,12 @@
     {
       "id": "thai_milk",
       "category": "餐饮",
-      "item": "曼谷泰奶合计约5杯（未包含在其他套餐内的估算）",
-      "amount": 250,
+      "item": "其他泰奶约4杯",
+      "amount": 200,
       "currency": "THB",
       "status": "estimate",
       "included": true,
-      "note": "按5杯×50THB/杯估算；与已经列入餐厅套餐的饮料可能重叠，实际总额待核"
+      "note": "暂按4杯×50 THB；与 Old Siam 单列的一杯合计约5杯，不另加套餐饮品"
     },
     {
       "id": "blue_bottle",
@@ -556,12 +476,97 @@
     {
       "id": "pre_husband_jelly",
       "category": "行前采购",
-      "item": "水母服（丈夫）",
-      "amount": null,
+      "item": "迪卡侬水母服（丈夫）",
+      "amount": 120,
       "currency": "CNY",
-      "status": "missing",
-      "included": false,
-      "note": "用户明确提醒丈夫也有水母服等行前采购，金额暂未提供；待付款清单补充。"
+      "status": "estimate",
+      "included": true,
+      "note": "本人回忆约 ¥120"
     }
-  ]
+  ],
+  "revision": "20261011-r3",
+  "migration": {
+    "removedIds": [
+      "grabfood",
+      "palace",
+      "grab",
+      "other",
+      "grab_candidates",
+      "coffee_bag",
+      "centralworld_pork",
+      "centralworld_hotpot"
+    ],
+    "previous": {
+      "oldsiamtea": {
+        "id": "oldsiamtea",
+        "category": "餐饮",
+        "item": "10/05 Thai Tea with Milk",
+        "amount": null,
+        "currency": "THB",
+        "status": "missing",
+        "included": false,
+        "note": "Old Siam 3F，金额未记录"
+      },
+      "thai_milk": {
+        "id": "thai_milk",
+        "category": "餐饮",
+        "item": "曼谷泰奶合计约5杯（未包含在其他套餐内的估算）",
+        "amount": 250,
+        "currency": "THB",
+        "status": "estimate",
+        "included": true,
+        "note": "按5杯×50THB/杯估算；与已经列入餐厅套餐的饮料可能重叠，实际总额待核"
+      },
+      "tha_tien": {
+        "id": "tha_tien",
+        "category": "餐饮",
+        "item": "10/05 河边晚餐与其他餐饮",
+        "amount": null,
+        "currency": "THB",
+        "status": "missing",
+        "included": false,
+        "note": "有菜单照片，没有核实实际点单和支付总额"
+      },
+      "centralworld_food": {
+        "id": "centralworld_food",
+        "category": "餐饮",
+        "item": "10/06 CentralWorld 7F 晚饭",
+        "amount": null,
+        "currency": "THB",
+        "status": "missing",
+        "included": false,
+        "note": "确有用餐，金额未知"
+      },
+      "pre_husband_jelly": {
+        "id": "pre_husband_jelly",
+        "category": "行前采购",
+        "item": "水母服（丈夫）",
+        "amount": null,
+        "currency": "CNY",
+        "status": "missing",
+        "included": false,
+        "note": "用户明确提醒丈夫也有水母服等行前采购，金额暂未提供；待付款清单补充。"
+      },
+      "lemongrass": {
+        "id": "lemongrass",
+        "category": "购物",
+        "item": "香茅皂（不含护手霜）",
+        "amount": 159,
+        "currency": "THB",
+        "status": "stated",
+        "included": true,
+        "note": "皂包装标价159泰铢；护手霜另列，避免混淆"
+      },
+      "elephants": {
+        "id": "elephants",
+        "category": "购物",
+        "item": "小象挂件×2",
+        "amount": 70.98,
+        "currency": "CNY",
+        "status": "likely",
+        "included": true,
+        "note": "微信查到商户近似「顾子/古子」¥70.98，用户认为对应两只小象挂件，关联未完全核实。替代此前258THB中值估算。"
+      }
+    }
+  }
 }
