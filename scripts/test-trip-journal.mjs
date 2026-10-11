@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import {toCnyCents} from '../global-trips/journal-ledger.mjs';
+import {toCnyCents,migrateLedgerRows} from '../global-trips/journal-ledger.mjs';
 const dir=new URL('../global-trips/trips/2026-maldives-bangkok/',import.meta.url);
 const read=name=>fs.readFileSync(new URL(name,dir),'utf8');
 const ledger=JSON.parse(read('ledger.json'));
@@ -21,13 +21,13 @@ test('loaded fragments have no duplicate IDs or collisions with the host page',(
  const trip=JSON.parse(read('trip.json'));for(const name of ['content','ledger','ledgerView']) assert.ok(fs.existsSync(new URL(trip.journal[name],dir)));
 });
 test('ledger preserves confirmed payment, refund removal and non-counted references',()=>{
- assert.equal(ledger.rows.length,56);assert.equal(new Set(ledger.rows.map(r=>r.id)).size,56);
+ assert.equal(ledger.rows.length,48);assert.equal(new Set(ledger.rows.map(r=>r.id)).size,48);
  assert.equal(ledger.rows.find(r=>r.id==='alipay190').amount,190.14);
- assert.equal(ledger.rows.find(r=>r.id==='palace').included,false);
- assert.equal(ledger.rows.find(r=>r.id==='grabfood').included,false);
+ assert.ok(!ledger.rows.some(r=>r.id==='palace'));
+ assert.ok(!ledger.rows.some(r=>r.id==='grabfood'));
  assert.ok(!ledger.rows.some(r=>r.item.includes('小吊带')));
  const total=rate=>ledger.rows.filter(r=>r.included).reduce((sum,r)=>sum+(toCnyCents(r,rate)??0),0);
- assert.equal(total(.2),6708719);assert.equal(total(.21),6713722);
+ assert.equal(total(.2),6735739);assert.equal(total(.21),6740393);
 });
 test('money distinguishes unknown, zero and invalid values; rounds THB to cents',()=>{
  assert.equal(toCnyCents({amount:null,currency:'CNY'},.2),null);
@@ -36,4 +36,16 @@ test('money distinguishes unknown, zero and invalid values; rounds THB to cents'
  assert.equal(toCnyCents({amount:99,currency:'THB'},.2),1980);
  assert.equal(toCnyCents({amount:-5,currency:'CNY'},.2),null);
  assert.equal(toCnyCents({amount:10,currency:'THB'},0),null);
+});
+
+test('ledger update preserves custom amounts and added rows and removes retired references',()=>{
+ const previous=ledger.migration.previous;
+ const custom={id:'custom_test',item:'咖啡',amount:28,currency:'CNY',included:true};
+ const stored=[{...previous.tha_tien},{...previous.pre_husband_jelly,amount:135},{id:'palace',included:false},custom];
+ const migrated=migrateLedgerRows(stored,ledger);
+ assert.equal(migrated.find(r=>r.id==='tha_tien').amount,110);
+ assert.equal(migrated.find(r=>r.id==='pre_husband_jelly').amount,135);
+ assert.ok(!migrated.some(r=>r.id==='palace'));
+ assert.deepEqual(migrated.find(r=>r.id==='custom_test'),custom);
+ assert.deepEqual(migrateLedgerRows(migrated,ledger),migrated);
 });
