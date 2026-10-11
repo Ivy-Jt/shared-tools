@@ -38,7 +38,7 @@ export function mountLedger(root, data){
     const body=root.querySelector('#journal-'+'ledgerBody'); body.textContent='';
     [...rows].sort((a,b)=>order.indexOf(a.category)-order.indexOf(b.category)).forEach(row=>{
       const tr=document.createElement('tr');if(!row.included)tr.className='unincluded';
-      function td(cls){const el=document.createElement('td'); if(cls)el.className=cls;tr.appendChild(el);return el}
+      function td(cls){const el=document.createElement('td');el.dataset.label=['类别','项目','币种','金额','状态','计入','折人民币'][tr.children.length]; if(cls)el.className=cls;tr.appendChild(el);return el}
       td('group-cell').textContent=row.category;
       const item=td('item');const nm=document.createElement('strong');nm.textContent=row.item;nm.title='双击修改项目名称';nm.style.cursor='text';nm.ondblclick=()=>{const v=prompt('修改消费项目名称',row.item);if(v&&v.trim()){row.item=v.trim();update()}};const note=document.createElement('span');note.textContent=row.note||'';note.title='双击修改备注';note.style.cursor='text';note.ondblclick=()=>{const v=prompt('修改备注',row.note||'');if(v!==null){row.note=v;update()}};item.append(nm,note);
       const curr=td();const cs=document.createElement('select'); ['CNY','THB'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v==='CNY'?'人民币':'泰铢';o.selected=v===row.currency;cs.appendChild(o)});cs.setAttribute('aria-label',row.item+' 币种');cs.onchange=()=>{row.currency=cs.value;update()};curr.appendChild(cs);
@@ -50,11 +50,11 @@ export function mountLedger(root, data){
     const considered=rows.filter(r=>r.included&&convert(r)!==null);
     const major=considered.filter(r=>r.category==='大项').reduce((s,r)=>s+convert(r),0);
     const other=considered.filter(r=>r.category!=='大项').reduce((s,r)=>s+convert(r),0);
-    root.querySelector('#journal-'+'majorTotal').textContent='≈ '+money(major);
-    root.querySelector('#journal-'+'otherTotal').textContent='≈ '+money(other);
-    root.querySelector('#journal-'+'grandTotal').textContent='≈ '+money(major+other);
+    root.querySelector('#journal-'+'majorTotal').textContent=money(major);
+    root.querySelector('#journal-'+'otherTotal').textContent=money(other);
+    root.querySelector('#journal-'+'grandTotal').textContent=money(major+other);
     root.querySelector('#journal-'+'footerTotal').textContent=money(major+other);
-    root.querySelector('#journal-'+'countNotice').textContent='已计入 '+considered.length+' 笔；尚有 '+rows.filter(r=>!r.included || convert(r)===null).length+' 笔待补或暂不计入';
+    root.querySelector('#journal-'+'countNotice').textContent=considered.length+' 笔花费';
     const groups=[{name:'交通',color:'#457f9c',test:r=>r.category==='交通'||r.id==='air'},{name:'住宿',color:'#63aa9a',test:r=>r.id==='ozen'||r.id==='fourpoints'||r.category==='住宿'},{name:'餐饮',color:'#dba875',test:r=>r.category==='餐饮'},{name:'采购',color:'#b57f9d',test:r=>r.category==='购物'||r.category==='行前采购'},{name:'体验及其他',color:'#8d8b9f',test:r=>true}];
     let cum=0;const stops=[];const legend=root.querySelector('#journal-'+'spendLegend');legend.replaceChildren();
     groups.forEach(g=>{const subset=considered.filter(r=>g.test(r)&&!groups.slice(0,groups.indexOf(g)).some(prev=>prev.test(r)));const val=subset.reduce((s,r)=>s+convert(r),0);if(!val)return;const pct=100*val/(major+other);stops.push(`${g.color} ${cum}% ${cum+pct}%`);cum+=pct;const line=document.createElement('div');line.className='legend-line';line.innerHTML=`<span class="legend-dot" style="background:${g.color}"></span><strong>${g.name}</strong><span>${money(val)}</span><em>${pct.toFixed(1)}%</em>`;legend.appendChild(line)});
@@ -75,7 +75,7 @@ export function mountLedger(root, data){
     if(!item||!Number.isFinite(amount)||amount<0)return;
     rows.push({id:'custom_'+crypto.randomUUID(),category:String(values.get('category')),item,amount,currency:String(values.get('currency')),status:String(values.get('status')),included:true,note:String(values.get('note')).trim()});
     update();form.reset();form.hidden=true;
-    root.querySelector('#journal-addStatus').textContent='已新增「'+item+'」，已计入合计并保存在当前浏览器。';
+    root.querySelector('#journal-addStatus').textContent='已新增「'+item+'」。';
   });
   function download(text,file,type){const blob=new Blob([text],{type});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=file;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
   root.querySelector('#journal-'+'exportJson').onclick=()=>download(JSON.stringify({tripId:'2026-maldives-bangkok',exportedAt:new Date().toISOString(),exchangeRateTHBtoCNY:rate,rows},null,2),'Trip001_预算账本.json','application/json');

@@ -133,3 +133,68 @@
 /* Display-only grading retains all original pixels and photographic detail. */
 .underwater-coral {filter:brightness(1.06) contrast(1.10) saturate(1.10)}
 .underwater-shark {filter:brightness(1.04) contrast(1.08) saturate(.92) hue-rotate(5deg)}
+
+/* A reading-first layout, with expenses stacked into cards on phones. */
+#memoryHero {padding:12px 18px;background:transparent;border:0;box-shadow:none}
+#memoryHero p {margin:0;font-size:13px;color:var(--ink2);line-height:1.65}
+#tripLedger .ledger-storage {font-size:12px;color:var(--ink2);margin:12px 0}
+#tripLedger .ledger-storage summary {cursor:pointer}
+@media(max-width:720px){
+ .trip-journal .shell {padding-left:12px;padding-right:12px}
+ .trip-journal .card,.trip-journal .panel,.trip-journal .section-head>div {min-width:0;max-width:100%}
+ #planner {border-radius:14px;padding:12px}
+ #planner .planner-tabs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;gap:6px}
+ #planner .plan-tab {min-width:0;padding:10px 4px;font-size:12px}
+ #timelineSection .timeline {grid-template-columns:1fr;overflow:visible;padding:0}
+ #timelineSection .t-node {min-width:0;padding:10px 12px}
+ #timelineSection .t-node::after {display:none}
+ #tripJournal .section {padding:16px 0}
+ #tripJournal .section-title {font-size:20px}
+ #tripJournal .intro {font-size:14px;margin:14px 0}
+ #tripJournal .day {padding:20px 0;gap:5px}
+ #tripJournal .day h3 {font-size:19px;line-height:1.5}
+ #tripJournal .day-card {overflow-wrap:anywhere}
+ #tripJournal .day p {line-height:1.9}
+ #tripJournal .chapter .body {padding:14px}
+ #tripJournal .chapter img {height:200px}
+ #tripJournal .roomstrip {gap:6px;padding:10px;font-size:11px}
+ #tripJournal .day-photos figure {min-width:0;max-width:100%}
+ .photo-album label,.photo-album input,.photo-album select {min-width:0;max-width:100%}
+ #photoAlbum input,#photoAlbum select {font-size:16px}
+ .journal-shortcuts {gap:6px;margin:12px 0}
+ .journal-shortcuts button,.journal-shortcuts a {font-size:12px;padding:9px 10px}
+ #tripLedger .section-title {font-size:20px}
+ #tripLedger .budget-viz {padding:12px;margin:12px 0}
+ #tripLedger .budget-viz-heading h3 {font-size:15px;margin-bottom:12px}
+ #tripLedger .budget-viz-flex {gap:14px}
+ #tripLedger .donut {width:150px;height:150px}
+ #tripLedger .donut-core {width:110px;height:110px}
+ #tripLedger .donut-core b {font-size:14px}
+ #tripLedger .legend-line {padding:7px 0;font-size:12px}
+ #tripLedger .budget-banner {grid-template-columns:1fr 1fr;gap:8px}
+ #tripLedger .bmetric {padding:10px}
+ #tripLedger .bmetric:last-child {grid-column:1/-1}
+ #tripLedger .bmetric strong {font-size:21px;margin:4px 0 0}
+ #tripLedger .budget-tools {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+ #tripLedger .fx {grid-column:1/-1;min-width:0;font-size:12px;flex-wrap:wrap;margin:0}
+ #tripLedger .budget-tools button {font-size:12px;padding:10px 6px;min-width:0}
+ #tripLedger #journal-addRow {grid-column:1/-1}
+ #tripLedger .table-wrap {overflow:visible;border:0}
+ #tripLedger .ledger,#tripLedger tbody {display:block;min-width:0;width:100%}
+ #tripLedger thead {position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%)}
+ #tripLedger tbody tr {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:13px;margin:10px 0;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+ #tripLedger td {display:flex;flex-direction:column;min-width:0;padding:0;border:0;gap:4px;white-space:normal!important}
+ #tripLedger td::before {content:attr(data-label);font-size:11px;color:var(--muted)}
+ #tripLedger td.group-cell,#tripLedger td.item,#tripLedger td:last-child {grid-column:1/-1}
+ #tripLedger td.group-cell {font-size:11px;color:var(--accent)}
+ #tripLedger td.group-cell::before,#tripLedger td.item::before {display:none}
+ #tripLedger td.item {min-width:0;overflow-wrap:anywhere}
+ #tripLedger td.item strong {font-size:14px;line-height:1.55}
+ #tripLedger td.item span {font-size:11px;line-height:1.6}
+ #tripLedger td:last-child {flex-direction:row;justify-content:space-between;padding-top:8px;border-top:1px solid var(--line);font-size:16px}
+ #tripLedger td input.money,#tripLedger td select {width:100%;min-width:0;max-width:100%;font-size:16px;min-height:40px}
+ #tripLedger td input[type=checkbox] {margin:10px 0;width:20px;height:20px}
+ #tripLedger .expense-fields {grid-template-columns:1fr}
+ #tripLedger .expense-fields input,#tripLedger .expense-fields select {font-size:16px;min-height:42px}
+ #tripLedger .sumline {font-size:13px;gap:6px}
+}
