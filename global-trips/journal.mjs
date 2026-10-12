@@ -1,4 +1,4 @@
-import { mountLedger } from './journal-ledger.mjs?v=20261012-r4';
+import { mountLedger } from './journal-ledger.mjs?v=20261012-r5';
 
 async function load() {
   const journal = document.querySelector('#tripJournal');

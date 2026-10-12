@@ -29,6 +29,7 @@ export function mountLedger(root, data){
   const statuses={contract:'合同价',estimate:'估算',stated:'本人报金额',lower:'下界/约数',reference:'参考估算',unconfirmed:'未确认支付',missing:'待补',paid:'实际支付',likely:'待核归属',duplicate:'重复参考（不计入）'};
   const order=['大项','交通','住宿','体验','餐饮','购物','行前采购','其他','待核项目','待补'];
   let rows=seed.map(r=>({...r})); let rate=.20;
+  const expandedRows=new Set();
   try {const old=JSON.parse(localStorage.getItem(key)||'null');if(old&&Array.isArray(old.rows)&&old.rows.every(r=>r&&typeof r.id==='string'&&typeof r.item==='string'&&['CNY','THB'].includes(r.currency)&&(r.amount===null||Number.isFinite(r.amount)&&r.amount>=0))){if(old.revision!==data.revision){localStorage.setItem(key+'-before-r3',JSON.stringify(old));rows=migrateLedgerRows(old.rows,data)}else rows=old.rows;rate=Number(old.rate)>0&&Number(old.rate)<=1?Number(old.rate):.20}}catch(e){}
   root.querySelector('#journal-'+'fxRate').value=rate.toFixed(3);
   const money=n=>'¥'+n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -37,12 +38,20 @@ export function mountLedger(root, data){
   function render(){
     const body=root.querySelector('#journal-'+'ledgerBody'); body.textContent='';
     [...rows].sort((a,b)=>order.indexOf(a.category)-order.indexOf(b.category)).forEach(row=>{
-      const tr=document.createElement('tr');if(!row.included)tr.className='unincluded';
+      const tr=document.createElement('tr');if(!row.included)tr.className='unincluded';tr.classList.toggle('expense-expanded',expandedRows.has(row.id));
       function td(cls){const el=document.createElement('td');el.dataset.label=['类别','项目','币种','金额','状态','计入','折人民币'][tr.children.length]; if(cls)el.className=cls;tr.appendChild(el);return el}
       td('group-cell').textContent=row.category;
       const item=td('item');const nm=document.createElement('strong');nm.textContent=row.item;nm.title='双击修改项目名称';nm.style.cursor='text';nm.ondblclick=()=>{const v=prompt('修改消费项目名称',row.item);if(v&&v.trim()){row.item=v.trim();update()}};const note=document.createElement('span');note.textContent=row.note||'';note.title='双击修改备注';note.style.cursor='text';note.ondblclick=()=>{const v=prompt('修改备注',row.note||'');if(v!==null){row.note=v;update()}};item.append(nm,note);
+      const meta=document.createElement('div');meta.className='expense-summary';
+      const summary=document.createElement('small');summary.textContent=row.category+' · '+(row.currency==='THB'?'泰铢':'人民币')+(row.status==='estimate'?' · 估算':'');
+      const more=document.createElement('button');more.type='button';more.textContent=expandedRows.has(row.id)?'收起':'编辑';more.setAttribute('aria-label',row.item+' '+more.textContent);more.setAttribute('aria-expanded',String(expandedRows.has(row.id)));
+      more.onclick=()=>{const open=!expandedRows.has(row.id);if(open)expandedRows.add(row.id);else expandedRows.delete(row.id);tr.classList.toggle('expense-expanded',open);more.textContent=open?'收起':'编辑';more.setAttribute('aria-label',row.item+' '+more.textContent);more.setAttribute('aria-expanded',String(open))};
+      meta.append(summary,more);item.append(meta);
+      const fields=document.createElement('div');fields.className='expense-mobile-fields';
+      for(const [key,label] of [['item','名称'],['note','备注']]){const wrapper=document.createElement('label');wrapper.textContent=label;const edit=document.createElement(key==='note'?'textarea':'input');edit.value=row[key]||'';edit.setAttribute('aria-label',row.item+' '+label);edit.onchange=()=>{const value=edit.value.trim();if(key==='item'&&!value){edit.value=row.item;return;}row[key]=value;update()};wrapper.append(edit);fields.append(wrapper)}
+      item.append(fields);
       const curr=td();const cs=document.createElement('select'); ['CNY','THB'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v==='CNY'?'人民币':'泰铢';o.selected=v===row.currency;cs.appendChild(o)});cs.setAttribute('aria-label',row.item+' 币种');cs.onchange=()=>{row.currency=cs.value;update()};curr.appendChild(cs);
-      const amt=td();const inp=document.createElement('input');inp.className='money';inp.type='number';inp.min='0';inp.step='0.01';inp.placeholder='待填';inp.value=(row.amount??'');inp.setAttribute('aria-label',row.item+' 金额');inp.onchange=()=>{if(!inp.validity.valid){inp.reportValidity();inp.value=row.amount??'';return;}row.amount=inp.value===''?null:Number(inp.value);if(row.amount!==null&&row.status==='missing')row.status='stated';if(row.amount!==null)row.included=true;update()};amt.appendChild(inp);
+      const amt=td();const inp=document.createElement('input');inp.className='money';inp.type='number';inp.inputMode='decimal';inp.min='0';inp.step='0.01';inp.placeholder='待填';inp.value=(row.amount??'');inp.setAttribute('aria-label',row.item+' 金额');inp.onchange=()=>{if(!inp.validity.valid){inp.reportValidity();inp.value=row.amount??'';return;}row.amount=inp.value===''?null:Number(inp.value);if(row.amount!==null&&row.status==='missing')row.status='stated';if(row.amount!==null)row.included=true;update()};amt.appendChild(inp);
       const status=td();const sel=document.createElement('select');for(const [v,t] of Object.entries(statuses)){const op=document.createElement('option');op.value=v;op.textContent=t;op.selected=v===row.status;sel.appendChild(op)}sel.setAttribute('aria-label',row.item+' 金额依据');sel.onchange=()=>{row.status=sel.value;update()};status.appendChild(sel);
       const check=td();const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!row.included;cb.setAttribute('aria-label',row.item+' 计入合计');cb.onchange=()=>{row.included=cb.checked;update()};check.appendChild(cb);
       const cny=td();const val=convert(row);cny.textContent=val==null?'—':money(val);if(row.status==='estimate'||row.status==='lower')cny.className='est';if(row.status==='unconfirmed')cny.className='unc';body.appendChild(tr);

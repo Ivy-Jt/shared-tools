@@ -194,7 +194,39 @@
  #tripLedger td:last-child {flex-direction:row;justify-content:space-between;padding-top:8px;border-top:1px solid var(--line);font-size:16px}
  #tripLedger td input.money,#tripLedger td select {width:100%;min-width:0;max-width:100%;font-size:16px;min-height:40px}
  #tripLedger td input[type=checkbox] {margin:10px 0;width:20px;height:20px}
- #tripLedger .expense-fields {grid-template-columns:1fr}
+ #tripLedger .expense-fields {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
  #tripLedger .expense-fields input,#tripLedger .expense-fields select {font-size:16px;min-height:42px}
  #tripLedger .sumline {font-size:13px;gap:6px}
+}
+
+/* Quick mobile entry: name and amount stay visible; other fields expand. */
+#tripLedger .expense-summary,#tripLedger .expense-mobile-fields {display:none}
+@media(max-width:720px){
+ #tripLedger tbody tr {grid-template-columns:minmax(0,1fr) 105px;gap:6px 10px;padding:10px 0;margin:0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;align-items:start}
+ #tripLedger tbody tr td {display:none}
+ #tripLedger tbody tr td.item {display:block;grid-column:1;grid-row:1;min-width:0}
+ #tripLedger tbody tr td.item strong {font-size:13px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ #tripLedger tbody tr td.item>span {display:none}
+ #tripLedger tbody tr td:nth-child(4) {display:flex;grid-column:2;grid-row:1;align-self:start;padding-top:1px}
+ #tripLedger tbody tr td:nth-child(4)::before {display:none}
+ #tripLedger td input.money {min-height:38px;height:38px;padding:6px 7px;font-size:16px;border-radius:7px}
+ #tripLedger .expense-summary {display:flex;align-items:center;justify-content:space-between;gap:4px;margin-top:2px}
+ #tripLedger .expense-summary small {font-size:10px;color:var(--muted);line-height:1.4}
+ #tripLedger .expense-summary button {padding:4px 0 4px 8px;min-height:28px;border:0;background:transparent;color:var(--accent);font-size:11px;flex:none}
+ #tripLedger tbody tr.expense-expanded {padding:12px 0;row-gap:10px}
+ #tripLedger tbody tr.expense-expanded td.item {grid-column:1/-1;grid-row:1}
+ #tripLedger tbody tr.expense-expanded td.item strong {display:block}
+ #tripLedger tbody tr.expense-expanded td:nth-child(3),#tripLedger tbody tr.expense-expanded td:nth-child(5),#tripLedger tbody tr.expense-expanded td:nth-child(6),#tripLedger tbody tr.expense-expanded td:last-child {display:flex;grid-column:auto;grid-row:auto}
+ #tripLedger tbody tr.expense-expanded td:nth-child(4) {grid-column:2;grid-row:2}
+ #tripLedger tbody tr.expense-expanded td:nth-child(4)::before {display:block}
+ #tripLedger tbody tr.expense-expanded td:last-child {grid-column:1/-1}
+ #tripLedger tr.expense-expanded .expense-mobile-fields {display:grid;gap:8px;margin-top:8px}
+ #tripLedger .expense-mobile-fields label {display:grid;gap:3px;font-size:11px;color:var(--muted)}
+ #tripLedger .expense-mobile-fields input,#tripLedger .expense-mobile-fields textarea {width:100%;min-width:0;font-size:16px;padding:7px}
+ #tripLedger .expense-mobile-fields textarea {min-height:65px;line-height:1.5}
+ #tripLedger .expense-fields label:last-child {grid-column:1/-1}
+ #tripLedger .new-expense {padding:12px}
+ #tripLedger .budget-banner {gap:5px}
+ #tripLedger .bmetric {padding:8px}
+ #tripLedger .budget-tools {gap:5px;margin:10px 0}
 }
