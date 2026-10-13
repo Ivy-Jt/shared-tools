@@ -32,24 +32,47 @@
 
 .day-photos{grid-column:1/-1;display:flex;gap:10px;overflow:auto}.day-photos figure{margin:0;min-width:150px;max-width:240px}.day-photos img{width:100%;height:150px;object-fit:cover;border-radius:10px}.day-photos figcaption{font-size:12px;overflow-wrap:anywhere}
 
-/* Shared preparation: compact rows, independent progress per traveller. */
-.preparation-entry{border-bottom:1px solid var(--line);padding:10px 0}
-.preparation-entry:last-child{border-bottom:0}
-.sharing-kind{font-size:10px;color:var(--muted)}
-.preparation-entry .packing-item{padding:6px 0}
-.preparation-entry .packing-controls{flex-wrap:wrap;gap:8px 12px}
-.preparation-entry .owner{flex-shrink:0}
-.preparation-entry .owner select{max-width:100px;border:1px solid var(--line);border-radius:6px;padding:5px;background:var(--paper);color:var(--ink);font-size:12px}
-.preparation-entry .is-ready .packing-name{color:var(--accent)}
-.preparation-entry .review-toggle{margin-left:auto}
-.preparation-entry .preparation-note{margin-top:4px}
-@media(max-width:720px){
- #packingGroups{grid-template-columns:1fr}
- .preparation-entry .packing-main{align-items:flex-start}
- .preparation-entry .packing-controls select{font-size:16px;max-width:110px}
- .preparation-entry .owner select{font-size:16px;max-width:106px}
- .preparation-entry .packed-toggle{min-height:34px;font-size:12px;gap:4px}
- .preparation-entry .packing-controls{gap:5px 8px}
- .preparation-entry .review-toggle{margin-left:0}
- .preparation-entry .packing-name{overflow-wrap:anywhere}
+/* One item per row; traveller columns stay side by side on phones. */
+#packingGroups{grid-template-columns:minmax(0,1fr);gap:16px}
+.preparation-group{padding:0;overflow:hidden;min-width:0}
+.preparation-table{border-collapse:collapse;table-layout:fixed;width:100%;font-size:13px;line-height:1.45}
+.preparation-table caption{text-align:left;padding:12px 14px;background:#f7f0d9;font-weight:800;font-size:15px;color:var(--ink)}
+.preparation-label-col{width:32%}
+.preparation-table th,.preparation-table td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:10px 12px;vertical-align:top;overflow-wrap:anywhere}
+.preparation-table tr>:last-child{border-right:0}
+.preparation-table tbody tr:last-child>*{border-bottom:0}
+.preparation-table thead th{text-align:center;font-size:13px;padding:8px 12px;color:var(--ink2)}
+.preparation-table thead th:first-child{text-align:left}
+.preparation-table tbody th{text-align:left;font-weight:600;background:#fffefa}
+.preparation-table [data-column=JT],.preparation-table thead th:nth-child(2){background:#eef7fa}
+.preparation-table [data-column=QX],.preparation-table thead th:nth-child(3){background:#fcf0f3}
+.preparation-table .packing-item{border:0;padding:0;min-width:0}
+.preparation-table .packing-controls{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin:0}
+.preparation-table .packed-toggle{min-height:32px;font-size:12px;gap:5px}
+.preparation-table .packed-toggle input{flex-shrink:0}
+.preparation-table .review-toggle{color:var(--muted)}
+.preparation-table select{max-width:100%;min-width:0;width:100px;min-height:32px;padding:4px 5px;border:1px solid #cbd8d5;border-radius:7px;background:#fff;color:var(--ink);font:inherit}
+.preparation-table select[data-owner]{display:block;margin-top:7px;font-size:12px;width:100%;max-width:110px}
+.preparation-table .is-ready .packed-toggle:not(.review-toggle){color:var(--accent);font-weight:700}
+.preparation-table .preparation-note{margin:4px 0 0;font-size:11px;font-weight:400}
+.preparation-table .preparation-note textarea{min-height:80px;padding:6px;font-size:16px}
+.preparation-table .preparation-note summary{padding:3px 0}
+.preparation-empty{display:block;color:#929d98;text-align:center;padding-top:6px;font-size:12px}
+.preparation-cell:has(.packing-item)>.preparation-empty{display:none}
+.packing-description,.sharing-kind,.packing-variant{display:block;font-weight:400;font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.packing-variant{margin:0 0 5px}
+.legacy-preparation{font-size:11px;font-weight:400;color:var(--muted);margin-top:8px}
+.legacy-preparation p{margin:5px 0;white-space:pre-wrap}
+@media(max-width:600px){
+ #packingGroups{gap:10px}
+ .preparation-table{font-size:12px}
+ .preparation-table caption{padding:10px;font-size:13px}
+ .preparation-table th,.preparation-table td{padding:8px 6px}
+ .preparation-table thead th{padding:7px 6px;font-size:12px}
+ .preparation-table select,.preparation-table select[data-owner]{font-size:16px;width:100%;min-height:32px}
+ .preparation-table .packing-controls{display:flex;flex-direction:column;align-items:stretch;gap:1px}
+ .preparation-table .packed-toggle{min-height:32px;font-size:11px;gap:4px;white-space:normal}
+ .preparation-table .packed-toggle input{width:17px;height:17px}
+ .preparation-table .preparation-note summary{min-height:24px;line-height:24px;padding:0}
+ .packing-description,.sharing-kind,.packing-variant{font-size:10px}
 }

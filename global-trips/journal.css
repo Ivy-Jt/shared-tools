@@ -230,3 +230,51 @@
  #tripLedger .bmetric {padding:8px}
  #tripLedger .budget-tools {gap:5px;margin:10px 0}
 }
+
+/* Denser phone layout keeps the journey and paired checklist in view. */
+@media(max-width:720px){
+ .trip-journal .shell{padding-left:8px;padding-right:8px}
+ .trip-journal .journal-brand{margin-bottom:10px}
+ .trip-journal .trip-cover{margin-bottom:8px}
+ .trip-journal .cover-copy{padding:14px 16px}
+ .trip-journal .cover-kicker{margin-bottom:10px}
+ .trip-journal .cover-subtitle{margin-top:8px}
+ .trip-journal .cover-copy p{margin:9px 0 11px;line-height:1.65}
+ .trip-journal .cover-footer{padding:9px 14px}
+ .trip-journal .mobile-summary{margin-bottom:8px}
+ .trip-journal .cloud-bar{padding:8px 10px;margin-bottom:8px}
+ #memoryHero{padding:6px 10px;margin-bottom:8px}
+ #timelineSection{padding:10px;margin-bottom:8px;border-radius:12px}
+ #timelineSection .section-head{margin-bottom:7px}
+ #timelineSection .section-head h3{font-size:15px}
+ #timelineSection .timeline{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ #timelineSection .t-node{padding:7px 8px;border-radius:8px}
+ #timelineSection .t-node b{font-size:11px;line-height:1.4;margin:2px 0}
+ #timelineSection .t-node span{font-size:10px;line-height:1.4}
+ #planner{padding:8px;border-radius:12px}
+ #planner>.section-head{margin-bottom:4px}
+ #planner>.section-head h3{font-size:16px;margin:0}
+ #planner .planner-tabs{gap:4px;margin:7px 0 9px}
+ #planner .plan-tab{padding:7px 3px;min-height:34px;font-size:12px;border-radius:8px}
+ #planner .packing-help{margin:0 0 6px;font-size:11px;line-height:1.45}
+ #packingGroups{gap:8px}
+ .preparation-table caption{padding:8px 9px}
+ .preparation-table th,.preparation-table td{padding:6px 5px}
+ .preparation-table .packing-variant{margin-bottom:3px}
+ .trip-journal .mobile-nav{padding:3px;left:5px;right:5px;border-radius:12px}
+ .trip-journal .mobile-nav button{min-height:34px;padding:5px 2px}
+ #tripJournal .section{padding:12px 0}
+ #tripJournal .section-head,#tripLedger .section-head{padding-bottom:7px;margin-bottom:12px}
+ #tripJournal .section-title,#tripLedger .section-title{font-size:18px}
+ #tripJournal .section-num,#tripLedger .section-num{font-size:14px}
+ #tripJournal .intro{margin:10px 0}
+ #tripJournal .day{padding:14px 0}
+ #tripJournal .day h3{font-size:18px;margin:3px 0 8px}
+ #tripJournal .day p{margin:8px 0;line-height:1.8}
+ #tripJournal .chapter .body,#tripJournal .memory{padding:10px}
+ #tripJournal .chapter h3{font-size:24px}
+ #tripJournal .day-gallery,#tripJournal .photo-grid,#tripJournal .gallery{gap:8px!important;margin:12px 0!important}
+ #tripJournal .day-photos{gap:8px;margin:12px 0}
+ #tripJournal figcaption{font-size:11px;line-height:1.45;margin-top:4px}
+ .journal-shortcuts{margin:8px 0}
+}

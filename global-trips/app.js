@@ -142,15 +142,14 @@
     if (bangkok.status !== 'confirmed') $('#decisionNote').innerHTML = `<b>Marriott Platinum Challenge · 决策项</b><br>${escapeHtml(bangkok.decisionNote)}`;
   }
 
-  function preparationNote(item) {
-    return `<details class="preparation-note" hidden><summary>备注 · 准备情况</summary><textarea maxlength="2000" data-note="prep:${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}的准备备注" placeholder="例如：已买，周三到货，还没试穿"></textarea><small data-prep-hint="${escapeHtml(item.key)}"></small></details>`;
+  function preparationNote(item, compact = false) {
+    return `<details class="preparation-note" hidden><summary>${compact ? '备注' : '备注 · 准备情况'}</summary><textarea maxlength="2000" data-note="prep:${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner || '')} ${escapeHtml(item.label)}的准备备注" placeholder="例如：已买，周三到货"></textarea><small data-prep-hint="${escapeHtml(item.key)}"></small></details>`;
   }
 
   function packingItem(item) {
 
     const options = Object.entries(packingLabels).map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
-    const owner = item.shared ? `<select data-owner="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}负责人"><option value="JT">JT 负责</option><option value="QX">QX 负责</option></select>` : `<b>${escapeHtml(item.owner)}</b>`;
-    return `<div class="packing-item" data-preparation-key="${escapeHtml(item.key)}"><div class="packing-main"><span class="packing-name">${escapeHtml(item.label)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}</span><span class="owner">${owner}</span></div><div class="packing-controls">${item.kind === 'task' ? '' : `<select data-packing-status="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner)} ${escapeHtml(item.label)}的采购状态"><option value="">待标记</option>${options}</select>`}<label class="packed-toggle"><input type="checkbox" data-key="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner)} ${escapeHtml(item.label)}准备好了">准备好了</label><label class="packed-toggle review-toggle"><input type="checkbox" data-key="review:${escapeHtml(item.key)}" data-review="${escapeHtml(item.key)}"><span data-review-label="${escapeHtml(item.key)}">对方确认</span></label></div>${preparationNote(item)}</div>`;
+    return `<div class="packing-item" data-preparation-key="${escapeHtml(item.key)}">${item.cellLabel ? `<small class="packing-variant">${escapeHtml(item.cellLabel)}</small>` : ''}<div class="packing-controls">${item.kind === 'task' ? '' : `<select data-packing-status="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner)} ${escapeHtml(item.label)}的采购状态"><option value="">待标记</option>${options}</select>`}<label class="packed-toggle"><input type="checkbox" data-key="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner)} ${escapeHtml(item.label)}准备好了">已备好</label><label class="packed-toggle review-toggle"><input type="checkbox" data-key="review:${escapeHtml(item.key)}" data-review="${escapeHtml(item.key)}"><span data-review-label="${escapeHtml(item.key)}">对方确认</span></label></div>${preparationNote(item, true)}</div>`;
 
   }
 
@@ -159,7 +158,23 @@
   }
 
   function renderPackingAndTodos() {
-    $('#packingGroups').innerHTML = trip.packing.map(group => `<div class="check-group"><h4>${escapeHtml(group.group)}</h4>${group.items.map(item => `<div class="preparation-entry"><span class="sharing-kind">${preparationRows(item).length > 1 ? '两人各自准备' : item.owner === 'JT+QX' ? '共同一份' : '个人物品 / 待办'}</span>${preparationRows(item).map(packingItem).join('')}${preparationRows(item).length > 1 ? `<details class="legacy-preparation" data-legacy-prep="${escapeHtml(item.key)}" hidden><summary>之前的共同记录</summary><p></p></details>` : ''}</div>`).join('')}</div>`).join('');
+    // Pair existing individual items visually without changing their saved keys.
+    const pairs = [{ keys: ['rash-jt', 'rash'], label: '水母衣 / 防晒泳衣' }, { keys: ['swim', 'swim-qx'], label: '泳装' }];
+    $('#packingGroups').innerHTML = trip.packing.map(group => {
+      const seen = new Set();
+      const rows = group.items.map(item => {
+        if (seen.has(item.key)) return '';
+        const pair = pairs.find(pair => pair.keys.includes(item.key) && pair.keys.every(key => group.items.some(entry => entry.key === key)));
+        const sources = pair ? pair.keys.map(key => group.items.find(entry => entry.key === key)) : [item];
+        sources.forEach(entry => seen.add(entry.key));
+        const entries = sources.flatMap(source => preparationRows(source).map(entry => ({ ...entry, cellLabel: pair?.label === '泳装' ? source.label.replace(/^(JT|QX) /, '') : '' })));
+        const shared = entries[0].shared;
+        const legacy = sources.filter(source => preparationRows(source).length > 1).map(source => `<details class="legacy-preparation" data-legacy-prep="${escapeHtml(source.key)}" hidden><summary>旧记录</summary><p></p></details>`).join('');
+        const notes = [...new Set(sources.map(source => source.note).filter(Boolean))];
+        return `<tr class="preparation-entry"><th scope="row"><span class="packing-name">${escapeHtml(pair?.label || item.label)}</span>${notes.map(note => `<small class="packing-description">${escapeHtml(note)}</small>`).join('')}${shared ? `<small class="sharing-kind">共同一份</small><select data-owner="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}负责人"><option value="JT">JT</option><option value="QX">QX</option></select>` : ''}${legacy}</th>${['JT', 'QX'].map(owner => `<td class="preparation-cell" data-column="${owner}">${entries.filter(entry => (entry.shared ? 'JT' : entry.owner) === owner).map(packingItem).join('')}<span class="preparation-empty">${shared ? '共用' : '—'}</span></td>`).join('')}</tr>`;
+      }).join('');
+      return `<div class="check-group preparation-group"><table class="preparation-table"><caption>${escapeHtml(group.group)}</caption><colgroup><col class="preparation-label-col"><col><col></colgroup><thead><tr><th scope="col">物品</th><th scope="col">JT</th><th scope="col">QX</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }).join('');
     $('#todoGroups').innerHTML = trip.todos.map(group => `<div class="check-group"><h4>${escapeHtml(group.owner)}</h4>${group.items.map(item => checkItem(item, group.owner)).join('')}</div>`).join('');
   }
 
@@ -295,8 +310,12 @@
     for (const item of packingEntries(trip)) {
       const card = $$('[data-preparation-key]').find(node => node.dataset.preparationKey === item.key);
       const owner = item.shared ? (state.notes[`owner:${item.key}`] === 'QX' ? 'QX' : 'JT') : item.owner;
-      const select = card.querySelector('[data-owner]');
+      const select = card.closest('tr')?.querySelector('[data-owner]');
       if (select) select.value = owner;
+      if (item.shared) {
+        const cell = card.closest('tr').querySelector(`[data-column="${owner}"]`);
+        if (card.parentElement !== cell) cell.prepend(card);
+      }
       const review = card.querySelector('[data-review]');
       const ready = state.checks[item.key] === true && !blocked(item.key);
       review.checked = ready && state.checks[`review:${item.key}`] === true;
