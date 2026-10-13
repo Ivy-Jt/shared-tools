@@ -33,7 +33,7 @@
 .day-photos{grid-column:1/-1;display:flex;gap:10px;overflow:auto}.day-photos figure{margin:0;min-width:150px;max-width:240px}.day-photos img{width:100%;height:150px;object-fit:cover;border-radius:10px}.day-photos figcaption{font-size:12px;overflow-wrap:anywhere}
 
 /* One item per row; traveller columns stay side by side on phones. */
-#packingGroups{grid-template-columns:minmax(0,1fr);gap:16px}
+#packingGroups,#todoGroups{grid-template-columns:minmax(0,1fr);gap:16px}
 .preparation-group{padding:0;overflow:hidden;min-width:0}
 .preparation-table{border-collapse:collapse;table-layout:fixed;width:100%;font-size:13px;line-height:1.45}
 .preparation-table caption{text-align:left;padding:12px 14px;background:#f7f0d9;font-weight:800;font-size:15px;color:var(--ink)}
@@ -44,8 +44,14 @@
 .preparation-table thead th{text-align:center;font-size:13px;padding:8px 12px;color:var(--ink2)}
 .preparation-table thead th:first-child{text-align:left}
 .preparation-table tbody th{text-align:left;font-weight:600;background:#fffefa}
-.preparation-table [data-column=JT],.preparation-table thead th:nth-child(2){background:#eef7fa}
-.preparation-table [data-column=QX],.preparation-table thead th:nth-child(3){background:#fcf0f3}
+.preparation-table [data-column=JT]{background:#fcf0f3}
+.preparation-table [data-column=QX]{background:#eef7fa}
+.todo-table thead th:first-child{text-align:center}
+.todo-table td{width:50%}
+.todo-table .task-with-note{border:0;padding:0;min-width:0}
+.todo-table .check-item{grid-template-columns:18px minmax(0,1fr);align-items:start;gap:6px;border:0;padding:2px 0;min-height:34px;line-height:1.6}
+.todo-table .check-item input{margin:3px 0 0;width:17px;height:17px}
+.todo-table .preparation-note{margin-left:24px}
 .preparation-table .packing-item{border:0;padding:0;min-width:0}
 .preparation-table .packing-controls{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin:0}
 .preparation-table .packed-toggle{min-height:32px;font-size:12px;gap:5px}

@@ -154,7 +154,7 @@
   }
 
   function checkItem(item, owner) {
-    return `<div class="task-with-note"><label class="check-item"><input type="checkbox" data-key="${escapeHtml(item.key)}"><span>${escapeHtml(item.label)}</span><span class="owner">${escapeHtml(item.owner || owner)}</span></label>${preparationNote(item)}</div>`;
+    return `<div class="task-with-note"><label class="check-item"><input type="checkbox" data-key="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner || owner)} ${escapeHtml(item.label)}"><span>${escapeHtml(item.label)}</span></label>${preparationNote({ ...item, owner: item.owner || owner }, true)}</div>`;
   }
 
   function renderPackingAndTodos() {
@@ -173,9 +173,12 @@
         const notes = [...new Set(sources.map(source => source.note).filter(Boolean))];
         return `<tr class="preparation-entry"><th scope="row"><span class="packing-name">${escapeHtml(pair?.label || item.label)}</span>${notes.map(note => `<small class="packing-description">${escapeHtml(note)}</small>`).join('')}${shared ? `<small class="sharing-kind">共同一份</small><select data-owner="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}负责人"><option value="JT">JT</option><option value="QX">QX</option></select>` : ''}${legacy}</th>${['JT', 'QX'].map(owner => `<td class="preparation-cell" data-column="${owner}">${entries.filter(entry => (entry.shared ? 'JT' : entry.owner) === owner).map(packingItem).join('')}<span class="preparation-empty">${shared ? '共用' : '—'}</span></td>`).join('')}</tr>`;
       }).join('');
-      return `<div class="check-group preparation-group"><table class="preparation-table"><caption>${escapeHtml(group.group)}</caption><colgroup><col class="preparation-label-col"><col><col></colgroup><thead><tr><th scope="col">物品</th><th scope="col">JT</th><th scope="col">QX</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      return `<div class="check-group preparation-group"><table class="preparation-table"><caption>${escapeHtml(group.group)}</caption><colgroup><col class="preparation-label-col"><col><col></colgroup><thead><tr><th scope="col">物品</th><th scope="col" data-column="JT">JT</th><th scope="col" data-column="QX">QX</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     }).join('');
-    $('#todoGroups').innerHTML = trip.todos.map(group => `<div class="check-group"><h4>${escapeHtml(group.owner)}</h4>${group.items.map(item => checkItem(item, group.owner)).join('')}</div>`).join('');
+    const owners = ['JT', 'QX'];
+    const todoColumns = owners.map(owner => trip.todos.flatMap(group => group.items.filter(item => (item.owner || group.owner) === owner)));
+    const todoRows = Array.from({ length: Math.max(...todoColumns.map(items => items.length)) }, (_, index) => `<tr>${owners.map((owner, column) => `<td data-column="${owner}">${todoColumns[column][index] ? checkItem(todoColumns[column][index], owner) : '<span class="preparation-empty">—</span>'}</td>`).join('')}</tr>`).join('');
+    $('#todoGroups').innerHTML = `<div class="check-group preparation-group"><table class="preparation-table todo-table"><caption>出发前待办</caption><thead><tr>${owners.map(owner => `<th scope="col" data-column="${owner}">${owner}</th>`).join('')}</tr></thead><tbody>${todoRows}</tbody></table></div>`;
   }
 
   function renderBudgetAndMemories() {
