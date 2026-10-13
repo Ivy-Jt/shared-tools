@@ -22,3 +22,19 @@ export function mergeStates(base, local, remote) {
   }
   return { merged, conflicts };
 }
+
+// Keep legacy keys intact; each traveller gets independent sync fields.
+const personalKeys = new Set(['dive-socks','shoes','hat','waterproof-pouch','grab','shoes2','prep-toiletries','prep-towel','prep-mask','charge','liquid']);
+export function preparationRows(item) {
+  const each = item.preparationMode === 'each' || (!item.preparationMode && personalKeys.has(item.key));
+  return each ? ['JT','QX'].map(owner => ({...item, key:`${item.key}:${owner}`, owner, sourceKey:item.key, each:true})) : [{...item, sourceKey:item.key, shared:item.owner === 'JT+QX'}];
+}
+export const packingEntries = trip => trip.packing.flatMap(group => group.items.flatMap(preparationRows));
+export function preparationFields(trip) {
+  const rows = packingEntries(trip);
+  return {
+    checks: rows.flatMap(item => [item.key, `review:${item.key}`]),
+    packingStates: rows.filter(item => item.kind !== 'task').map(item => item.key),
+    notes: rows.flatMap(item => [`prep:${item.key}`, ...(item.shared ? [`owner:${item.key}`] : [])])
+  };
+}

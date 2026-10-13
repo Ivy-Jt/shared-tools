@@ -7,6 +7,9 @@
   let cloud;
   let defaultBudgets;
   let legacyPatch;
+  let preparationRows;
+  let packingEntries;
+  let editingEnabled = false;
 
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
@@ -144,9 +147,11 @@
   }
 
   function packingItem(item) {
-    if (item.kind === 'task') return checkItem(item);
+
     const options = Object.entries(packingLabels).map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
-    return `<div class="packing-item"><div class="packing-main"><span class="packing-name">${escapeHtml(item.label)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}</span><span class="owner">${escapeHtml(item.owner)}</span></div><div class="packing-controls"><select data-packing-status="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}的采购状态"><option value="">待标记</option>${options}</select><label class="packed-toggle"><input type="checkbox" data-key="${escapeHtml(item.key)}">已打包</label></div>${preparationNote(item)}</div>`;
+    const owner = item.shared ? `<select data-owner="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.label)}负责人"><option value="JT">JT 负责</option><option value="QX">QX 负责</option></select>` : `<b>${escapeHtml(item.owner)}</b>`;
+    return `<div class="packing-item" data-preparation-key="${escapeHtml(item.key)}"><div class="packing-main"><span class="packing-name">${escapeHtml(item.label)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}</span><span class="owner">${owner}</span></div><div class="packing-controls">${item.kind === 'task' ? '' : `<select data-packing-status="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner)} ${escapeHtml(item.label)}的采购状态"><option value="">待标记</option>${options}</select>`}<label class="packed-toggle"><input type="checkbox" data-key="${escapeHtml(item.key)}" aria-label="${escapeHtml(item.owner)} ${escapeHtml(item.label)}准备好了">准备好了</label><label class="packed-toggle review-toggle"><input type="checkbox" data-key="review:${escapeHtml(item.key)}" data-review="${escapeHtml(item.key)}"><span data-review-label="${escapeHtml(item.key)}">对方确认</span></label></div>${preparationNote(item)}</div>`;
+
   }
 
   function checkItem(item, owner) {
@@ -154,7 +159,7 @@
   }
 
   function renderPackingAndTodos() {
-    $('#packingGroups').innerHTML = trip.packing.map(group => `<div class="check-group"><h4>${escapeHtml(group.group)}</h4>${group.items.map(item => packingItem(item)).join('')}</div>`).join('');
+    $('#packingGroups').innerHTML = trip.packing.map(group => `<div class="check-group"><h4>${escapeHtml(group.group)}</h4>${group.items.map(item => `<div class="preparation-entry"><span class="sharing-kind">${preparationRows(item).length > 1 ? '两人各自准备' : item.owner === 'JT+QX' ? '共同一份' : '个人物品 / 待办'}</span>${preparationRows(item).map(packingItem).join('')}${preparationRows(item).length > 1 ? `<details class="legacy-preparation" data-legacy-prep="${escapeHtml(item.key)}" hidden><summary>之前的共同记录</summary><p></p></details>` : ''}</div>`).join('')}</div>`).join('');
     $('#todoGroups').innerHTML = trip.todos.map(group => `<div class="check-group"><h4>${escapeHtml(group.owner)}</h4>${group.items.map(item => checkItem(item, group.owner)).join('')}</div>`).join('');
   }
 
@@ -166,9 +171,24 @@
     $('#memoryGrid').innerHTML = trip.memoryPrompts.map(item => `<div class="memory-card"><h4><label for="note-${escapeHtml(item.key)}">${escapeHtml(item.title)}</label></h4><textarea id="note-${escapeHtml(item.key)}" maxlength="5000" data-note="${escapeHtml(item.key)}" placeholder="${escapeHtml(item.placeholder)}"></textarea></div>`).join('');
   }
 
+  const preparationBlocked = key => /未到货|待收货|未收到|没收到|未确认|待确认|未完成|还没|尚未|待填写|待办理/.test(state.notes[`prep:${key}`] || '');
+  function clearReview(key) {
+    state.checks[`review:${key}`] = false;
+    saveState('checks', `review:${key}`);
+  }
+
   function bindState() {
+    $$('select[data-owner]').forEach(select => {
+      select.addEventListener('change', () => {
+        state.notes[`owner:${select.dataset.owner}`] = select.value;
+        state.checks[`review:${select.dataset.owner}`] = false;
+        saveState('notes', `owner:${select.dataset.owner}`);
+        saveState('checks', `review:${select.dataset.owner}`);
+        updateProgress();
+      });
+    });
     $$('select[data-packing-status]').forEach(select => {
-      const item = trip.packing.flatMap(group => group.items).find(entry => entry.key === select.dataset.packingStatus);
+      const item = packingEntries(trip).find(entry => entry.key === select.dataset.packingStatus);
       const selected = state.packingStates[select.dataset.packingStatus] ?? item?.status ?? '';
       select.value = packingLabels[selected] ? selected : '';
       select.dataset.state = select.value || 'unset';
@@ -176,6 +196,7 @@
         state.packingStates[select.dataset.packingStatus] = select.value;
         select.dataset.state = select.value || 'unset';
         saveState('packingStates', select.dataset.packingStatus);
+        clearReview(select.dataset.packingStatus);
         updateProgress();
       });
     });
@@ -183,6 +204,11 @@
       input.checked = Boolean(state.checks[input.dataset.key]);
       input.addEventListener('change', () => {
         state.checks[input.dataset.key] = input.checked;
+        if (!input.dataset.review && !input.checked && input.closest('#packingGroups')) {
+          const reviewKey = `review:${input.dataset.key}`;
+          state.checks[reviewKey] = false;
+          saveState('checks', reviewKey);
+        }
         saveState('checks', input.dataset.key);
         updateProgress();
       });
@@ -192,6 +218,7 @@
       textarea.addEventListener('input', () => {
         state.notes[textarea.dataset.note] = textarea.value;
         saveState('notes', textarea.dataset.note);
+        if (textarea.closest('#packingGroups') && textarea.dataset.note.startsWith('prep:')) clearReview(textarea.dataset.note.slice(5));
         updateProgress();
       });
     });
@@ -249,16 +276,37 @@
   }
 
   function updateProgress() {
-    const packing = $$('#packingGroups input[type=checkbox]').filter(input => {
+    const packing = $$('#packingGroups input[type=checkbox]:not([data-review])').filter(input => {
       const status = input.closest('.packing-item')?.querySelector('select[data-packing-status]')?.value;
       return status !== 'not_needed' && (status !== 'optional' || input.checked);
     });
-    const blocked = key => /未到货|待收货|未收到|没收到|未确认|待确认|未完成|还没|尚未|待填写|待办理/.test(state.notes[`prep:${key}`] || '');
+    const blocked = preparationBlocked;
     $$('[data-prep-hint]').forEach(node => { node.textContent = blocked(node.dataset.prepHint) ? '备注提示仍有待办，请确认后再算准备完成。' : ''; });
     const done = packing.filter(input => input.checked && !blocked(input.dataset.key)).length;
     const tasks = $$('#todoGroups input[data-key]');
     const tasksDone = tasks.filter(input => input.checked && !blocked(input.dataset.key)).length;
-    $('#readinessNote').textContent = cloud?.key ? `打包就绪 ${done}/${packing.length} · 待办完成 ${tasksDone}/${tasks.length}。备注中的待收货、未确认等措辞会提示复核；只是规则提示，不会自动修改勾选。` : '登录后可填写每项备注，并结合待办提示检查准备情况。';
+    $$('[data-legacy-prep]').forEach(node => {
+      const key = node.dataset.legacyPrep;
+      const text = [state.checks[key] ? '之前已共同勾选' : '', packingLabels[state.packingStates[key]] || '', state.notes[`prep:${key}`] || ''].filter(Boolean).join(' · ');
+      node.hidden = !text;
+      node.querySelector('p').textContent = text;
+    });
+    let confirmed = 0;
+    for (const item of packingEntries(trip)) {
+      const card = $$('[data-preparation-key]').find(node => node.dataset.preparationKey === item.key);
+      const owner = item.shared ? (state.notes[`owner:${item.key}`] === 'QX' ? 'QX' : 'JT') : item.owner;
+      const select = card.querySelector('[data-owner]');
+      if (select) select.value = owner;
+      const review = card.querySelector('[data-review]');
+      const ready = state.checks[item.key] === true && !blocked(item.key);
+      review.checked = ready && state.checks[`review:${item.key}`] === true;
+      review.disabled = !editingEnabled || !ready;
+      review.setAttribute('aria-label', `${owner === 'JT' ? 'QX' : 'JT'}确认 ${item.label}`);
+      card.querySelector('[data-review-label]').textContent = `${owner === 'JT' ? 'QX' : 'JT'}确认`;
+      if (review.checked && packing.some(input => input.dataset.key === item.key)) confirmed++;
+      card.classList.toggle('is-ready', ready);
+    }
+    $('#readinessNote').textContent = cloud?.key ? `准备好了 ${done}/${packing.length} · 已互相确认 ${confirmed} · 待办 ${tasksDone}/${tasks.length}` : '登录后，两个人可以各自勾选、互相确认。';
     const percent = packing.length ? Math.round(done / packing.length * 100) : 0;
     const row = $('[data-status-key="packing"]');
     row.querySelector('.status-summary').textContent = `已完成 ${done} / ${packing.length}`;
@@ -345,8 +393,8 @@
     state.budgets = { ...defaultBudgets, ...remote.budgets };
     $$('input[type=checkbox][data-key]').forEach(input => { input.checked = state.checks[input.dataset.key] === true; });
     $$('select[data-packing-status]').forEach(select => {
-      const item = trip.packing.flatMap(group => group.items).find(item => item.key === select.dataset.packingStatus);
-      const value = state.packingStates[item.key] ?? item.status ?? '';
+      const item = packingEntries(trip).find(item => item.key === select.dataset.packingStatus);
+      const value = state.packingStates[select.dataset.packingStatus] ?? item?.status ?? '';
       select.value = packingLabels[value] ? value : '';
       select.dataset.state = select.value || 'unset';
     });
@@ -363,8 +411,10 @@
   }
 
   function editable(enabled) {
+    editingEnabled = enabled;
     $$('.preparation-note').forEach(node => { node.hidden = !enabled; });
-    $$('input[data-key],select[data-packing-status],textarea[data-note],.budget-input,.select-hotel,#resetBtn').forEach(input => { input.disabled = !enabled; });
+    $$('input[data-key],select[data-packing-status],select[data-owner],textarea[data-note],.budget-input,.select-hotel,#resetBtn').forEach(input => { input.disabled = !enabled; });
+    $$('[data-review]').forEach(input => { input.disabled = !enabled || state.checks[input.dataset.review] !== true || preparationBlocked(input.dataset.review); });
   }
 
   function getLegacyPatch(legacy) {
@@ -390,6 +440,7 @@
     const config = await configResponse.json();
     const legacyCount = Object.values(legacyPatch).reduce((sum, values) => sum + Object.keys(values).length, 0);
     const labels = Object.fromEntries([
+      ...packingEntries(trip).flatMap(item => [{key:item.key,label:`${item.owner} ${item.label}`},{key:`review:${item.key}`,label:`${item.label}互相确认`},{key:`prep:${item.key}`,label:`${item.owner} ${item.label}备注`},{key:`owner:${item.key}`,label:`${item.label}负责人`}]),
       ...trip.packing.flatMap(group => group.items), ...trip.todos.flatMap(group => group.items),
       ...[...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => ({ key: `prep:${item.key}`, label: `${item.label}备注` }))),
       ...trip.budget.items, ...trip.memoryPrompts.map(item => ({ key: item.key, label: item.title }))
@@ -433,6 +484,7 @@
     const response = await fetch(source, { cache: 'no-store' });
     if (!response.ok) throw new Error(`Trip Data 读取失败：${response.status}`);
     trip = await response.json();
+    ({ preparationRows, packingEntries } = await import('./sync-core.mjs?v=20261013-r1'));
     if (!trip.id || !trip.dates || !trip.hotels) throw new Error('Trip Data 结构不完整');
     defaultBudgets = Object.fromEntries(trip.budget.items.map(item => [item.key, item.defaultCny ?? '']));
     const legacy = readState(defaultBudgets);
