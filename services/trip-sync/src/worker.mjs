@@ -1,12 +1,15 @@
 import { photos } from './photos.mjs';
 import trip from '../../../global-trips/trips/2026-maldives-bangkok/trip.json' with { type: 'json' };
 
+import { preparationFields } from '../../../global-trips/sync-core.mjs';
+const extraFields = preparationFields(trip);
 const fieldKeys = {
   checks: new Set([...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => item.key))),
   packingStates: new Set(trip.packing.flatMap(group => group.items.filter(item => item.kind !== 'task').map(item => item.key))),
   notes: new Set([...trip.memoryPrompts.map(item => item.key), ...[...trip.packing, ...trip.todos].flatMap(group => group.items.map(item => `prep:${item.key}`))]),
   budgets: new Set(trip.budget.items.map(item => item.key))
 };
+for (const group of Object.keys(extraFields)) for (const key of extraFields[group]) fieldKeys[group].add(key);
 const statuses = new Set(['', 'owned', 'bought', 'to_buy', 'optional', 'not_needed']);
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 
