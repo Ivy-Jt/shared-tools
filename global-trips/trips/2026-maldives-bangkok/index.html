@@ -6,7 +6,7 @@
 <meta name="description" content="JT &amp; QX 的 2026 马尔代夫与曼谷旅行计划、旅途中工作台和旅行回忆。">
 <meta name="theme-color" content="#f5f2eb">
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="../../app.css?v=20260926-photos">
+<link rel="stylesheet" href="../../app.css?v=20261013-r1">
 <link rel="stylesheet" href="../../journal.css?v=20261012-r5">
 <link rel="stylesheet" href="./cover.css?v=20261007-cover-ozen">
 <title>JT &amp; QX's Global Trips · Maldives × Bangkok</title>
@@ -79,7 +79,7 @@
     <div class="planner-tabs" role="tablist"><button class="plan-tab active" data-panel="itinerary">行程</button><button class="plan-tab" data-panel="hotels">酒店</button><button class="plan-tab" data-panel="packing">打包清单</button><button class="plan-tab" data-panel="budget">预算</button><button class="plan-tab" data-panel="todos">待办</button><button class="plan-tab" data-panel="memories">旅行回忆</button></div>
     <div class="panel active" id="panel-itinerary"><div class="itinerary-grid"><div><section class="room-journey" aria-label="OZEN 四晚房型"><h4>OZEN · 四晚，三种房间</h4><div id="roomJourney"></div></section><div class="day-list" id="dayList"></div></div><div class="aside-note" id="principles"></div></div></div>
     <div class="panel" id="panel-hotels"><div class="known-booking" id="maldivesBooking"></div><div class="section-head" style="margin-top:12px"><div><h3 style="font-size:17px">Bangkok · 已订酒店</h3><small id="bangkokPriceNote"></small></div></div><div class="hotel-grid" id="hotelGrid"></div><div class="challenge" id="decisionNote"></div></div>
-    <div class="panel" id="panel-packing"><p class="packing-help">采购状态和“已打包”分别记录；可选未带和不需要的物品不计入进度。登录后自动保存。</p><p id="readinessNote" class="packing-help"></p><div class="check-grid" id="packingGroups"></div></div>
+    <div class="panel" id="panel-packing"><p class="packing-help">各自准备自己的，共同物品带一份。准备好后，让对方再确认一下。</p><p id="readinessNote" class="packing-help"></p><div class="check-grid" id="packingGroups"></div></div>
     <div class="panel" id="panel-budget"><section id="tripLedger" aria-label="旅行费用账本"><p role="status">正在载入费用账本…</p></section><details><summary>行前预算与原有同步记录</summary><div class="budget-grid"><div class="budget-list" id="budgetList"></div><div class="total-box"><div class="eyebrow">Trip Budget</div><div class="big" id="budgetTotal">—</div><p id="budgetNote"></p></div></div></details></div>
     <div class="panel" id="panel-todos"><div class="todo-grid" id="todoGroups"></div></div>
     <div class="panel" id="panel-memories"><section id="photoAlbum" class="photo-album"><h3>添加我们的照片</h3><p>登录后，按日期添加我们的照片。</p><p data-photo-status role="status">登录后可查看和上传私人照片</p><form hidden><label>照片<input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" required></label><label>放在哪里<select aria-label="照片日期"><option value="cover">旅行封面</option></select></label><label>一句描述<input type="text" maxlength="300" placeholder="这一刻，想记住什么"></label><button type="submit">上传照片</button><small>自动压缩，最多 24 张；最新封面会显示在页面顶部。</small></form><button type="button" data-photo-refresh hidden>刷新相册</button><div data-photo-gallery class="photo-gallery"></div></section><div class="journal-shortcuts"><button type="button" data-jump-panel="budget">旅行账本</button><a href="#photoAlbum">添加照片</a></div><section id="tripJournal" aria-label="八天完整游记"><p role="status">正在载入完整游记…</p></section><div class="memory-grid" id="memoryGrid"></div></div>
@@ -91,6 +91,6 @@
 
 <nav class="mobile-nav" aria-label="手机工作区导航"><button class="active" data-action="overview">首页</button><button data-panel="itinerary">行程</button><button data-panel="budget">预算</button><button data-panel="packing">清单</button><button data-panel="memories">回忆</button></nav>
 <script type="module" src="../../journal.mjs?v=20261012-r5"></script>
-<script src="../../app.js?v=20261012-r4" defer></script>
+<script src="../../app.js?v=20261013-r1" defer></script>
 </body>
 </html>
